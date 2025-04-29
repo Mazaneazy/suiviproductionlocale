@@ -32,12 +32,12 @@ const AddDossierDialog = ({
       <DialogTrigger asChild>
         <Button className="bg-certif-green hover:bg-certif-green/90">
           <PlusCircle className="mr-2" size={16} />
-          Nouveau dossier
+          Nouveau dossier de certification
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Ajouter un nouveau dossier</DialogTitle>
+          <DialogTitle>Ajouter un nouveau dossier de certification</DialogTitle>
         </DialogHeader>
         <DossierForm
           newDossier={newDossier}
