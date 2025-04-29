@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useData } from '../contexts/DataContext';
 import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
@@ -29,9 +29,10 @@ import {
   DialogClose,
 } from '../components/ui/dialog';
 import { Badge } from '../components/ui/badge';
-import { CreditCard, PlusCircle, Check, X } from 'lucide-react';
+import { CreditCard, PlusCircle, Check, X, Upload, Mail, FileText } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../contexts/AuthContext';
+import { NoteFrais } from '../types';
 
 const NotesFrais = () => {
   const { notesFrais, dossiers, addNoteFrais, updateNoteFrais } = useData();
@@ -40,6 +41,10 @@ const NotesFrais = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('tous');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [selectedNote, setSelectedNote] = useState<NoteFrais | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // État pour la nouvelle note de frais
   const [newNoteFrais, setNewNoteFrais] = useState({
@@ -50,8 +55,11 @@ const NotesFrais = () => {
     hebergement: 0,
     restauration: 0,
     indemnites: 0,
-    status: 'en_attente',
-    commentaire: ''
+    status: 'en_attente' as 'en_attente' | 'validee' | 'rejetee',
+    commentaire: '',
+    fichierUrl: '',
+    notificationEnvoyee: false,
+    operateurNotifie: false
   });
 
   // Filtrer les notes de frais en fonction des critères de recherche
@@ -84,6 +92,42 @@ const NotesFrais = () => {
     }
   };
 
+  // Fonction pour gérer l'upload de fichier
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setUploadedFile(file);
+      toast({
+        title: "Fichier sélectionné",
+        description: `${file.name} a été sélectionné.`,
+      });
+    }
+  };
+
+  // Fonction pour simuler l'envoi d'une notification par email
+  const handleSendNotification = (noteId: string) => {
+    updateNoteFrais(noteId, { 
+      notificationEnvoyee: true 
+    });
+    
+    toast({
+      title: "Notification envoyée",
+      description: "L'opérateur a été notifié de sa note de frais.",
+    });
+  };
+
+  // Fonction pour marquer comme notifié
+  const handleMarkAsNotified = (noteId: string) => {
+    updateNoteFrais(noteId, { 
+      operateurNotifie: true 
+    });
+    
+    toast({
+      title: "Confirmation reçue",
+      description: "L'opérateur a confirmé la réception de sa note de frais.",
+    });
+  };
+
   // Fonction pour ajouter une nouvelle note de frais
   const handleAddNoteFrais = () => {
     // Vérifier que tous les champs obligatoires sont remplis
@@ -96,7 +140,23 @@ const NotesFrais = () => {
       return;
     }
 
-    addNoteFrais(newNoteFrais);
+    // Simuler l'upload du fichier (dans une vraie application, cela serait fait vers un service de stockage)
+    let fichierUrl = '';
+    if (uploadedFile) {
+      // Dans une vraie application, nous téléchargerions le fichier vers un serveur
+      // et obtiendrions une URL. Ici, nous simulons simplement cette URL
+      fichierUrl = URL.createObjectURL(uploadedFile);
+    }
+
+    const noteFraisToAdd = {
+      ...newNoteFrais,
+      fichierUrl,
+      notificationEnvoyee: false,
+      operateurNotifie: false
+    };
+
+    addNoteFrais(noteFraisToAdd);
+    
     toast({
       title: "Note de frais ajoutée",
       description: "La note de frais a été créée avec succès.",
@@ -111,9 +171,16 @@ const NotesFrais = () => {
       hebergement: 0,
       restauration: 0,
       indemnites: 0,
-      status: 'en_attente',
-      commentaire: ''
+      status: 'en_attente' as 'en_attente' | 'validee' | 'rejetee',
+      commentaire: '',
+      fichierUrl: '',
+      notificationEnvoyee: false,
+      operateurNotifie: false
     });
+    setUploadedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     
     setDialogOpen(false);
   };
@@ -169,10 +236,23 @@ const NotesFrais = () => {
     return note.deplacement + note.hebergement + note.restauration + note.indemnites;
   };
 
+  // Afficher les détails d'une note
+  const handleShowDetails = (note: NoteFrais) => {
+    setSelectedNote(note);
+    setDetailDialogOpen(true);
+  };
+
   return (
     <Layout>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-certif-blue">Notes de frais</h1>
+        <div className="flex items-center">
+          <img 
+            src="/lovable-uploads/e1bf7151-3abe-4c2a-8037-71e791d77bf9.png" 
+            alt="ANOR Logo" 
+            className="h-14 mr-4" 
+          />
+          <h1 className="text-3xl font-bold text-certif-blue">Notes de frais</h1>
+        </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-certif-blue hover:bg-certif-blue/90">
@@ -290,6 +370,24 @@ const NotesFrais = () => {
                   className="col-span-3"
                 />
               </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="fichier" className="text-right font-medium text-sm">
+                  Document
+                </label>
+                <div className="col-span-3">
+                  <Input
+                    id="fichier"
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*,.pdf"
+                    className="col-span-3"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Formats acceptés: PDF, JPG, PNG (max 5 MB)
+                  </p>
+                </div>
+              </div>
             </div>
             <DialogFooter>
               <DialogClose asChild>
@@ -339,6 +437,7 @@ const NotesFrais = () => {
                 <TableHead className="text-right">Indemnités</TableHead>
                 <TableHead className="text-right">Total</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Notification</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -363,6 +462,17 @@ const NotesFrais = () => {
                         </Badge>
                       </TableCell>
                       <TableCell>
+                        {note.notificationEnvoyee ? (
+                          note.operateurNotifie ? (
+                            <Badge className="bg-green-500 text-white">Reçue</Badge>
+                          ) : (
+                            <Badge className="bg-yellow-500 text-white">Envoyée</Badge>
+                          )
+                        ) : (
+                          <Badge className="bg-gray-400 text-white">Non envoyée</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
                         <div className="flex space-x-2">
                           {note.status === 'en_attente' && currentUser?.role === 'comptable' && (
                             <>
@@ -384,7 +494,33 @@ const NotesFrais = () => {
                               </Button>
                             </>
                           )}
-                          <Button variant="outline" size="sm">
+                          {note.status === 'validee' && !note.notificationEnvoyee && (
+                            <Button 
+                              variant="outline" 
+                              size="icon"
+                              className="h-8 w-8 text-blue-500 hover:text-blue-700"
+                              onClick={() => handleSendNotification(note.id)}
+                              title="Envoyer une notification"
+                            >
+                              <Mail size={16} />
+                            </Button>
+                          )}
+                          {note.notificationEnvoyee && !note.operateurNotifie && (
+                            <Button 
+                              variant="outline" 
+                              size="icon"
+                              className="h-8 w-8 text-green-500 hover:text-green-700"
+                              onClick={() => handleMarkAsNotified(note.id)}
+                              title="Marquer comme notifié"
+                            >
+                              <Check size={16} />
+                            </Button>
+                          )}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleShowDetails(note)}
+                          >
                             Détails
                           </Button>
                         </div>
@@ -394,7 +530,7 @@ const NotesFrais = () => {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={9} className="h-24 text-center">
+                  <TableCell colSpan={10} className="h-24 text-center">
                     Aucune note de frais trouvée
                   </TableCell>
                 </TableRow>
@@ -403,6 +539,82 @@ const NotesFrais = () => {
           </Table>
         </div>
       </div>
+
+      {/* Dialog for note details */}
+      <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Détails de la note de frais</DialogTitle>
+          </DialogHeader>
+          {selectedNote && (
+            <div className="py-4">
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Opérateur</p>
+                  <p>{dossiers.find(d => d.id === selectedNote.dossierId)?.operateurNom}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Date</p>
+                  <p>{new Date(selectedNote.dateCreation).toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Statut</p>
+                  <Badge className={getStatusColor(selectedNote.status)}>
+                    {formatStatus(selectedNote.status)}
+                  </Badge>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Total</p>
+                  <p className="font-bold">{calculerTotal(selectedNote).toFixed(2)} €</p>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200 pt-4 mb-4">
+                <h3 className="font-medium mb-2">Détails des frais</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <p className="text-sm">Déplacement:</p>
+                  <p className="text-sm text-right">{selectedNote.deplacement.toFixed(2)} €</p>
+                  <p className="text-sm">Hébergement:</p>
+                  <p className="text-sm text-right">{selectedNote.hebergement.toFixed(2)} €</p>
+                  <p className="text-sm">Restauration:</p>
+                  <p className="text-sm text-right">{selectedNote.restauration.toFixed(2)} €</p>
+                  <p className="text-sm">Indemnités:</p>
+                  <p className="text-sm text-right">{selectedNote.indemnites.toFixed(2)} €</p>
+                </div>
+              </div>
+
+              {selectedNote.commentaire && (
+                <div className="border-t border-gray-200 pt-4 mb-4">
+                  <h3 className="font-medium mb-2">Commentaire</h3>
+                  <p className="text-sm">{selectedNote.commentaire}</p>
+                </div>
+              )}
+
+              {selectedNote.fichierUrl && (
+                <div className="border-t border-gray-200 pt-4">
+                  <h3 className="font-medium mb-2">Document joint</h3>
+                  <div className="flex items-center">
+                    <FileText size={20} className="mr-2 text-blue-500" />
+                    <a 
+                      href={selectedNote.fichierUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-500 underline"
+                    >
+                      Voir le document
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button>Fermer</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };

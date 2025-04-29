@@ -31,6 +31,9 @@ export interface NoteFrais {
   indemnites: number;
   status: 'en_attente' | 'validee' | 'rejetee';
   commentaire?: string;
+  fichierUrl?: string;
+  notificationEnvoyee?: boolean;
+  operateurNotifie?: boolean;
 }
 
 export interface Inspection {
