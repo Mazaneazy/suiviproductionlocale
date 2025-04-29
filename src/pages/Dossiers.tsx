@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import Layout from '../components/Layout';
@@ -31,6 +30,7 @@ import {
 import { Badge } from '../components/ui/badge';
 import { FileText, AlertCircle, CheckCircle, Clock, PlusCircle } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import { Dossier } from '../types';
 
 const Dossiers = () => {
   const { dossiers, addDossier } = useData();
@@ -39,13 +39,13 @@ const Dossiers = () => {
   const [statusFilter, setStatusFilter] = useState('tous');
   const [dialogOpen, setDialogOpen] = useState(false);
   
-  // État pour le nouveau dossier
-  const [newDossier, setNewDossier] = useState({
+  // État pour le nouveau dossier - Fix the status property to use the correct type
+  const [newDossier, setNewDossier] = useState<Omit<Dossier, 'id'>>({
     operateurNom: '',
     typeProduit: '',
     responsable: 'Gestionnaire',
     dateTransmission: new Date().toISOString().split('T')[0],
-    status: 'en_attente',
+    status: 'en_attente', // This is now properly typed as one of the allowed values
     delai: 30,
     dateButoir: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
   });
@@ -66,7 +66,7 @@ const Dossiers = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    // Si le délai est modifié, recalculer la date butoir
+    // If the délai is modified, recalculate the date butoir
     if (name === 'delai') {
       const delaiValue = parseInt(value) || 0;
       const dateTransmission = new Date(newDossier.dateTransmission);
@@ -79,7 +79,7 @@ const Dossiers = () => {
         dateButoir: dateButoir.toISOString().split('T')[0],
       });
     }
-    // Si la date de transmission est modifiée, recalculer la date butoir
+    // If the date de transmission is modified, recalculate the date butoir
     else if (name === 'dateTransmission') {
       const dateTransmission = new Date(value);
       const dateButoir = new Date(dateTransmission);
@@ -110,14 +110,14 @@ const Dossiers = () => {
       });
       return;
     }
-
+    
     addDossier(newDossier);
     toast({
       title: "Dossier ajouté",
       description: `Le dossier pour "${newDossier.operateurNom}" a été créé avec succès.`,
     });
     
-    // Réinitialiser le formulaire
+    // Reset the form
     setNewDossier({
       operateurNom: '',
       typeProduit: '',
@@ -262,7 +262,9 @@ const Dossiers = () => {
                 </label>
                 <Select
                   value={newDossier.status}
-                  onValueChange={(value) => setNewDossier({ ...newDossier, status: value })}
+                  onValueChange={(value: "complet" | "en_attente" | "rejete" | "en_cours" | "certifie") => 
+                    setNewDossier({ ...newDossier, status: value })
+                  }
                 >
                   <SelectTrigger className="col-span-3">
                     <SelectValue placeholder="Sélectionner un statut" />
@@ -272,6 +274,7 @@ const Dossiers = () => {
                     <SelectItem value="complet">Complet</SelectItem>
                     <SelectItem value="en_cours">En cours</SelectItem>
                     <SelectItem value="rejete">Rejeté</SelectItem>
+                    <SelectItem value="certifie">Certifié</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
