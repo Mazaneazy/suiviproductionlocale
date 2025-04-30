@@ -40,25 +40,25 @@ const App = () => (
               } />
 
               <Route path="/dossiers" element={
-                <ProtectedRoute allowedRoles={['admin', 'gestionnaire']}>
+                <ProtectedRoute moduleName="dossiers">
                   <Dossiers />
                 </ProtectedRoute>
               } />
 
               <Route path="/notes-frais" element={
-                <ProtectedRoute allowedRoles={['admin', 'comptable', 'inspecteur']}>
+                <ProtectedRoute moduleName="notes-frais">
                   <NotesFrais />
                 </ProtectedRoute>
               } />
 
               <Route path="/inspections" element={
-                <ProtectedRoute allowedRoles={['admin', 'inspecteur', 'gestionnaire']}>
+                <ProtectedRoute moduleName="inspections">
                   <Inspections />
                 </ProtectedRoute>
               } />
 
               <Route path="/certificats" element={
-                <ProtectedRoute allowedRoles={['admin', 'certificateur']}>
+                <ProtectedRoute moduleName="certificats">
                   <Certificats />
                 </ProtectedRoute>
               } />

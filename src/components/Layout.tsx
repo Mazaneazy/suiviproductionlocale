@@ -28,7 +28,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { currentUser, logout, hasRole } = useAuth();
+  const { currentUser, logout, hasAccess } = useAuth();
   const { notifications, markNotificationAsRead, getUnreadNotificationsCount } = useData();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -52,20 +52,28 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const unreadCount = getUnreadNotificationsCount();
 
-  // Déterminer les liens de navigation en fonction du rôle
+  // Définir les liens de navigation avec les modules associés
   const navLinks = [
-    { to: '/dashboard', icon: <Home size={20} />, label: 'Tableau de bord', roles: ['admin', 'gestionnaire', 'inspecteur', 'comptable', 'certificateur'] },
-    { to: '/dossiers', icon: <FileText size={20} />, label: 'Transmission dossier', roles: ['admin', 'gestionnaire'] },
-    { to: '/notes-frais', icon: <CreditCard size={20} />, label: 'Notes de frais', roles: ['admin', 'comptable', 'inspecteur'] },
-    { to: '/inspections', icon: <ClipboardCheck size={20} />, label: 'Inspections', roles: ['admin', 'inspecteur', 'gestionnaire'] },
-    { to: '/certificats', icon: <FileCheck size={20} />, label: 'Certificats', roles: ['admin', 'certificateur'] },
-    { to: '/statistiques', icon: <BarChart size={20} />, label: 'Statistiques', roles: ['admin'] },
+    { to: '/dashboard', icon: <Home size={20} />, label: 'Tableau de bord', module: null }, // Accessible à tous
+    { to: '/dossiers', icon: <FileText size={20} />, label: 'Dossiers', module: 'dossiers' },
+    { to: '/notes-frais', icon: <CreditCard size={20} />, label: 'Notes de frais', module: 'notes-frais' },
+    { to: '/inspections', icon: <ClipboardCheck size={20} />, label: 'Inspections', module: 'inspections' },
+    { to: '/certificats', icon: <FileCheck size={20} />, label: 'Certificats', module: 'certificats' },
+    { to: '/statistiques', icon: <BarChart size={20} />, label: 'Statistiques', module: 'statistiques' },
   ];
 
-  // Filtrer les liens en fonction du rôle de l'utilisateur
+  // Filtrer les liens selon les droits d'accès de l'utilisateur
   const filteredNavLinks = navLinks.filter(link => 
-    link.roles.some(role => hasRole(role as any))
+    link.module === null || hasAccess(link.module)
   );
+
+  // Adapter le titre du lien Dossier selon le rôle de l'utilisateur
+  const adaptLinkLabels = (link: any) => {
+    if (link.to === '/dossiers' && currentUser?.role === 'acceuil') {
+      return 'Réception des dossiers';
+    }
+    return link.label;
+  };
 
   return (
     <div className="min-h-screen bg-certif-lightgray flex flex-col">
@@ -97,7 +105,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         {link.icon}
-                        <span>{link.label}</span>
+                        <span>{adaptLinkLabels(link)}</span>
                       </Link>
                     ))}
                   </nav>
@@ -200,7 +208,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 className="flex items-center space-x-2 py-2 px-3 rounded-md hover:bg-gray-100 transition-colors"
               >
                 {link.icon}
-                <span>{link.label}</span>
+                <span>{adaptLinkLabels(link)}</span>
               </Link>
             ))}
           </nav>
