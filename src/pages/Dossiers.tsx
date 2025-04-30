@@ -18,6 +18,8 @@ const Dossiers = () => {
   // État pour le nouveau dossier
   const [newDossier, setNewDossier] = useState<Omit<Dossier, 'id'>>({
     operateurNom: '',
+    promoteurNom: '',
+    telephone: '',
     typeProduit: '',
     responsable: 'Gestionnaire',
     dateTransmission: new Date().toISOString().split('T')[0],
@@ -49,6 +51,8 @@ const Dossiers = () => {
     // Reset the form
     setNewDossier({
       operateurNom: '',
+      promoteurNom: '',
+      telephone: '',
       typeProduit: '',
       responsable: 'Gestionnaire',
       dateTransmission: new Date().toISOString().split('T')[0],

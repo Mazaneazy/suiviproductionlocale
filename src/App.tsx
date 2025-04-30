@@ -16,6 +16,7 @@ import NotesFrais from "./pages/NotesFrais";
 import Inspections from "./pages/Inspections";
 import Certificats from "./pages/Certificats";
 import Accueil from "./pages/Accueil";
+import ResponsableTechnique from "./pages/ResponsableTechnique";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 
@@ -54,7 +55,7 @@ const App = () => (
 
               <Route path="/responsable-technique" element={
                 <ProtectedRoute moduleName="responsable-technique">
-                  <NotFound /> {/* We'll implement this later */}
+                  <ResponsableTechnique />
                 </ProtectedRoute>
               } />
 

@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useContext } from 'react';
-import { Dossier, NoteFrais, Inspection, Certificat, Notification, Statistique } from '../types';
+import { Dossier, NoteFrais, Inspection, Certificat, Notification, Statistique, DocumentDossier } from '../types';
 import { DataContextProps } from './data/types';
 import { MOCK_DOSSIERS, MOCK_NOTES_FRAIS, MOCK_INSPECTIONS, MOCK_CERTIFICATS, MOCK_NOTIFICATIONS } from './data/mockData';
 import { generateId, calculateStatistics } from './data/utils';
@@ -27,7 +27,11 @@ const DataContext = createContext<DataContextProps>({
   updateInspection: () => {},
   addCertificat: () => {},
   updateCertificat: () => {},
+  addDocument: () => {},
+  removeDocument: () => {},
+  updateDocument: () => {},
   getDossierById: () => undefined,
+  getDocumentsByDossierId: () => [],
   getNoteFraisByDossierId: () => [],
   getInspectionsByDossierId: () => [],
   getCertificatByDossierId: () => undefined,
@@ -42,6 +46,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [inspections, setInspections] = useState<Inspection[]>(MOCK_INSPECTIONS);
   const [certificats, setCertificats] = useState<Certificat[]>(MOCK_CERTIFICATS);
   const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
+  const [documents, setDocuments] = useState<DocumentDossier[]>([]);
   const [statistiques, setStatistiques] = useState<Statistique>(calculateStatistics(MOCK_DOSSIERS));
 
   const addDossier = (dossier: Omit<Dossier, 'id'>) => {
@@ -94,8 +99,27 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ));
   };
 
+  const addDocument = (document: Omit<DocumentDossier, 'id'>) => {
+    const newDocument = { ...document, id: generateId(), status: 'en_attente' };
+    setDocuments([...documents, newDocument]);
+  };
+
+  const removeDocument = (id: string) => {
+    setDocuments(documents.filter(doc => doc.id !== id));
+  };
+
+  const updateDocument = (id: string, data: Partial<DocumentDossier>) => {
+    setDocuments(documents.map(doc => 
+      doc.id === id ? { ...doc, ...data } : doc
+    ));
+  };
+
   const getDossierById = (id: string) => {
     return dossiers.find(dossier => dossier.id === id);
+  };
+
+  const getDocumentsByDossierId = (dossierId: string) => {
+    return documents.filter(doc => doc.dossierId === dossierId);
   };
 
   const getNoteFraisByDossierId = (dossierId: string) => {
@@ -140,7 +164,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updateInspection,
       addCertificat,
       updateCertificat,
+      addDocument,
+      removeDocument,
+      updateDocument,
       getDossierById,
+      getDocumentsByDossierId,
       getNoteFraisByDossierId,
       getInspectionsByDossierId,
       getCertificatByDossierId,

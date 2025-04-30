@@ -31,6 +31,8 @@ export interface DocumentDossier {
   nom: string;
   url: string;
   dateUpload: string;
+  status?: 'valide' | 'rejete' | 'en_attente';
+  commentaire?: string;
 }
 
 export interface NoteFrais {
@@ -47,6 +49,12 @@ export interface NoteFrais {
   fichierUrl?: string;
   notificationEnvoyee?: boolean;
   operateurNotifie?: boolean;
+  fraisGestion?: number;
+  fraisInspection?: number;
+  fraisAnalyses?: number;
+  fraisSurveillance?: number;
+  total?: number;
+  validePar?: string;
 }
 
 export interface Inspection {

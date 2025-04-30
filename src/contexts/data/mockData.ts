@@ -6,6 +6,8 @@ export const MOCK_DOSSIERS: Dossier[] = [
   {
     id: '1',
     operateurNom: 'SABC (Société Anonyme des Brasseries du Cameroun)',
+    promoteurNom: 'Jean Ndongo',
+    telephone: '+237 655 123 456',
     typeProduit: 'Boissons gazeuses',
     dateTransmission: '2025-03-15',
     responsable: 'Gestionnaire',
@@ -16,6 +18,8 @@ export const MOCK_DOSSIERS: Dossier[] = [
   {
     id: '2',
     operateurNom: 'SOSUCAM (Société Sucrière du Cameroun)',
+    promoteurNom: 'Marie Mbala',
+    telephone: '+237 677 234 567',
     typeProduit: 'Sucre raffiné',
     dateTransmission: '2025-02-28',
     responsable: 'Gestionnaire',
@@ -26,6 +30,8 @@ export const MOCK_DOSSIERS: Dossier[] = [
   {
     id: '3',
     operateurNom: 'CICAM (Cotonnière Industrielle du Cameroun)',
+    promoteurNom: 'Paul Biya',
+    telephone: '+237 699 345 678',
     typeProduit: 'Textile',
     dateTransmission: '2025-01-20',
     responsable: 'Gestionnaire',
@@ -36,6 +42,8 @@ export const MOCK_DOSSIERS: Dossier[] = [
   {
     id: '4',
     operateurNom: 'CIMENCAM (Cimenteries du Cameroun)',
+    promoteurNom: 'Sarah Ekolo',
+    telephone: '+237 655 456 789',
     typeProduit: 'Ciment',
     dateTransmission: '2025-03-05',
     responsable: 'Gestionnaire',
@@ -46,6 +54,8 @@ export const MOCK_DOSSIERS: Dossier[] = [
   {
     id: '5',
     operateurNom: 'CHOCOCAM (Chocolaterie et Confiserie du Cameroun)',
+    promoteurNom: 'Pierre Kamdem',
+    telephone: '+237 677 567 890',
     typeProduit: 'Chocolats et confiseries',
     dateTransmission: '2025-03-10',
     responsable: 'Gestionnaire',
@@ -56,6 +66,8 @@ export const MOCK_DOSSIERS: Dossier[] = [
   {
     id: '6',
     operateurNom: 'ALUCAM (Aluminium du Cameroun)',
+    promoteurNom: 'Eric Mboma',
+    telephone: '+237 699 678 901',
     typeProduit: 'Aluminium',
     dateTransmission: '2025-02-15',
     responsable: 'Gestionnaire',
@@ -66,6 +78,8 @@ export const MOCK_DOSSIERS: Dossier[] = [
   {
     id: '7',
     operateurNom: 'PAMOL Plantations',
+    promoteurNom: 'Sophie Manga',
+    telephone: '+237 655 789 012',
     typeProduit: 'Huile de palme',
     dateTransmission: '2025-01-25',
     responsable: 'Gestionnaire',
@@ -76,6 +90,8 @@ export const MOCK_DOSSIERS: Dossier[] = [
   {
     id: '8',
     operateurNom: 'SODECOTON (Société de Développement du Coton)',
+    promoteurNom: 'Michel Atangana',
+    telephone: '+237 677 890 123',
     typeProduit: 'Coton',
     dateTransmission: '2025-02-10',
     responsable: 'Gestionnaire',
@@ -86,6 +102,8 @@ export const MOCK_DOSSIERS: Dossier[] = [
   {
     id: '9',
     operateurNom: 'SEMC (Société des Eaux Minérales du Cameroun)',
+    promoteurNom: 'Claudine Ndom',
+    telephone: '+237 699 901 234',
     typeProduit: 'Eau minérale',
     dateTransmission: '2025-03-01',
     responsable: 'Gestionnaire',
@@ -96,6 +114,8 @@ export const MOCK_DOSSIERS: Dossier[] = [
   {
     id: '10',
     operateurNom: 'MAÏSCAM (Société Maïserie du Cameroun)',
+    promoteurNom: 'Jacques Etoga',
+    telephone: '+237 655 012 345',
     typeProduit: 'Farine de maïs',
     dateTransmission: '2025-02-20',
     responsable: 'Gestionnaire',

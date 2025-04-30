@@ -18,6 +18,7 @@ export interface DataContextProps {
   updateCertificat: (id: string, data: Partial<Certificat>) => void;
   addDocument: (document: Omit<DocumentDossier, 'id'>) => void;
   removeDocument: (id: string) => void;
+  updateDocument: (id: string, data: Partial<DocumentDossier>) => void;
   getDossierById: (id: string) => Dossier | undefined;
   getDocumentsByDossierId: (dossierId: string) => DocumentDossier[];
   getNoteFraisByDossierId: (dossierId: string) => NoteFrais[];
