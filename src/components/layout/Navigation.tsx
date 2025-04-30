@@ -13,11 +13,11 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onItemClick }) 
   const { currentUser, hasAccess } = useAuth();
   const location = useLocation();
 
-  // Définir les liens de navigation avec les modules associés
+  // Définir les liens de navigation avec les modules associés et les titres spécifiques par rôle
   const navLinks = [
     { to: '/dashboard', icon: <Home size={20} />, label: 'Tableau de bord', module: null }, // Accessible à tous
-    { to: '/accueil', icon: <FileText size={20} />, label: 'Accueil', module: 'acceuil' },
-    { to: '/dossiers', icon: <FileText size={20} />, label: 'Dossiers', module: 'dossiers' },
+    { to: '/accueil', icon: <FileText size={20} />, label: 'Poste d\'Accueil', module: 'acceuil' },
+    { to: '/dossiers', icon: <FileText size={20} />, label: 'Dossiers en cours', module: 'dossiers' },
     { to: '/notes-frais', icon: <CreditCard size={20} />, label: 'Notes de frais', module: 'notes-frais' },
     { to: '/inspections', icon: <ClipboardCheck size={20} />, label: 'Inspections', module: 'inspections' },
     { to: '/certificats', icon: <FileCheck size={20} />, label: 'Certificats', module: 'certificats' },
@@ -30,11 +30,23 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onItemClick }) 
     link.module === null || hasAccess(link.module)
   );
 
-  // Adapter le titre du lien Dossier selon le rôle de l'utilisateur
+  // Adapter le titre du lien selon le rôle de l'utilisateur
   const adaptLinkLabels = (link: any) => {
-    if (link.to === '/dossiers' && currentUser?.role === 'acceuil') {
-      return 'Réception des dossiers';
+    const roleTitles: Record<string, Record<string, string>> = {
+      'acceuil': { '/accueil': 'Poste d\'Accueil' },
+      'inspecteur': { '/inspections': 'Chef des Inspections' },
+      'comptable': { '/notes-frais': 'Responsable Notes de Frais' },
+      'analyste': { '/statistiques': 'Chargé du reporting' },
+      'certificats': { '/certificats': 'Délivrance des Certificats' },
+      'chef_mission': { '/inspections': 'Chef de Mission d\'Inspection' },
+      'directeur': { '/certificats': 'Directeur Evaluation Conformité' },
+      'directeur_general': { '/dashboard': 'Direction Générale ANOR' },
+    };
+
+    if (currentUser?.role && roleTitles[currentUser.role] && roleTitles[currentUser.role][link.to]) {
+      return roleTitles[currentUser.role][link.to];
     }
+
     return link.label;
   };
 

@@ -19,6 +19,7 @@ import Accueil from "./pages/Accueil";
 import ResponsableTechnique from "./pages/ResponsableTechnique";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
+import Statistiques from "./pages/Statistiques";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,12 @@ const App = () => (
               <Route path="/certificats" element={
                 <ProtectedRoute moduleName="certificats">
                   <Certificats />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/statistiques" element={
+                <ProtectedRoute moduleName="statistiques">
+                  <Statistiques />
                 </ProtectedRoute>
               } />
 

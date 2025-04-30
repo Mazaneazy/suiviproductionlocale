@@ -75,6 +75,11 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({ dossier, onNoteFraisCre
     onNoteFraisCreated();
   };
   
+  // Formatter les montants en FCFA
+  const formatMontant = (montant: number) => {
+    return montant.toLocaleString() + ' FCFA';
+  };
+  
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -115,6 +120,7 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({ dossier, onNoteFraisCre
                 value={noteFrais.fraisGestion}
                 onChange={handleChange}
               />
+              <p className="text-xs text-gray-500">{formatMontant(noteFrais.fraisGestion)}</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="fraisInspection">Inspection et échantillonnage (FCFA)</Label>
@@ -125,6 +131,7 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({ dossier, onNoteFraisCre
                 value={noteFrais.fraisInspection}
                 onChange={handleChange}
               />
+              <p className="text-xs text-gray-500">{formatMontant(noteFrais.fraisInspection)}</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="fraisAnalyses">Analyses et essais (FCFA)</Label>
@@ -135,6 +142,7 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({ dossier, onNoteFraisCre
                 value={noteFrais.fraisAnalyses}
                 onChange={handleChange}
               />
+              <p className="text-xs text-gray-500">{formatMontant(noteFrais.fraisAnalyses)}</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="fraisSurveillance">Surveillance (FCFA)</Label>
@@ -145,12 +153,13 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({ dossier, onNoteFraisCre
                 value={noteFrais.fraisSurveillance}
                 onChange={handleChange}
               />
+              <p className="text-xs text-gray-500">{formatMontant(noteFrais.fraisSurveillance)}</p>
             </div>
           </div>
           
           <div className="p-4 bg-gray-100 rounded-lg flex justify-between items-center">
             <span className="font-medium">Total:</span>
-            <span className="font-bold text-lg">{total.toLocaleString()} FCFA</span>
+            <span className="font-bold text-lg">{formatMontant(total)}</span>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
-export type UserRole = 'admin' | 'acceuil' | 'inspecteur' | 'analyste' | 'surveillant' | 'comptable' | 'directeur' | 'responsable_technique' | 'chef_mission';
+
+export type UserRole = 'admin' | 'acceuil' | 'inspecteur' | 'analyste' | 'surveillant' | 'comptable' | 'directeur' | 'responsable_technique' | 'chef_mission' | 'certificats' | 'directeur_general';
 
 export interface User {
   id: string;
@@ -66,6 +67,9 @@ export interface Inspection {
   resultat: 'conforme' | 'non_conforme' | 'en_attente';
   recommandations?: string;
   actionsCorrectives?: string;
+  rapportUrl?: string;
+  avisResponsableTechnique?: 'favorable' | 'defavorable' | 'en_attente';
+  commentaireResponsableTechnique?: string;
 }
 
 export interface Certificat {

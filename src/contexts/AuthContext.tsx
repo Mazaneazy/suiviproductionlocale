@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { User, UserRole } from '../types';
 
@@ -22,14 +23,15 @@ const AuthContext = createContext<AuthContextProps>({
 // Mock users for demo purposes
 const MOCK_USERS: User[] = [
   { id: '1', name: 'Admin', email: 'admin@certif.com', role: 'admin', avatar: '' },
-  { id: '2', name: 'Acceuil', email: 'acceuil@certif.com', role: 'acceuil', avatar: '' },
-  { id: '3', name: 'Inspecteur', email: 'inspecteur@certif.com', role: 'inspecteur', avatar: '' },
-  { id: '4', name: 'Comptable', email: 'comptable@certif.com', role: 'comptable', avatar: '' },
-  { id: '5', name: 'Analyste', email: 'analyste@certif.com', role: 'analyste', avatar: '' },
-  { id: '6', name: 'Surveillant', email: 'surveillant@certif.com', role: 'surveillant', avatar: '' },
-  { id: '7', name: 'Directeur', email: 'directeur@certif.com', role: 'directeur', avatar: '' },
+  { id: '2', name: 'Poste d\'Accueil', email: 'acceuil@certif.com', role: 'acceuil', avatar: '' },
+  { id: '3', name: 'Chef des Inspections', email: 'inspecteur@certif.com', role: 'inspecteur', avatar: '' },
+  { id: '4', name: 'Responsable Notes de Frais', email: 'comptable@certif.com', role: 'comptable', avatar: '' },
+  { id: '5', name: 'Chargé du reporting', email: 'analyste@certif.com', role: 'analyste', avatar: '' },
+  { id: '6', name: 'Chef de Mission d\'Inspection', email: 'chef_mission@certif.com', role: 'chef_mission', avatar: '' },
+  { id: '7', name: 'Directeur Evaluation Conformité', email: 'directeur@certif.com', role: 'directeur', avatar: '' },
   { id: '8', name: 'Responsable Technique', email: 'technique@certif.com', role: 'responsable_technique', avatar: '' },
-  { id: '9', name: 'Chef de Mission', email: 'chef_mission@certif.com', role: 'chef_mission', avatar: '' },
+  { id: '9', name: 'Délivrance des Certificats', email: 'certificats@certif.com', role: 'certificats', avatar: '' },
+  { id: '10', name: 'Directeur Général ANOR', email: 'dg@certif.com', role: 'directeur_general', avatar: '' },
 ];
 
 // Définir les accès par module pour chaque rôle
@@ -37,12 +39,13 @@ const ROLE_ACCESS_MAP: Record<string, string[]> = {
   'admin': ['dossiers', 'notes-frais', 'inspections', 'certificats', 'statistiques', 'acceuil', 'responsable-technique'],
   'acceuil': ['dossiers', 'acceuil'],
   'comptable': ['notes-frais'],
-  'inspecteur': ['inspections', 'notes-frais'],
-  'analyste': ['dossiers', 'inspections'],
-  'surveillant': ['inspections'],
+  'inspecteur': ['inspections'],
+  'analyste': ['statistiques'],
+  'chef_mission': ['inspections', 'dossiers'],
   'directeur': ['dossiers', 'notes-frais', 'certificats', 'statistiques'],
-  'responsable_technique': ['dossiers', 'notes-frais', 'responsable-technique'],
-  'chef_mission': ['dossiers', 'inspections'],
+  'responsable_technique': ['dossiers', 'notes-frais', 'responsable-technique', 'inspections'],
+  'certificats': ['certificats', 'dossiers'],
+  'directeur_general': ['dossiers', 'notes-frais', 'inspections', 'certificats', 'statistiques', 'acceuil', 'responsable-technique'],
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -83,14 +86,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!currentUser) return false;
     
     if (Array.isArray(role)) {
-      return role.includes(currentUser.role as UserRole) || currentUser.role === 'admin';
+      return role.includes(currentUser.role as UserRole) || currentUser.role === 'admin' || currentUser.role === 'directeur_general';
     }
-    return currentUser.role === role || currentUser.role === 'admin';
+    return currentUser.role === role || currentUser.role === 'admin' || currentUser.role === 'directeur_general';
   };
 
   const hasAccess = (module: string): boolean => {
     if (!currentUser) return false;
-    if (currentUser.role === 'admin') return true;
+    if (currentUser.role === 'admin' || currentUser.role === 'directeur_general') return true;
     
     const allowedModules = ROLE_ACCESS_MAP[currentUser.role] || [];
     return allowedModules.includes(module);
