@@ -1,5 +1,4 @@
-
-export type UserRole = 'admin' | 'acceuil' | 'inspecteur' | 'analyste' | 'surveillant' | 'comptable' | 'directeur';
+export type UserRole = 'admin' | 'acceuil' | 'inspecteur' | 'analyste' | 'surveillant' | 'comptable' | 'directeur' | 'responsable_technique' | 'chef_mission';
 
 export interface User {
   id: string;
@@ -12,12 +11,26 @@ export interface User {
 export interface Dossier {
   id: string;
   operateurNom: string;
+  promoteurNom: string;
+  telephone: string;
   typeProduit: string;
   dateTransmission: string;
   responsable: string;
-  status: 'complet' | 'en_attente' | 'rejete' | 'en_cours' | 'certifie';
+  status: 'complet' | 'en_attente' | 'rejete' | 'en_cours' | 'certifie' | 'a_corriger';
   delai: number; // délai en jours
   dateButoir: string;
+  documents?: DocumentDossier[];
+  parametresEvaluation?: string[];
+  commentaires?: string;
+}
+
+export interface DocumentDossier {
+  id: string;
+  dossierId: string;
+  type: 'registre_commerce' | 'carte_contribuable' | 'processus_production' | 'certificats_conformite' | 'liste_personnel' | 'plan_localisation';
+  nom: string;
+  url: string;
+  dateUpload: string;
 }
 
 export interface NoteFrais {

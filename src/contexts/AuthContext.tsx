@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { User, UserRole } from '../types';
 
@@ -29,17 +28,21 @@ const MOCK_USERS: User[] = [
   { id: '5', name: 'Analyste', email: 'analyste@certif.com', role: 'analyste', avatar: '' },
   { id: '6', name: 'Surveillant', email: 'surveillant@certif.com', role: 'surveillant', avatar: '' },
   { id: '7', name: 'Directeur', email: 'directeur@certif.com', role: 'directeur', avatar: '' },
+  { id: '8', name: 'Responsable Technique', email: 'technique@certif.com', role: 'responsable_technique', avatar: '' },
+  { id: '9', name: 'Chef de Mission', email: 'chef_mission@certif.com', role: 'chef_mission', avatar: '' },
 ];
 
 // Définir les accès par module pour chaque rôle
 const ROLE_ACCESS_MAP: Record<string, string[]> = {
-  'admin': ['dossiers', 'notes-frais', 'inspections', 'certificats', 'statistiques'],
-  'acceuil': ['dossiers'],
+  'admin': ['dossiers', 'notes-frais', 'inspections', 'certificats', 'statistiques', 'acceuil', 'responsable-technique'],
+  'acceuil': ['dossiers', 'acceuil'],
   'comptable': ['notes-frais'],
   'inspecteur': ['inspections', 'notes-frais'],
   'analyste': ['dossiers', 'inspections'],
   'surveillant': ['inspections'],
   'directeur': ['dossiers', 'notes-frais', 'certificats', 'statistiques'],
+  'responsable_technique': ['dossiers', 'notes-frais', 'responsable-technique'],
+  'chef_mission': ['dossiers', 'inspections'],
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

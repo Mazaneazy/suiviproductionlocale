@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
-import { useNavigate, Link } from 'react-router-dom';
-import { Bell, FileText, FileCheck, ClipboardCheck, CreditCard, Home, BarChart, LogOut, User, Check } from 'lucide-react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { Bell, FileText, FileCheck, ClipboardCheck, CreditCard, Home, BarChart, LogOut, User, Check, Inbox } from 'lucide-react';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import {
@@ -33,6 +32,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -55,11 +55,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   // Définir les liens de navigation avec les modules associés
   const navLinks = [
     { to: '/dashboard', icon: <Home size={20} />, label: 'Tableau de bord', module: null }, // Accessible à tous
+    { to: '/accueil', icon: <Inbox size={20} />, label: 'Accueil', module: 'acceuil' },
     { to: '/dossiers', icon: <FileText size={20} />, label: 'Dossiers', module: 'dossiers' },
     { to: '/notes-frais', icon: <CreditCard size={20} />, label: 'Notes de frais', module: 'notes-frais' },
     { to: '/inspections', icon: <ClipboardCheck size={20} />, label: 'Inspections', module: 'inspections' },
     { to: '/certificats', icon: <FileCheck size={20} />, label: 'Certificats', module: 'certificats' },
     { to: '/statistiques', icon: <BarChart size={20} />, label: 'Statistiques', module: 'statistiques' },
+    { to: '/responsable-technique', icon: <FileText size={20} />, label: 'Responsable Technique', module: 'responsable-technique' },
   ];
 
   // Filtrer les liens selon les droits d'accès de l'utilisateur
@@ -73,6 +75,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       return 'Réception des dossiers';
     }
     return link.label;
+  };
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
   };
 
   return (
@@ -101,7 +107,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       <Link
                         key={link.to}
                         to={link.to}
-                        className="flex items-center space-x-2 py-2 px-3 rounded-md hover:bg-gray-100"
+                        className={`flex items-center space-x-2 py-2 px-3 rounded-md ${isActive(link.to) ? 'bg-certif-lightblue text-certif-blue font-medium' : 'hover:bg-gray-100'}`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         {link.icon}
@@ -205,7 +211,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Link
                 key={link.to}
                 to={link.to}
-                className="flex items-center space-x-2 py-2 px-3 rounded-md hover:bg-gray-100 transition-colors"
+                className={`flex items-center space-x-2 py-2 px-3 rounded-md ${isActive(link.to) ? 'bg-certif-lightblue text-certif-blue font-medium' : 'hover:bg-gray-100'} transition-colors`}
               >
                 {link.icon}
                 <span>{adaptLinkLabels(link)}</span>

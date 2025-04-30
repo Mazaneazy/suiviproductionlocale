@@ -1,5 +1,5 @@
 
-import { Dossier, NoteFrais, Inspection, Certificat, Notification, Statistique } from '../../types';
+import { Dossier, NoteFrais, Inspection, Certificat, Notification, Statistique, DocumentDossier } from '../../types';
 
 export interface DataContextProps {
   dossiers: Dossier[];
@@ -16,7 +16,10 @@ export interface DataContextProps {
   updateInspection: (id: string, data: Partial<Inspection>) => void;
   addCertificat: (certificat: Omit<Certificat, 'id'>) => void;
   updateCertificat: (id: string, data: Partial<Certificat>) => void;
+  addDocument: (document: Omit<DocumentDossier, 'id'>) => void;
+  removeDocument: (id: string) => void;
   getDossierById: (id: string) => Dossier | undefined;
+  getDocumentsByDossierId: (dossierId: string) => DocumentDossier[];
   getNoteFraisByDossierId: (dossierId: string) => NoteFrais[];
   getInspectionsByDossierId: (dossierId: string) => Inspection[];
   getCertificatByDossierId: (dossierId: string) => Certificat | undefined;

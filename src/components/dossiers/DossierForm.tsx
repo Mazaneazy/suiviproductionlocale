@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -22,7 +23,7 @@ interface DossierFormProps {
 const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierFormProps) => {
   const { toast } = useToast();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     
     // If the délai is modified, recalculate the date butoir
@@ -84,9 +85,38 @@ const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierF
           value={newDossier.operateurNom}
           onChange={handleInputChange}
           className="col-span-3"
-          placeholder="Nom de l'opérateur"
+          placeholder="Nom de l'entreprise"
         />
       </div>
+      
+      <div className="grid grid-cols-4 items-center gap-4">
+        <label htmlFor="promoteurNom" className="text-right font-medium text-sm">
+          Promoteur*
+        </label>
+        <Input
+          id="promoteurNom"
+          name="promoteurNom"
+          value={newDossier.promoteurNom || ''}
+          onChange={handleInputChange}
+          className="col-span-3"
+          placeholder="Nom du promoteur"
+        />
+      </div>
+      
+      <div className="grid grid-cols-4 items-center gap-4">
+        <label htmlFor="telephone" className="text-right font-medium text-sm">
+          Téléphone*
+        </label>
+        <Input
+          id="telephone"
+          name="telephone"
+          value={newDossier.telephone || ''}
+          onChange={handleInputChange}
+          className="col-span-3"
+          placeholder="Numéro de téléphone"
+        />
+      </div>
+      
       <div className="grid grid-cols-4 items-center gap-4">
         <label htmlFor="typeProduit" className="text-right font-medium text-sm">
           Type de produit*
@@ -100,6 +130,7 @@ const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierF
           placeholder="Type de produit"
         />
       </div>
+      
       <div className="grid grid-cols-4 items-center gap-4">
         <label htmlFor="dateTransmission" className="text-right font-medium text-sm">
           Date de transmission
@@ -146,7 +177,7 @@ const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierF
         </label>
         <Select
           value={newDossier.status}
-          onValueChange={(value: "complet" | "en_attente" | "rejete" | "en_cours" | "certifie") => 
+          onValueChange={(value: "complet" | "en_attente" | "rejete" | "en_cours" | "certifie" | "a_corriger") => 
             setNewDossier({ ...newDossier, status: value })
           }
         >
@@ -159,6 +190,7 @@ const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierF
             <SelectItem value="en_cours">En cours</SelectItem>
             <SelectItem value="rejete">Rejeté</SelectItem>
             <SelectItem value="certifie">Certifié</SelectItem>
+            <SelectItem value="a_corriger">À corriger</SelectItem>
           </SelectContent>
         </Select>
       </div>
