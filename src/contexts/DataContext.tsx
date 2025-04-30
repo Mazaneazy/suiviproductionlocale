@@ -100,7 +100,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addDocument = (document: Omit<DocumentDossier, 'id'>) => {
-    const newDocument = { ...document, id: generateId(), status: 'en_attente' };
+    // Explicitly set the status to 'en_attente' as a valid DocumentDossier status
+    const newDocument = { 
+      ...document, 
+      id: generateId(), 
+      status: 'en_attente' as const 
+    };
     setDocuments([...documents, newDocument]);
   };
 
