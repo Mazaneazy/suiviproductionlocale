@@ -20,7 +20,6 @@ import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 import Statistiques from "./pages/Statistiques";
 import UserManagement from "./pages/UserManagement";
-import NotesFrais from "./pages/NotesFrais";
 
 const queryClient = new QueryClient();
 
@@ -82,12 +81,6 @@ const App = () => (
               <Route path="/user-management" element={
                 <ProtectedRoute moduleName="user-management">
                   <UserManagement />
-                </ProtectedRoute>
-              } />
-
-              <Route path="/notes-frais" element={
-                <ProtectedRoute moduleName="notes-frais">
-                  <NotesFrais />
                 </ProtectedRoute>
               } />
 
