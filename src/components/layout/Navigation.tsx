@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FileCheck, FileText, ClipboardCheck, CreditCard, Home, BarChart } from 'lucide-react';
+import { FileCheck, FileText, ClipboardCheck, Home, BarChart, UserRound, Shield } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface NavigationProps {
@@ -18,11 +18,11 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onItemClick }) 
     { to: '/dashboard', icon: <Home size={20} />, label: 'Tableau de bord', module: null }, // Accessible à tous
     { to: '/accueil', icon: <FileText size={20} />, label: 'Poste d\'Accueil', module: 'acceuil' },
     { to: '/dossiers', icon: <FileText size={20} />, label: 'Dossiers en cours', module: 'dossiers' },
-    { to: '/notes-frais', icon: <CreditCard size={20} />, label: 'Notes de frais', module: 'notes-frais' },
     { to: '/inspections', icon: <ClipboardCheck size={20} />, label: 'Inspections', module: 'inspections' },
-    { to: '/certificats', icon: <FileCheck size={20} />, label: 'Certificats', module: 'certificats' },
+    { to: '/certificats', icon: <FileCheck size={20} />, label: 'Résultats', module: 'resultats' },
     { to: '/statistiques', icon: <BarChart size={20} />, label: 'Statistiques', module: 'statistiques' },
-    { to: '/responsable-technique', icon: <FileText size={20} />, label: 'Responsable Technique', module: 'responsable-technique' },
+    { to: '/responsable-technique', icon: <Shield size={20} />, label: 'Responsable Technique', module: 'responsable-technique' },
+    { to: '/user-management', icon: <UserRound size={20} />, label: 'Gestion des utilisateurs', module: 'user-management' },
   ];
 
   // Filtrer les liens selon les droits d'accès de l'utilisateur
@@ -41,6 +41,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onItemClick }) 
       'chef_mission': { '/inspections': 'Chef de Mission d\'Inspection' },
       'directeur': { '/certificats': 'Directeur Evaluation Conformité' },
       'directeur_general': { '/dashboard': 'Direction Générale ANOR' },
+      'gestionnaire': { '/dossiers': 'Gestion des dossiers' },
     };
 
     if (currentUser?.role && roleTitles[currentUser.role] && roleTitles[currentUser.role][link.to]) {

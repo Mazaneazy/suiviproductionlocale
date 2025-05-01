@@ -33,6 +33,7 @@ import { Badge } from '../components/ui/badge';
 import { ClipboardCheck, PlusCircle, MapPin, Calendar, User } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../contexts/AuthContext';
+import InspectionDetails from '../components/inspections/InspectionDetails';
 
 const Inspections = () => {
   const { inspections, dossiers, addInspection, updateInspection } = useData();
@@ -41,6 +42,8 @@ const Inspections = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('tous');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [inspectionDetailsOpen, setInspectionDetailsOpen] = useState(false);
+  const [selectedInspectionId, setSelectedInspectionId] = useState('');
   
   // État pour la nouvelle inspection
   const [newInspection, setNewInspection] = useState({
@@ -130,6 +133,12 @@ const Inspections = () => {
       title: "Inspection non-conforme",
       description: "L'inspection a été marquée comme non-conforme.",
     });
+  };
+
+  // Fonction pour afficher les détails d'une inspection
+  const handleViewDetails = (id: string) => {
+    setSelectedInspectionId(id);
+    setInspectionDetailsOpen(true);
   };
 
   // Fonction pour obtenir la couleur du badge en fonction du statut
@@ -343,7 +352,11 @@ const Inspections = () => {
                               </Button>
                             </>
                           )}
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleViewDetails(inspection.id)}
+                          >
                             Détails
                           </Button>
                         </div>
@@ -362,6 +375,15 @@ const Inspections = () => {
           </Table>
         </div>
       </div>
+      
+      {/* Le dialogue de détails d'inspection */}
+      {inspectionDetailsOpen && selectedInspectionId && (
+        <InspectionDetails 
+          isOpen={inspectionDetailsOpen}
+          onClose={() => setInspectionDetailsOpen(false)}
+          inspectionId={selectedInspectionId}
+        />
+      )}
     </Layout>
   );
 };

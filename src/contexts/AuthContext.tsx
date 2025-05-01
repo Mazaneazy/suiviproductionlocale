@@ -9,6 +9,8 @@ interface AuthContextProps {
   logout: () => void;
   hasRole: (role: UserRole | UserRole[]) => boolean;
   hasAccess: (module: string) => boolean;
+  createUser: (userData: Omit<User, "id">) => Promise<boolean>;
+  getAllUsers: () => User[];
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -18,10 +20,12 @@ const AuthContext = createContext<AuthContextProps>({
   logout: () => {},
   hasRole: () => false,
   hasAccess: () => false,
+  createUser: async () => false,
+  getAllUsers: () => [],
 });
 
 // Mock users for demo purposes
-const MOCK_USERS: User[] = [
+const INITIAL_MOCK_USERS: User[] = [
   { id: '1', name: 'Admin', email: 'admin@certif.com', role: 'admin', avatar: '' },
   { id: '2', name: 'Poste d\'Accueil', email: 'acceuil@certif.com', role: 'acceuil', avatar: '' },
   { id: '3', name: 'Chef des Inspections', email: 'inspecteur@certif.com', role: 'inspecteur', avatar: '' },
@@ -32,27 +36,40 @@ const MOCK_USERS: User[] = [
   { id: '8', name: 'Responsable Technique', email: 'technique@certif.com', role: 'responsable_technique', avatar: '' },
   { id: '9', name: 'Délivrance des Certificats', email: 'certificats@certif.com', role: 'certificats', avatar: '' },
   { id: '10', name: 'Directeur Général ANOR', email: 'dg@certif.com', role: 'directeur_general', avatar: '' },
+  { id: '11', name: 'Gestionnaire', email: 'gestionnaire@certif.com', role: 'gestionnaire', avatar: '' },
 ];
 
 // Définir les accès par module pour chaque rôle
 const ROLE_ACCESS_MAP: Record<string, string[]> = {
-  'admin': ['dossiers', 'notes-frais', 'inspections', 'certificats', 'statistiques', 'acceuil', 'responsable-technique'],
+  'admin': ['dossiers', 'inspections', 'certificats', 'statistiques', 'acceuil', 'responsable-technique', 'user-management'],
   'acceuil': ['dossiers', 'acceuil'],
-  'comptable': ['notes-frais'],
-  'inspecteur': ['inspections'],
-  'analyste': ['statistiques'],
+  'inspecteur': ['inspections', 'dossiers'],
+  'analyste': ['statistiques', 'dossiers'],
   'chef_mission': ['inspections', 'dossiers'],
-  'directeur': ['dossiers', 'notes-frais', 'certificats', 'statistiques'],
-  'responsable_technique': ['dossiers', 'notes-frais', 'responsable-technique', 'inspections'],
-  'certificats': ['certificats', 'dossiers'],
-  'directeur_general': ['dossiers', 'notes-frais', 'inspections', 'certificats', 'statistiques', 'acceuil', 'responsable-technique'],
+  'directeur': ['dossiers', 'certificats', 'statistiques', 'resultats'],
+  'responsable_technique': ['dossiers', 'responsable-technique', 'inspections'],
+  'certificats': ['certificats', 'dossiers', 'resultats'],
+  'directeur_general': ['dossiers', 'inspections', 'certificats', 'statistiques', 'acceuil', 'responsable-technique'],
+  'gestionnaire': ['dossiers', 'inspections'],
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
+    // Load users from localStorage if available
+    const storedUsers = localStorage.getItem('certif_users');
+    if (storedUsers) {
+      setUsers(JSON.parse(storedUsers));
+    } else {
+      // Initialize with default users if no users are stored
+      setUsers(INITIAL_MOCK_USERS);
+      localStorage.setItem('certif_users', JSON.stringify(INITIAL_MOCK_USERS));
+    }
+
+    // Check if user is already logged in
     const storedUser = localStorage.getItem('certif_user');
     if (storedUser) {
       setCurrentUser(JSON.parse(storedUser));
@@ -61,8 +78,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // In a real app, this would be an API call
-    const user = MOCK_USERS.find(user => user.email === email);
+    // Get the latest users from localStorage
+    const storedUsers = localStorage.getItem('certif_users');
+    const currentUsers = storedUsers ? JSON.parse(storedUsers) : INITIAL_MOCK_USERS;
+    
+    const user = currentUsers.find((user: User) => user.email === email);
     
     // Simulate a delay for the "API call"
     await new Promise(resolve => setTimeout(resolve, 800));
@@ -99,8 +119,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return allowedModules.includes(module);
   };
 
+  const createUser = async (userData: Omit<User, "id">): Promise<boolean> => {
+    // Simulate a delay for API call
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const newUser = { 
+      ...userData, 
+      id: (users.length + 1).toString(),
+    };
+
+    const updatedUsers = [...users, newUser];
+    setUsers(updatedUsers);
+    localStorage.setItem('certif_users', JSON.stringify(updatedUsers));
+    
+    return true;
+  };
+
+  const getAllUsers = (): User[] => {
+    return users;
+  };
+
   return (
-    <AuthContext.Provider value={{ currentUser, isAuthenticated, login, logout, hasRole, hasAccess }}>
+    <AuthContext.Provider value={{ 
+      currentUser, 
+      isAuthenticated, 
+      login, 
+      logout, 
+      hasRole, 
+      hasAccess, 
+      createUser,
+      getAllUsers
+    }}>
       {children}
     </AuthContext.Provider>
   );

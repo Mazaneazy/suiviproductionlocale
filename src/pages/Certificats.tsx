@@ -4,6 +4,7 @@ import { useData } from '../contexts/DataContext';
 import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
+import { Textarea } from '../components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -29,35 +30,41 @@ import {
   DialogClose,
 } from '../components/ui/dialog';
 import { Badge } from '../components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { FileCheck, PlusCircle, DownloadCloud, AlertCircle } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import { useAuth } from '../contexts/AuthContext';
 
 const Certificats = () => {
   const { certificats, dossiers, inspections, addCertificat, updateCertificat } = useData();
+  const { currentUser } = useAuth();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('tous');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentTab, setCurrentTab] = useState('certificat');
   
-  // État pour le nouveau certificat
-  const [newCertificat, setNewCertificat] = useState({
+  // État pour le nouveau résultat (certificat, non-conformité ou actions correctives)
+  const [newResult, setNewResult] = useState({
+    type: 'certificat',
     dossierId: '',
-    numero: `CERT-${new Date().getFullYear()}-${certificats.length + 1}`.padStart(8, '0'),
     entreprise: '',
     produit: '',
+    numero: `CERT-${new Date().getFullYear()}-${certificats.length + 1}`.padStart(8, '0'),
     dateDelivrance: new Date().toISOString().split('T')[0],
     dateExpiration: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    status: 'actif' as 'actif' | 'suspendu' | 'retire' | 'expire'
+    status: 'actif' as 'actif' | 'suspendu' | 'retire' | 'expire',
+    commentaire: ''
   });
 
   // Obtenir les dossiers éligibles pour la certification (avec inspection conforme)
   const dossiersEligibles = dossiers
     .filter(dossier => {
       const dossierInspections = inspections.filter(i => i.dossierId === dossier.id);
-      const hasConformeInspection = dossierInspections.some(i => i.resultat === 'conforme');
-      const hasCertificat = certificats.some(c => c.dossierId === dossier.id);
+      const hasInspection = dossierInspections.length > 0;
+      const hasCertificat = certificats.some(c => c.dossierId === dossier.id && c.status === 'actif');
       
-      return hasConformeInspection && !hasCertificat && dossier.status !== 'rejete';
+      return hasInspection && !hasCertificat && dossier.status !== 'rejete';
     });
 
   // Filtrer les certificats en fonction des critères de recherche
@@ -72,22 +79,36 @@ const Certificats = () => {
     return matchesSearch && matchesStatus;
   });
 
-  // Fonction pour mettre à jour les champs du nouveau certificat
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Fonction pour mettre à jour les champs du nouveau résultat
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setNewCertificat({
-      ...newCertificat,
+    setNewResult({
+      ...newResult,
       [name]: value,
     });
   };
 
-  // Fonction pour mettre à jour les informations du certificat quand on change le dossier
+  // Fonction pour mettre à jour le type de résultat
+  const handleTypeChange = (type: string) => {
+    setCurrentTab(type);
+    setNewResult({
+      ...newResult,
+      type,
+      numero: type === 'certificat' 
+        ? `CERT-${new Date().getFullYear()}-${certificats.length + 1}`.padStart(8, '0')
+        : type === 'non_conformite'
+          ? `NC-${new Date().getFullYear()}-${certificats.length + 1}`.padStart(8, '0')
+          : `AC-${new Date().getFullYear()}-${certificats.length + 1}`.padStart(8, '0')
+    });
+  };
+
+  // Fonction pour mettre à jour les informations quand on change le dossier
   const handleDossierChange = (dossierId: string) => {
     const dossier = dossiers.find(d => d.id === dossierId);
     
     if (dossier) {
-      setNewCertificat({
-        ...newCertificat,
+      setNewResult({
+        ...newResult,
         dossierId,
         entreprise: dossier.operateurNom,
         produit: dossier.typeProduit,
@@ -95,10 +116,10 @@ const Certificats = () => {
     }
   };
 
-  // Fonction pour ajouter un nouveau certificat
-  const handleAddCertificat = () => {
+  // Fonction pour ajouter un nouveau certificat ou résultat
+  const handleAddResult = () => {
     // Vérifier que tous les champs obligatoires sont remplis
-    if (!newCertificat.dossierId) {
+    if (!newResult.dossierId) {
       toast({
         variant: "destructive",
         title: "Erreur",
@@ -107,21 +128,61 @@ const Certificats = () => {
       return;
     }
 
-    addCertificat(newCertificat);
-    toast({
-      title: "Certificat émis",
-      description: `Le certificat pour "${newCertificat.entreprise}" a été émis avec succès.`,
-    });
+    // Pour un certificat
+    if (newResult.type === 'certificat') {
+      const certificat = {
+        dossierId: newResult.dossierId,
+        numero: newResult.numero,
+        entreprise: newResult.entreprise,
+        produit: newResult.produit,
+        dateDelivrance: newResult.dateDelivrance,
+        dateExpiration: newResult.dateExpiration,
+        status: newResult.status
+      };
+      
+      addCertificat(certificat);
+      
+      toast({
+        title: "Certificat de conformité émis",
+        description: `Le certificat pour "${newResult.entreprise}" a été émis et attend validation.`,
+      });
+    } else {
+      // Pour les autres types de résultats (non-conformité ou actions correctives)
+      // Dans un système réel, vous auriez une autre fonction pour gérer ces types
+      // Pour l'instant, on simule avec la même fonction
+      const certificat = {
+        dossierId: newResult.dossierId,
+        numero: newResult.numero,
+        entreprise: newResult.entreprise,
+        produit: newResult.produit,
+        dateDelivrance: newResult.dateDelivrance,
+        dateExpiration: newResult.dateExpiration,
+        status: 'actif' as 'actif'
+      };
+      
+      addCertificat(certificat);
+      
+      const resultType = newResult.type === 'non_conformite' 
+        ? "Rapport de non-conformité" 
+        : "Lettre d'actions correctives";
+        
+      toast({
+        title: `${resultType} émis`,
+        description: `Le document pour "${newResult.entreprise}" a été émis et attend validation.`,
+      });
+    }
     
     // Réinitialiser le formulaire
-    setNewCertificat({
+    setNewResult({
+      type: 'certificat',
       dossierId: '',
-      numero: `CERT-${new Date().getFullYear()}-${certificats.length + 2}`.padStart(8, '0'),
       entreprise: '',
       produit: '',
+      numero: `CERT-${new Date().getFullYear()}-${certificats.length + 2}`.padStart(8, '0'),
       dateDelivrance: new Date().toISOString().split('T')[0],
       dateExpiration: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      status: 'actif'
+      status: 'actif',
+      commentaire: ''
     });
     
     setDialogOpen(false);
@@ -131,8 +192,8 @@ const Certificats = () => {
   const handleSuspendCertificat = (id: string) => {
     updateCertificat(id, { status: 'suspendu' });
     toast({
-      title: "Certificat suspendu",
-      description: "Le certificat a été suspendu avec succès.",
+      title: "Document suspendu",
+      description: "Le document a été suspendu avec succès.",
     });
   };
 
@@ -140,16 +201,16 @@ const Certificats = () => {
   const handleReactivateCertificat = (id: string) => {
     updateCertificat(id, { status: 'actif' });
     toast({
-      title: "Certificat réactivé",
-      description: "Le certificat a été réactivé avec succès.",
+      title: "Document réactivé",
+      description: "Le document a été réactivé avec succès.",
     });
   };
 
   // Fonction pour simuler le téléchargement d'un certificat
   const handleDownloadCertificat = (certificat: any) => {
     toast({
-      title: "Téléchargement du certificat",
-      description: `Le certificat ${certificat.numero} a été téléchargé.`,
+      title: "Téléchargement du document",
+      description: `Le document ${certificat.numero} a été téléchargé.`,
     });
   };
 
@@ -195,118 +256,268 @@ const Certificats = () => {
     return diffDays <= 30 && diffDays > 0;
   };
 
+  // Déterminer si l'utilisateur peut créer des documents
+  const canCreateDocuments = currentUser?.role === 'certificats' || 
+                           currentUser?.role === 'directeur' ||
+                           currentUser?.role === 'admin' ||
+                           currentUser?.role === 'directeur_general';
+
+  const getResultTypeLabel = (numero: string) => {
+    if (numero.startsWith('CERT')) return 'Certificat';
+    if (numero.startsWith('NC')) return 'Non-conformité';
+    if (numero.startsWith('AC')) return 'Actions correctives';
+    return 'Document';
+  };
+
   return (
     <Layout>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-certif-blue">Certificats</h1>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-certif-green hover:bg-certif-green/90">
-              <PlusCircle className="mr-2" size={16} />
-              Nouveau certificat
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-lg">
-            <DialogHeader>
-              <DialogTitle>Émettre un nouveau certificat</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="dossierId" className="text-right font-medium text-sm">
-                  Dossier*
-                </label>
-                <Select
-                  value={newCertificat.dossierId}
-                  onValueChange={handleDossierChange}
-                >
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Sélectionner un dossier" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {dossiersEligibles.map((dossier) => (
-                      <SelectItem key={dossier.id} value={dossier.id}>
-                        {dossier.operateurNom} - {dossier.typeProduit}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="numero" className="text-right font-medium text-sm">
-                  Numéro
-                </label>
-                <Input
-                  id="numero"
-                  name="numero"
-                  value={newCertificat.numero}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  readOnly
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="entreprise" className="text-right font-medium text-sm">
-                  Entreprise
-                </label>
-                <Input
-                  id="entreprise"
-                  name="entreprise"
-                  value={newCertificat.entreprise}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  readOnly
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="produit" className="text-right font-medium text-sm">
-                  Produit
-                </label>
-                <Input
-                  id="produit"
-                  name="produit"
-                  value={newCertificat.produit}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  readOnly
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="dateDelivrance" className="text-right font-medium text-sm">
-                  Date de délivrance
-                </label>
-                <Input
-                  id="dateDelivrance"
-                  name="dateDelivrance"
-                  type="date"
-                  value={newCertificat.dateDelivrance}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="dateExpiration" className="text-right font-medium text-sm">
-                  Date d'expiration
-                </label>
-                <Input
-                  id="dateExpiration"
-                  name="dateExpiration"
-                  type="date"
-                  value={newCertificat.dateExpiration}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Annuler</Button>
-              </DialogClose>
-              <Button onClick={handleAddCertificat} className="bg-certif-green hover:bg-certif-green/90">
-                Émettre
+        <h1 className="text-3xl font-bold text-certif-blue">Résultats d'évaluation</h1>
+        {canCreateDocuments && (
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-certif-green hover:bg-certif-green/90">
+                <PlusCircle className="mr-2" size={16} />
+                Nouveau document
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Créer un document de résultat</DialogTitle>
+              </DialogHeader>
+              
+              <Tabs defaultValue="certificat" value={currentTab} onValueChange={handleTypeChange}>
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="certificat">Certificat</TabsTrigger>
+                  <TabsTrigger value="non_conformite">Non-conformité</TabsTrigger>
+                  <TabsTrigger value="actions_correctives">Actions correctives</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="certificat" className="pt-4">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="dossierId" className="text-right font-medium text-sm">
+                        Dossier*
+                      </label>
+                      <Select
+                        value={newResult.dossierId}
+                        onValueChange={handleDossierChange}
+                      >
+                        <SelectTrigger className="col-span-3">
+                          <SelectValue placeholder="Sélectionner un dossier" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {dossiersEligibles.map((dossier) => (
+                            <SelectItem key={dossier.id} value={dossier.id}>
+                              {dossier.operateurNom} - {dossier.typeProduit}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="numero" className="text-right font-medium text-sm">
+                        Numéro
+                      </label>
+                      <Input
+                        id="numero"
+                        name="numero"
+                        value={newResult.numero}
+                        onChange={handleInputChange}
+                        className="col-span-3"
+                        readOnly
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="dateDelivrance" className="text-right font-medium text-sm">
+                        Date de délivrance
+                      </label>
+                      <Input
+                        id="dateDelivrance"
+                        name="dateDelivrance"
+                        type="date"
+                        value={newResult.dateDelivrance}
+                        onChange={handleInputChange}
+                        className="col-span-3"
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="dateExpiration" className="text-right font-medium text-sm">
+                        Date d'expiration
+                      </label>
+                      <Input
+                        id="dateExpiration"
+                        name="dateExpiration"
+                        type="date"
+                        value={newResult.dateExpiration}
+                        onChange={handleInputChange}
+                        className="col-span-3"
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="non_conformite" className="pt-4">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="dossierId" className="text-right font-medium text-sm">
+                        Dossier*
+                      </label>
+                      <Select
+                        value={newResult.dossierId}
+                        onValueChange={handleDossierChange}
+                      >
+                        <SelectTrigger className="col-span-3">
+                          <SelectValue placeholder="Sélectionner un dossier" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {dossiersEligibles.map((dossier) => (
+                            <SelectItem key={dossier.id} value={dossier.id}>
+                              {dossier.operateurNom} - {dossier.typeProduit}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="numero" className="text-right font-medium text-sm">
+                        Numéro
+                      </label>
+                      <Input
+                        id="numero"
+                        name="numero"
+                        value={newResult.numero}
+                        className="col-span-3"
+                        readOnly
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-4 items-start gap-4">
+                      <label htmlFor="commentaire" className="text-right font-medium text-sm pt-2">
+                        Raisons de non-conformité
+                      </label>
+                      <Textarea
+                        id="commentaire"
+                        name="commentaire"
+                        value={newResult.commentaire}
+                        onChange={handleInputChange}
+                        className="col-span-3"
+                        rows={4}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="dateDelivrance" className="text-right font-medium text-sm">
+                        Date du rapport
+                      </label>
+                      <Input
+                        id="dateDelivrance"
+                        name="dateDelivrance"
+                        type="date"
+                        value={newResult.dateDelivrance}
+                        onChange={handleInputChange}
+                        className="col-span-3"
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="actions_correctives" className="pt-4">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="dossierId" className="text-right font-medium text-sm">
+                        Dossier*
+                      </label>
+                      <Select
+                        value={newResult.dossierId}
+                        onValueChange={handleDossierChange}
+                      >
+                        <SelectTrigger className="col-span-3">
+                          <SelectValue placeholder="Sélectionner un dossier" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {dossiersEligibles.map((dossier) => (
+                            <SelectItem key={dossier.id} value={dossier.id}>
+                              {dossier.operateurNom} - {dossier.typeProduit}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="numero" className="text-right font-medium text-sm">
+                        Numéro
+                      </label>
+                      <Input
+                        id="numero"
+                        name="numero"
+                        value={newResult.numero}
+                        className="col-span-3"
+                        readOnly
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-4 items-start gap-4">
+                      <label htmlFor="commentaire" className="text-right font-medium text-sm pt-2">
+                        Actions correctives requises
+                      </label>
+                      <Textarea
+                        id="commentaire"
+                        name="commentaire"
+                        value={newResult.commentaire}
+                        onChange={handleInputChange}
+                        className="col-span-3"
+                        rows={4}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="dateDelivrance" className="text-right font-medium text-sm">
+                        Date d'émission
+                      </label>
+                      <Input
+                        id="dateDelivrance"
+                        name="dateDelivrance"
+                        type="date"
+                        value={newResult.dateDelivrance}
+                        onChange={handleInputChange}
+                        className="col-span-3"
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="dateExpiration" className="text-right font-medium text-sm">
+                        Date limite
+                      </label>
+                      <Input
+                        id="dateExpiration"
+                        name="dateExpiration"
+                        type="date"
+                        value={newResult.dateExpiration}
+                        onChange={handleInputChange}
+                        className="col-span-3"
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+              
+              <DialogFooter className="mt-6">
+                <DialogClose asChild>
+                  <Button variant="outline">Annuler</Button>
+                </DialogClose>
+                <Button onClick={handleAddResult} className="bg-certif-green hover:bg-certif-green/90">
+                  Émettre le document
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
@@ -338,11 +549,12 @@ const Certificats = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Type</TableHead>
                 <TableHead>Numéro</TableHead>
                 <TableHead>Entreprise</TableHead>
                 <TableHead>Produit</TableHead>
-                <TableHead>Date de délivrance</TableHead>
-                <TableHead>Date d'expiration</TableHead>
+                <TableHead>Date d'émission</TableHead>
+                <TableHead>Date limite/expiration</TableHead>
                 <TableHead>Statut</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -351,6 +563,7 @@ const Certificats = () => {
               {filteredCertificats.length > 0 ? (
                 filteredCertificats.map((certificat) => (
                   <TableRow key={certificat.id}>
+                    <TableCell>{getResultTypeLabel(certificat.numero)}</TableCell>
                     <TableCell className="font-mono">{certificat.numero}</TableCell>
                     <TableCell className="font-medium">{certificat.entreprise}</TableCell>
                     <TableCell>{certificat.produit}</TableCell>
@@ -370,7 +583,7 @@ const Certificats = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
-                        {certificat.status === 'actif' && (
+                        {certificat.status === 'actif' && canCreateDocuments && (
                           <Button 
                             variant="outline" 
                             size="sm" 
@@ -380,7 +593,7 @@ const Certificats = () => {
                             Suspendre
                           </Button>
                         )}
-                        {certificat.status === 'suspendu' && (
+                        {certificat.status === 'suspendu' && canCreateDocuments && (
                           <Button 
                             variant="outline" 
                             size="sm" 
@@ -404,8 +617,8 @@ const Certificats = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">
-                    Aucun certificat trouvé
+                  <TableCell colSpan={8} className="h-24 text-center">
+                    Aucun document trouvé
                   </TableCell>
                 </TableRow>
               )}

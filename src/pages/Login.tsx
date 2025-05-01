@@ -15,7 +15,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, getAllUsers } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,14 +41,14 @@ const Login = () => {
     }
   };
 
-  // Ajouter des suggestions d'identifiants pour les différents rôles
-  const loginExamples = [
-    { role: 'Admin', email: 'admin@certif.com' },
-    { role: 'Gestionnaire', email: 'gestionnaire@certif.com' },
-    { role: 'Inspecteur', email: 'inspecteur@certif.com' },
-    { role: 'Comptable', email: 'comptable@certif.com' },
-    { role: 'Certificateur', email: 'certificateur@certif.com' },
-  ];
+  // Get all available users for demo
+  const users = getAllUsers();
+  
+  // Create login examples from users
+  const loginExamples = users.map(user => ({
+    role: user.name,
+    email: user.email,
+  }));
 
   const handleExampleLogin = (exampleEmail: string) => {
     setEmail(exampleEmail);
@@ -119,7 +119,7 @@ const Login = () => {
           <CardFooter className="flex flex-col">
             <div className="w-full border-t pt-4">
               <p className="text-sm text-gray-500 mb-2">Pour la démonstration, utilisez:</p>
-              <div className="grid grid-cols-1 gap-2">
+              <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto">
                 {loginExamples.map((example) => (
                   <Button 
                     key={example.role}
@@ -129,7 +129,7 @@ const Login = () => {
                     size="sm"
                   >
                     <span className="font-semibold">{example.role}</span>
-                    <span className="text-gray-500">{example.email}</span>
+                    <span className="text-gray-500 truncate max-w-[150px]">{example.email}</span>
                   </Button>
                 ))}
               </div>

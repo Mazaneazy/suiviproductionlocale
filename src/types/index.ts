@@ -1,5 +1,5 @@
 
-export type UserRole = 'admin' | 'acceuil' | 'inspecteur' | 'analyste' | 'surveillant' | 'comptable' | 'directeur' | 'responsable_technique' | 'chef_mission' | 'certificats' | 'directeur_general';
+export type UserRole = 'admin' | 'acceuil' | 'inspecteur' | 'analyste' | 'surveillant' | 'comptable' | 'directeur' | 'responsable_technique' | 'chef_mission' | 'certificats' | 'directeur_general' | 'gestionnaire';
 
 export interface User {
   id: string;
@@ -23,6 +23,7 @@ export interface Dossier {
   documents?: DocumentDossier[];
   parametresEvaluation?: string[];
   commentaires?: string;
+  historique?: HistoriqueEvenement[];
 }
 
 export interface DocumentDossier {
@@ -99,4 +100,26 @@ export interface Statistique {
   dossiersEnCours: number;
   dossiersRejetes: number;
   delaiMoyenTraitement: number; // en jours
+}
+
+export interface HistoriqueEvenement {
+  id: string;
+  dossierId: string;
+  date: string;
+  action: string;
+  responsable: string;
+  commentaire?: string;
+}
+
+export interface ResultatConformite {
+  id: string;
+  dossierId: string;
+  type: 'certificat' | 'non_conformite' | 'actions_correctives';
+  dateCreation: string;
+  creePar: string;
+  valide: boolean;
+  validePar?: string;
+  dateValidation?: string;
+  contenu: string;
+  fichierUrl?: string;
 }

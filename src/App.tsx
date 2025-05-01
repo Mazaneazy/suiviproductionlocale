@@ -12,7 +12,6 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Dossiers from "./pages/Dossiers";
-import NotesFrais from "./pages/NotesFrais";
 import Inspections from "./pages/Inspections";
 import Certificats from "./pages/Certificats";
 import Accueil from "./pages/Accueil";
@@ -20,6 +19,7 @@ import ResponsableTechnique from "./pages/ResponsableTechnique";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 import Statistiques from "./pages/Statistiques";
+import UserManagement from "./pages/UserManagement";
 
 const queryClient = new QueryClient();
 
@@ -60,12 +60,6 @@ const App = () => (
                 </ProtectedRoute>
               } />
 
-              <Route path="/notes-frais" element={
-                <ProtectedRoute moduleName="notes-frais">
-                  <NotesFrais />
-                </ProtectedRoute>
-              } />
-
               <Route path="/inspections" element={
                 <ProtectedRoute moduleName="inspections">
                   <Inspections />
@@ -73,7 +67,7 @@ const App = () => (
               } />
 
               <Route path="/certificats" element={
-                <ProtectedRoute moduleName="certificats">
+                <ProtectedRoute moduleName="resultats">
                   <Certificats />
                 </ProtectedRoute>
               } />
@@ -81,6 +75,12 @@ const App = () => (
               <Route path="/statistiques" element={
                 <ProtectedRoute moduleName="statistiques">
                   <Statistiques />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/user-management" element={
+                <ProtectedRoute moduleName="user-management">
+                  <UserManagement />
                 </ProtectedRoute>
               } />
 

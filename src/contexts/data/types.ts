@@ -1,5 +1,5 @@
 
-import { Dossier, NoteFrais, Inspection, Certificat, Notification, Statistique, DocumentDossier } from '../../types';
+import { Dossier, NoteFrais, Inspection, Certificat, Notification, Statistique, DocumentDossier, HistoriqueEvenement, ResultatConformite } from '../../types';
 
 export interface DataContextProps {
   dossiers: Dossier[];
