@@ -20,16 +20,23 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onItemClick }) 
     { to: '/dossiers', icon: <FileText size={20} />, label: 'Dossiers en cours', module: 'dossiers' },
     { to: '/inspections', icon: <ClipboardCheck size={20} />, label: 'Inspections', module: 'inspections' },
     { to: '/certificats', icon: <FileCheck size={20} />, label: 'Résultats', module: 'resultats' },
-    { to: '/notes-frais', icon: <Calculator size={20} />, label: 'Notes de frais', module: 'notes-frais' },
+    { to: '/notes-frais', icon: <Calculator size={20} />, label: 'Notes de frais', module: 'notes-frais', excludeRoles: ['inspecteur'] },
     { to: '/statistiques', icon: <BarChart size={20} />, label: 'Statistiques', module: 'statistiques' },
     { to: '/responsable-technique', icon: <Shield size={20} />, label: 'Responsable Technique', module: 'responsable-technique' },
     { to: '/user-management', icon: <UserRound size={20} />, label: 'Gestion des utilisateurs', module: 'user-management' },
   ];
 
-  // Filtrer les liens selon les droits d'accès de l'utilisateur
-  const filteredNavLinks = navLinks.filter(link => 
-    link.module === null || hasAccess(link.module)
-  );
+  // Filtrer les liens selon les droits d'accès de l'utilisateur et exclure selon le rôle
+  const filteredNavLinks = navLinks.filter(link => {
+    // Vérifier si le lien doit être exclu pour le rôle actuel de l'utilisateur
+    const shouldExcludeByRole = link.excludeRoles && 
+      currentUser?.role && 
+      link.excludeRoles.includes(currentUser.role);
+
+    // Conserver le lien s'il n'a pas de module (accessible à tous) ou si l'utilisateur a accès
+    // ET s'il ne doit pas être exclu pour le rôle actuel
+    return (link.module === null || hasAccess(link.module)) && !shouldExcludeByRole;
+  });
 
   // Adapter le titre du lien selon le rôle de l'utilisateur
   const adaptLinkLabels = (link: any) => {
