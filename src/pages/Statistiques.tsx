@@ -1,138 +1,189 @@
 
 import React from 'react';
 import Layout from '../components/Layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useData } from '../contexts/DataContext';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import PrintStatisticsButton from '../components/statistiques/PrintStatisticsButton';
 
 const Statistiques = () => {
-  const { dossiers, certificats, statistiques } = useData();
+  const { statistiques, dossiers, certificats } = useData();
   
-  // Données pour le graphique des statuts de dossiers
-  const statusData = [
-    { name: 'Certifiés', value: statistiques.dossiersCertifies },
-    { name: 'En cours', value: statistiques.dossiersEnCours },
-    { name: 'Rejetés', value: statistiques.dossiersRejetes },
-    { name: 'En attente', value: dossiers.filter(d => d.status === 'en_attente').length },
-    { name: 'À corriger', value: dossiers.filter(d => d.status === 'a_corriger').length },
+  // Données pour le graphique des dossiers
+  const dossierData = [
+    { name: 'En cours', value: statistiques.dossiersEnCours, fill: '#3182CE' },
+    { name: 'Certifiés', value: statistiques.dossiersCertifies, fill: '#38A169' },
+    { name: 'Rejetés', value: statistiques.dossiersRejetes, fill: '#E53E3E' }
   ];
-
-  // Données pour le graphique des délais moyens de traitement par mois
-  const currentYear = new Date().getFullYear();
-  const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
-                    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
   
-  const monthlyData = monthNames.map((month, index) => {
-    return {
-      name: month,
-      délai: Math.floor(Math.random() * 10) + 20, // Données simulées: entre 20 et 30 jours
-      certificats: Math.floor(Math.random() * 8) + 1, // Données simulées: entre 1 et 8 certificats
-    };
-  });
+  // Données pour la répartition des certificats
+  const certificatsParStatut = certificats.reduce((acc: Record<string, number>, cert) => {
+    acc[cert.status] = (acc[cert.status] || 0) + 1;
+    return acc;
+  }, {});
+  
+  const certificatData = [
+    { name: 'Actifs', value: certificatsParStatut.actif || 0, fill: '#38A169' },
+    { name: 'Suspendus', value: certificatsParStatut.suspendu || 0, fill: '#ECC94B' },
+    { name: 'Retirés', value: certificatsParStatut.retire || 0, fill: '#E53E3E' },
+    { name: 'Expirés', value: certificatsParStatut.expire || 0, fill: '#718096' }
+  ];
+  
+  // Données pour les délais de traitement
+  const delaiData = [
+    { name: '< 15 jours', value: dossiers.filter(d => d.delai < 15).length, fill: '#38A169' },
+    { name: '15-30 jours', value: dossiers.filter(d => d.delai >= 15 && d.delai <= 30).length, fill: '#3182CE' },
+    { name: '> 30 jours', value: dossiers.filter(d => d.delai > 30).length, fill: '#E53E3E' }
+  ];
+  
+  // Couleurs pour le graphique pie
+  const COLORS = ['#38A169', '#3182CE', '#E53E3E', '#ECC94B', '#718096'];
 
   return (
     <Layout>
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-certif-blue">Statistiques et Reporting</h1>
-        <p className="text-gray-600 mt-2">
-          Tableau de bord analytique des activités de certification
-        </p>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-certif-blue">Statistiques</h1>
+        <PrintStatisticsButton />
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Total dossiers</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{statistiques.totalDossiers}</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Dossiers certifiés</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-green-600">{statistiques.dossiersCertifies}</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Délai moyen (jours)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-certif-blue">{statistiques.delaiMoyenTraitement}</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <Card>
           <CardHeader>
-            <CardTitle>Statut des dossiers</CardTitle>
+            <CardTitle>{statistiques.totalDossiers}</CardTitle>
+            <CardDescription>Total des dossiers</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={statusData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`${value} dossiers`, 'Quantité']} />
-                  <Legend />
-                  <Bar dataKey="value" name="Nombre de dossiers" fill="#4f46e5" />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="text-sm flex justify-between">
+              <span>Certification: {statistiques.dossiersCertifies}</span>
+              <span>En cours: {statistiques.dossiersEnCours}</span>
+              <span>Rejetés: {statistiques.dossiersRejetes}</span>
             </div>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader>
-            <CardTitle>Activité mensuelle {currentYear}</CardTitle>
+            <CardTitle>{statistiques.delaiMoyenTraitement} jours</CardTitle>
+            <CardDescription>Délai moyen de traitement</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis yAxisId="left" orientation="left" />
-                  <YAxis yAxisId="right" orientation="right" />
-                  <Tooltip formatter={(value, name) => 
-                    [name === 'délai' ? `${value} jours` : `${value} certificats`, 
-                     name === 'délai' ? 'Délai moyen' : 'Certificats délivrés']} />
-                  <Legend />
-                  <Bar yAxisId="left" dataKey="délai" name="Délai moyen (jours)" fill="#0ea5e9" />
-                  <Bar yAxisId="right" dataKey="certificats" name="Certificats délivrés" fill="#22c55e" />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="text-sm flex justify-between">
+              <span>Objectif: 30 jours</span>
+              <span>Min: 7 jours</span>
+              <span>Max: 60 jours</span>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>{certificats.length}</CardTitle>
+            <CardDescription>Certificats émis</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-sm flex justify-between">
+              <span>Actifs: {certificatsParStatut.actif || 0}</span>
+              <span>Suspendus: {certificatsParStatut.suspendu || 0}</span>
+              <span>Expirés: {certificatsParStatut.expire || 0}</span>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Performance financière (FCFA)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-80">
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Répartition des dossiers</CardTitle>
+            <CardDescription>Par statut</CardDescription>
+          </CardHeader>
+          <CardContent className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyData.map(m => ({
-                ...m, 
-                recettes: Math.floor(Math.random() * 2000000) + 1000000, // Données simulées: entre 1M et 3M FCFA
-                dépenses: Math.floor(Math.random() * 1000000) + 500000, // Données simulées: entre 500K et 1.5M FCFA
-              }))}>
+              <BarChart
+                data={dossierData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip formatter={(value) => [`${value.toLocaleString()} FCFA`, value === 'recettes' ? 'Recettes' : 'Dépenses']} />
+                <Tooltip />
+                <Bar dataKey="value" name="Nombre de dossiers" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Statut des certificats</CardTitle>
+            <CardDescription>Répartition par statut</CardDescription>
+          </CardHeader>
+          <CardContent className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={certificatData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={true}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {certificatData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
                 <Legend />
-                <Bar dataKey="recettes" name="Recettes" fill="#22c55e" />
-                <Bar dataKey="dépenses" name="Dépenses" fill="#ef4444" />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Financier (FCFA)</CardTitle>
+          <CardDescription>Revenus générés par les certifications</CardDescription>
+        </CardHeader>
+        <CardContent className="h-96">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="border rounded-lg p-4">
+                <div className="text-lg font-medium mb-1">Frais de gestion</div>
+                <div className="text-2xl font-bold">2,450,000 FCFA</div>
+                <div className="text-sm text-gray-500 mt-1">70 dossiers traités</div>
+              </div>
+              
+              <div className="border rounded-lg p-4">
+                <div className="text-lg font-medium mb-1">Frais d'inspection</div>
+                <div className="text-2xl font-bold">3,760,000 FCFA</div>
+                <div className="text-sm text-gray-500 mt-1">94 inspections réalisées</div>
+              </div>
+              
+              <div className="border rounded-lg p-4">
+                <div className="text-lg font-medium mb-1">Frais de surveillance</div>
+                <div className="text-2xl font-bold">1,820,000 FCFA</div>
+                <div className="text-sm text-gray-500 mt-1">52 entreprises sous surveillance</div>
+              </div>
+            </div>
+            
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={[
+                  { name: 'T1', frais: 1850000 },
+                  { name: 'T2', frais: 2120000 },
+                  { name: 'T3', frais: 2340000 },
+                  { name: 'T4', frais: 1720000 },
+                ]}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis tickFormatter={(value) => `${(value/1000000).toFixed(1)}M`} />
+                <Tooltip formatter={(value) => `${value.toLocaleString()} FCFA`} />
+                <Bar dataKey="frais" name="Revenus (FCFA)" fill="#38A169" />
               </BarChart>
             </ResponsiveContainer>
           </div>

@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { User, UserRole } from '../types';
 
@@ -41,16 +40,17 @@ const INITIAL_MOCK_USERS: User[] = [
 
 // Définir les accès par module pour chaque rôle
 const ROLE_ACCESS_MAP: Record<string, string[]> = {
-  'admin': ['dossiers', 'inspections', 'certificats', 'statistiques', 'acceuil', 'responsable-technique', 'user-management'],
+  'admin': ['dossiers', 'inspections', 'resultats', 'certificats', 'statistiques', 'acceuil', 'responsable-technique', 'user-management', 'notes-frais'],
   'acceuil': ['dossiers', 'acceuil'],
-  'inspecteur': ['inspections', 'dossiers'],
+  'inspecteur': ['inspections', 'dossiers', 'notes-frais'],
   'analyste': ['statistiques', 'dossiers'],
   'chef_mission': ['inspections', 'dossiers'],
-  'directeur': ['dossiers', 'certificats', 'statistiques', 'resultats'],
+  'directeur': ['dossiers', 'certificats', 'statistiques', 'resultats', 'inspections'],
   'responsable_technique': ['dossiers', 'responsable-technique', 'inspections'],
   'certificats': ['certificats', 'dossiers', 'resultats'],
   'directeur_general': ['dossiers', 'inspections', 'certificats', 'statistiques', 'acceuil', 'responsable-technique'],
-  'gestionnaire': ['dossiers', 'inspections'],
+  'gestionnaire': ['dossiers', 'inspections', 'notes-frais'],
+  'comptable': ['notes-frais', 'dossiers'],
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

@@ -30,7 +30,7 @@ import {
   DialogClose,
 } from '../components/ui/dialog';
 import { Badge } from '../components/ui/badge';
-import { ClipboardCheck, PlusCircle, MapPin, Calendar, User } from 'lucide-react';
+import { ClipboardCheck, PlusCircle, MapPin, Calendar, User, X } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../contexts/AuthContext';
 import InspectionDetails from '../components/inspections/InspectionDetails';
@@ -45,12 +45,15 @@ const Inspections = () => {
   const [inspectionDetailsOpen, setInspectionDetailsOpen] = useState(false);
   const [selectedInspectionId, setSelectedInspectionId] = useState('');
   
+  // État pour le nouvel inspecteur à ajouter
+  const [newInspectorName, setNewInspectorName] = useState('');
+  
   // État pour la nouvelle inspection
   const [newInspection, setNewInspection] = useState({
     dossierId: '',
     dateInspection: new Date().toISOString().split('T')[0],
     lieu: '',
-    inspecteurs: [currentUser?.name || ''],
+    inspecteurs: currentUser?.name ? [currentUser.name] : [],
     resultat: 'en_attente' as 'conforme' | 'non_conforme' | 'en_attente',
     recommandations: '',
     actionsCorrectives: ''
@@ -79,14 +82,36 @@ const Inspections = () => {
     });
   };
 
+  // Fonction pour ajouter un inspecteur
+  const handleAddInspector = () => {
+    if (newInspectorName.trim() === '') return;
+    
+    if (!newInspection.inspecteurs.includes(newInspectorName.trim())) {
+      setNewInspection({
+        ...newInspection,
+        inspecteurs: [...newInspection.inspecteurs, newInspectorName.trim()]
+      });
+    }
+    
+    setNewInspectorName('');
+  };
+
+  // Fonction pour supprimer un inspecteur
+  const handleRemoveInspector = (inspector: string) => {
+    setNewInspection({
+      ...newInspection,
+      inspecteurs: newInspection.inspecteurs.filter(i => i !== inspector)
+    });
+  };
+
   // Fonction pour ajouter une nouvelle inspection
   const handleAddInspection = () => {
     // Vérifier que tous les champs obligatoires sont remplis
-    if (!newInspection.dossierId || !newInspection.lieu) {
+    if (!newInspection.dossierId || !newInspection.lieu || newInspection.inspecteurs.length === 0) {
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: "Veuillez remplir tous les champs obligatoires.",
+        description: "Veuillez remplir tous les champs obligatoires, y compris l'ajout d'au moins un inspecteur.",
       });
       return;
     }
@@ -102,7 +127,7 @@ const Inspections = () => {
       dossierId: '',
       dateInspection: new Date().toISOString().split('T')[0],
       lieu: '',
-      inspecteurs: [currentUser?.name || ''],
+      inspecteurs: currentUser?.name ? [currentUser.name] : [],
       resultat: 'en_attente',
       recommandations: '',
       actionsCorrectives: ''
@@ -234,6 +259,46 @@ const Inspections = () => {
                   placeholder="Adresse de l'inspection"
                 />
               </div>
+              
+              <div className="grid grid-cols-4 items-start gap-4">
+                <label className="text-right font-medium text-sm pt-2">
+                  Inspecteurs*
+                </label>
+                <div className="col-span-3">
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {newInspection.inspecteurs.map((inspector) => (
+                      <Badge key={inspector} variant="secondary" className="flex items-center gap-1 px-2 py-1">
+                        <User size={14} />
+                        {inspector}
+                        <button 
+                          type="button" 
+                          onClick={() => handleRemoveInspector(inspector)}
+                          className="ml-1 rounded-full hover:bg-gray-200 p-0.5"
+                        >
+                          <X size={14} />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      value={newInspectorName}
+                      onChange={(e) => setNewInspectorName(e.target.value)}
+                      placeholder="Nom de l'inspecteur"
+                      className="flex-1"
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleAddInspector}
+                    >
+                      Ajouter
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              
               <div className="grid grid-cols-4 items-start gap-4">
                 <label htmlFor="recommandations" className="text-right font-medium text-sm pt-2">
                   Notes
@@ -302,7 +367,8 @@ const Inspections = () => {
                 filteredInspections.map((inspection) => {
                   const dossier = dossiers.find(d => d.id === inspection.dossierId);
                   const isPast = new Date(inspection.dateInspection) < new Date();
-                  const canUpdate = isPast && inspection.resultat === 'en_attente' && currentUser?.role === 'inspecteur';
+                  const canUpdate = isPast && inspection.resultat === 'en_attente' && 
+                                   (currentUser?.role === 'inspecteur' || currentUser?.role === 'chef_mission');
                   
                   return (
                     <TableRow key={inspection.id}>

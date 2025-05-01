@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FileCheck, FileText, ClipboardCheck, Home, BarChart, UserRound, Shield } from 'lucide-react';
+import { FileCheck, FileText, ClipboardCheck, Home, BarChart, UserRound, Shield, Calculator } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface NavigationProps {
@@ -20,6 +20,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onItemClick }) 
     { to: '/dossiers', icon: <FileText size={20} />, label: 'Dossiers en cours', module: 'dossiers' },
     { to: '/inspections', icon: <ClipboardCheck size={20} />, label: 'Inspections', module: 'inspections' },
     { to: '/certificats', icon: <FileCheck size={20} />, label: 'Résultats', module: 'resultats' },
+    { to: '/notes-frais', icon: <Calculator size={20} />, label: 'Notes de frais', module: 'notes-frais' },
     { to: '/statistiques', icon: <BarChart size={20} />, label: 'Statistiques', module: 'statistiques' },
     { to: '/responsable-technique', icon: <Shield size={20} />, label: 'Responsable Technique', module: 'responsable-technique' },
     { to: '/user-management', icon: <UserRound size={20} />, label: 'Gestion des utilisateurs', module: 'user-management' },
