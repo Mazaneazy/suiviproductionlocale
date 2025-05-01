@@ -64,12 +64,11 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
                 certif: {
-                    blue: '#1A365D',
-                    green: '#2C7A7B',
-                    red: '#C53030',
-                    yellow: '#DD6B20',
-                    lightblue: '#EBF8FF',
-                    lightgray: '#F7FAFC'
+                    blue: '#0068B7',     // ANOR blue from the logo
+                    lightblue: '#E6F2FF', // Light shade of ANOR blue
+                    darkblue: '#004C8A',  // Darker shade of ANOR blue
+                    gray: '#F7FAFC',
+                    lightgray: '#F0F4F8'
                 }
 			},
 			borderRadius: {

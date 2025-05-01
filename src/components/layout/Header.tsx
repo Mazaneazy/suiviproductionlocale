@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FileCheck } from 'lucide-react';
 import { Button } from '../ui/button';
 import {
   Sheet,
@@ -45,9 +44,16 @@ const Header: React.FC<HeaderProps> = ({ mobileMenuOpen, setMobileMenuOpen }) =>
               </div>
             </SheetContent>
           </Sheet>
-          <Link to="/" className="text-xl font-bold text-certif-blue flex items-center">
-            <FileCheck className="mr-2 text-certif-green" />
-            CertifFlow
+          <Link to="/" className="flex items-center">
+            <img 
+              src="/lovable-uploads/b3a4f946-cb80-4ff5-9096-718b92e2e94a.png" 
+              alt="ANOR Logo" 
+              className="h-10 mr-3" 
+            />
+            <div className="flex flex-col">
+              <span className="text-lg font-bold text-certif-blue">Suivi de la Certification</span>
+              <span className="text-sm text-certif-blue">des Produits Locaux</span>
+            </div>
           </Link>
         </div>
 

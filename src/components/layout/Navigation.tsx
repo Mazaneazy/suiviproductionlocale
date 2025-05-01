@@ -62,7 +62,11 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onItemClick }) 
         <Link
           key={link.to}
           to={link.to}
-          className={`flex items-center space-x-2 py-2 px-3 rounded-md ${isActive(link.to) ? 'bg-certif-lightblue text-certif-blue font-medium' : 'hover:bg-gray-100'} transition-colors`}
+          className={`flex items-center space-x-2 py-2 px-3 rounded-md ${
+            isActive(link.to) 
+              ? 'bg-certif-lightblue text-certif-blue font-medium' 
+              : 'hover:bg-gray-100'
+          } transition-colors`}
           onClick={onItemClick}
         >
           {link.icon}
