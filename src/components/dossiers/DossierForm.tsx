@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Dossier } from '@/types';
 import DossierBasicFields from './fields/DossierBasicFields';
 import DossierDateFields from './fields/DossierDateFields';
-import DossierStatusField from './fields/DossierStatusField';
 import DocumentFields from './fields/DocumentFields';
 import { useDossierForm } from './hooks/useDossierForm';
 import { Separator } from '@/components/ui/separator';
@@ -20,11 +19,10 @@ interface DossierFormProps {
 const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierFormProps) => {
   const { 
     handleInputChange, 
-    handleStatusChange, 
+    handleFileChange,
     handleAddDossier,
     documents,
     fileInputRefs,
-    handleFileChange,
     removeFile
   } = useDossierForm(
     newDossier, 
@@ -47,13 +45,6 @@ const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierF
       <DossierDateFields 
         newDossier={newDossier} 
         handleInputChange={handleInputChange} 
-      />
-      
-      <Separator className="my-2" />
-      
-      <DossierStatusField 
-        status={newDossier.status} 
-        onStatusChange={handleStatusChange} 
       />
       
       <Separator className="my-2" />

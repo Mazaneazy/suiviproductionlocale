@@ -1,3 +1,4 @@
+
 import { useState, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Dossier, DocumentDossier } from '@/types';
@@ -70,10 +71,6 @@ export const useDossierForm = (
     }
   };
 
-  const handleStatusChange = (value: "complet" | "en_attente" | "rejete" | "en_cours" | "certifie" | "a_corriger") => {
-    setNewDossier({ ...newDossier, status: value });
-  };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
     const file = e.target.files?.[0] || null;
     
@@ -142,7 +139,6 @@ export const useDossierForm = (
   
   return {
     handleInputChange,
-    handleStatusChange,
     handleAddDossier,
     documents,
     fileInputRefs,
