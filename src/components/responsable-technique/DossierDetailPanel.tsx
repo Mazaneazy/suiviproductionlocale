@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { useData } from '@/contexts/DataContext';
 import { Dossier, DocumentDossier } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, X, AlertCircle, FileText } from 'lucide-react';
+import { Check, X, AlertCircle, FileText, FilePdf } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -59,6 +58,8 @@ const DossierDetailPanel: React.FC<DossierDetailPanelProps> = ({
         return 'Liste du personnel';
       case 'plan_localisation':
         return 'Plan de localisation';
+      case 'pdf':
+        return 'Document PDF';
       default:
         return type;
     }
@@ -75,6 +76,11 @@ const DossierDetailPanel: React.FC<DossierDetailPanelProps> = ({
       ...documentStatuses,
       [docId]: status
     });
+  };
+  
+  // View PDF document
+  const viewDocument = (url: string, name: string) => {
+    window.open(url, `_blank_${name}`);
   };
   
   // Vérifier si tous les documents sont validés
@@ -147,21 +153,39 @@ const DossierDetailPanel: React.FC<DossierDetailPanelProps> = ({
               <Card key={doc.id} className="overflow-hidden">
                 <CardHeader className="p-4 pb-2">
                   <CardTitle className="text-sm font-medium flex items-center">
-                    <FileText size={16} className="mr-2" />
-                    {formatDocumentType(doc.type)}
+                    {doc.type === 'pdf' ? (
+                      <FilePdf size={16} className="mr-2 text-red-500" />
+                    ) : (
+                      <FileText size={16} className="mr-2" />
+                    )}
+                    {doc.type === 'pdf' ? doc.nom : formatDocumentType(doc.type)}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
-                  <p className="text-sm">{doc.nom}</p>
+                  <p className="text-sm">
+                    {doc.type === 'pdf' 
+                      ? `Téléversé le ${new Date(doc.dateUpload).toLocaleDateString()}` 
+                      : doc.nom}
+                  </p>
                 </CardContent>
                 <CardFooter className="p-4 pt-0 flex justify-between">
-                  <div>
+                  <div className="flex items-center gap-2">
                     {doc.status === 'valide' || documentStatuses[doc.id] === 'valide' ? (
                       <Badge className="bg-green-500">Validé</Badge>
                     ) : doc.status === 'rejete' || documentStatuses[doc.id] === 'rejete' ? (
                       <Badge className="bg-red-500">Rejeté</Badge>
                     ) : (
                       <Badge>En attente</Badge>
+                    )}
+                    {doc.type === 'pdf' && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => viewDocument(doc.url, doc.nom)}
+                        className="text-certif-blue hover:text-certif-blue/80"
+                      >
+                        Visualiser
+                      </Button>
                     )}
                   </div>
                   <div className="flex gap-2">

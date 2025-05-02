@@ -40,8 +40,25 @@ const Dossiers = () => {
     return matchesSearch && matchesStatus;
   });
 
+  // Check if company name already exists
+  const companyNameExists = (name: string): boolean => {
+    return dossiers.some(dossier => 
+      dossier.operateurNom.toLowerCase() === name.toLowerCase()
+    );
+  };
+
   // Fonction pour ajouter un nouveau dossier
   const handleAddDossier = () => {
+    // Check for duplicate company name
+    if (companyNameExists(newDossier.operateurNom)) {
+      toast({
+        title: "Erreur",
+        description: `Une entreprise avec le nom "${newDossier.operateurNom}" existe déjà.`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
     addDossier(newDossier);
     toast({
       title: "Dossier ajouté",

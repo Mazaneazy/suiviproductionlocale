@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Calendar, Clock, User, FileCheck } from 'lucide-react';
+import { FileText, Calendar, Clock, User, FileCheck, FilePdf } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -56,6 +56,31 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
       case 'a_corriger': return 'À corriger';
       default: return status;
     }
+  };
+
+  // Format document type name for better display
+  const formatDocumentType = (type: string) => {
+    switch (type) {
+      case 'registre_commerce':
+        return 'Registre de Commerce';
+      case 'carte_contribuable':
+        return 'Carte de Contribuable (NIU)';
+      case 'processus_production':
+        return 'Schéma du processus de production';
+      case 'certificats_conformite':
+        return 'Certificats de Conformité';
+      case 'liste_personnel':
+        return 'Liste du personnel';
+      case 'plan_localisation':
+        return 'Plan de localisation';
+      default:
+        return type;
+    }
+  };
+
+  // Helper function to view a PDF document
+  const viewDocument = (url: string, name: string) => {
+    window.open(url, `_blank_${name}`);
   };
 
   return (
@@ -137,16 +162,26 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
                   {documents.map((doc) => (
                     <div key={doc.id} className="flex items-center justify-between p-3 border rounded-md">
                       <div className="flex items-center">
-                        <FileText className="mr-3 text-certif-blue" size={20} />
+                        {doc.type === 'pdf' ? (
+                          <FilePdf className="mr-3 text-red-500" size={20} />
+                        ) : (
+                          <FileText className="mr-3 text-certif-blue" size={20} />
+                        )}
                         <div>
-                          <div className="font-medium">{doc.nom}</div>
+                          <div className="font-medium">
+                            {doc.type !== 'pdf' ? formatDocumentType(doc.type) : doc.nom}
+                          </div>
                           <div className="text-sm text-gray-500">
                             Téléversé le {new Date(doc.dateUpload).toLocaleDateString()}
                           </div>
                         </div>
                       </div>
-                      <Button variant="outline" size="sm">
-                        Télécharger
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => viewDocument(doc.url, doc.nom)}
+                      >
+                        {doc.type === 'pdf' ? 'Visualiser' : 'Télécharger'}
                       </Button>
                     </div>
                   ))}
