@@ -1,311 +1,355 @@
+import { Dossier, NoteFrais, Inspection, Certificat, Notification, DocumentDossier } from '../../types';
+import { generateId } from './utils';
 
-import { Dossier, NoteFrais, Inspection, Certificat, Notification } from '../../types';
-
-// Données de démo pour des entreprises camerounaises
 export const MOCK_DOSSIERS: Dossier[] = [
   {
-    id: '1',
-    operateurNom: 'SABC (Société Anonyme des Brasseries du Cameroun)',
-    promoteurNom: 'Jean Ndongo',
-    telephone: '+237 655 123 456',
-    typeProduit: 'Boissons gazeuses',
-    dateTransmission: '2025-03-15',
+    id: 'dossier-1',
+    operateurNom: 'SADAM Sarl',
+    promoteurNom: 'M. Jean Eboa',
+    telephone: '678901234',
+    typeProduit: 'Jus de fruits',
     responsable: 'Gestionnaire',
-    status: 'en_cours',
-    delai: 30,
-    dateButoir: '2025-04-15',
-  },
-  {
-    id: '2',
-    operateurNom: 'SOSUCAM (Société Sucrière du Cameroun)',
-    promoteurNom: 'Marie Mbala',
-    telephone: '+237 677 234 567',
-    typeProduit: 'Sucre raffiné',
-    dateTransmission: '2025-02-28',
-    responsable: 'Gestionnaire',
-    status: 'complet',
-    delai: 30,
-    dateButoir: '2025-03-30',
-  },
-  {
-    id: '3',
-    operateurNom: 'CICAM (Cotonnière Industrielle du Cameroun)',
-    promoteurNom: 'Paul Biya',
-    telephone: '+237 699 345 678',
-    typeProduit: 'Textile',
-    dateTransmission: '2025-01-20',
-    responsable: 'Gestionnaire',
-    status: 'certifie',
-    delai: 45,
-    dateButoir: '2025-03-06',
-  },
-  {
-    id: '4',
-    operateurNom: 'CIMENCAM (Cimenteries du Cameroun)',
-    promoteurNom: 'Sarah Ekolo',
-    telephone: '+237 655 456 789',
-    typeProduit: 'Ciment',
-    dateTransmission: '2025-03-05',
-    responsable: 'Gestionnaire',
+    dateTransmission: new Date(2024, 0, 20).toISOString(),
     status: 'en_attente',
     delai: 30,
-    dateButoir: '2025-04-05',
+    dateButoir: new Date(2024, 1, 19).toISOString(),
+    historique: [
+      {
+        id: generateId(),
+        dossierId: 'dossier-1',
+        date: new Date().toISOString(),
+        action: 'Dossier créé',
+        responsable: 'System',
+        commentaire: 'Dossier initial créé par le système.'
+      }
+    ]
   },
   {
-    id: '5',
-    operateurNom: 'CHOCOCAM (Chocolaterie et Confiserie du Cameroun)',
-    promoteurNom: 'Pierre Kamdem',
-    telephone: '+237 677 567 890',
-    typeProduit: 'Chocolats et confiseries',
-    dateTransmission: '2025-03-10',
-    responsable: 'Gestionnaire',
-    status: 'en_cours',
-    delai: 20,
-    dateButoir: '2025-03-30',
-  },
-  {
-    id: '6',
-    operateurNom: 'ALUCAM (Aluminium du Cameroun)',
-    promoteurNom: 'Eric Mboma',
-    telephone: '+237 699 678 901',
-    typeProduit: 'Aluminium',
-    dateTransmission: '2025-02-15',
-    responsable: 'Gestionnaire',
-    status: 'en_attente',
-    delai: 40,
-    dateButoir: '2025-03-27',
-  },
-  {
-    id: '7',
-    operateurNom: 'PAMOL Plantations',
-    promoteurNom: 'Sophie Manga',
-    telephone: '+237 655 789 012',
-    typeProduit: 'Huile de palme',
-    dateTransmission: '2025-01-25',
-    responsable: 'Gestionnaire',
-    status: 'certifie',
-    delai: 35,
-    dateButoir: '2025-03-01',
-  },
-  {
-    id: '8',
-    operateurNom: 'SODECOTON (Société de Développement du Coton)',
-    promoteurNom: 'Michel Atangana',
-    telephone: '+237 677 890 123',
-    typeProduit: 'Coton',
-    dateTransmission: '2025-02-10',
-    responsable: 'Gestionnaire',
-    status: 'complet',
-    delai: 25,
-    dateButoir: '2025-03-07',
-  },
-  {
-    id: '9',
-    operateurNom: 'SEMC (Société des Eaux Minérales du Cameroun)',
-    promoteurNom: 'Claudine Ndom',
-    telephone: '+237 699 901 234',
+    id: 'dossier-2',
+    operateurNom: 'BOIS Sarl',
+    promoteurNom: 'Mme. Alice Kamga',
+    telephone: '698765432',
     typeProduit: 'Eau minérale',
-    dateTransmission: '2025-03-01',
     responsable: 'Gestionnaire',
-    status: 'en_cours',
-    delai: 15,
-    dateButoir: '2025-03-16',
+    dateTransmission: new Date(2024, 0, 15).toISOString(),
+    status: 'complet',
+    delai: 45,
+    dateButoir: new Date(2024, 2, 1).toISOString(),
+    historique: [
+      {
+        id: generateId(),
+        dossierId: 'dossier-2',
+        date: new Date().toISOString(),
+        action: 'Dossier créé',
+        responsable: 'System',
+        commentaire: 'Dossier initial créé par le système.'
+      }
+    ]
   },
   {
-    id: '10',
-    operateurNom: 'MAÏSCAM (Société Maïserie du Cameroun)',
-    promoteurNom: 'Jacques Etoga',
-    telephone: '+237 655 012 345',
-    typeProduit: 'Farine de maïs',
-    dateTransmission: '2025-02-20',
+    id: 'dossier-3',
+    operateurNom: 'CATTIN Cameroon',
+    promoteurNom: 'M. Pierre Titi',
+    telephone: '654321098',
+    typeProduit: 'Conserves de légumes',
     responsable: 'Gestionnaire',
+    dateTransmission: new Date(2024, 0, 10).toISOString(),
+    status: 'rejete',
+    delai: 60,
+    dateButoir: new Date(2024, 2, 10).toISOString(),
+    historique: [
+      {
+        id: generateId(),
+        dossierId: 'dossier-3',
+        date: new Date().toISOString(),
+        action: 'Dossier créé',
+        responsable: 'System',
+        commentaire: 'Dossier initial créé par le système.'
+      }
+    ]
+  },
+  {
+    id: 'dossier-4',
+    operateurNom: 'AFRICA FOODS',
+    promoteurNom: 'Mme. Marie Ntonè',
+    telephone: '666777888',
+    typeProduit: 'Biscuits',
+    responsable: 'Gestionnaire',
+    dateTransmission: new Date(2024, 0, 5).toISOString(),
     status: 'en_attente',
     delai: 30,
-    dateButoir: '2025-03-22',
+    dateButoir: new Date(2024, 1, 4).toISOString(),
+    historique: [
+      {
+        id: generateId(),
+        dossierId: 'dossier-4',
+        date: new Date().toISOString(),
+        action: 'Dossier créé',
+        responsable: 'System',
+        commentaire: 'Dossier initial créé par le système.'
+      }
+    ]
   },
+  {
+    id: 'dossier-5',
+    operateurNom: 'AGROCAM Sarl',
+    promoteurNom: 'M. Marc Essomba',
+    telephone: '688999000',
+    typeProduit: 'Huile végétale',
+    responsable: 'Gestionnaire',
+    dateTransmission: new Date(2023, 11, 28).toISOString(),
+    status: 'en_attente',
+    delai: 45,
+    dateButoir: new Date(2024, 1, 11).toISOString(),
+    historique: [
+      {
+        id: generateId(),
+        dossierId: 'dossier-5',
+        date: new Date().toISOString(),
+        action: 'Dossier créé',
+        responsable: 'System',
+        commentaire: 'Dossier initial créé par le système.'
+      }
+    ]
+  },
+  {
+    id: 'dossier-6',
+    operateurNom: 'SODECAO SA',
+    promoteurNom: 'Mme. Jeanne Biloa',
+    telephone: '677112233',
+    typeProduit: 'Chocolat',
+    responsable: 'Gestionnaire',
+    dateTransmission: new Date(2023, 11, 20).toISOString(),
+    status: 'en_attente',
+    delai: 60,
+    dateButoir: new Date(2024, 1, 19).toISOString(),
+    historique: [
+      {
+        id: generateId(),
+        dossierId: 'dossier-6',
+        date: new Date().toISOString(),
+        action: 'Dossier créé',
+        responsable: 'System',
+        commentaire: 'Dossier initial créé par le système.'
+      }
+    ]
+  },
+  {
+    id: 'dossier-7',
+    operateurNom: 'SAFACAM SA',
+    promoteurNom: 'M. Alain Tewa',
+    telephone: '699887766',
+    typeProduit: 'Farine de blé',
+    responsable: 'Gestionnaire',
+    dateTransmission: new Date(2023, 11, 12).toISOString(),
+    status: 'en_attente',
+    delai: 30,
+    dateButoir: new Date(2024, 0, 11).toISOString(),
+    historique: [
+      {
+        id: generateId(),
+        dossierId: 'dossier-7',
+        date: new Date().toISOString(),
+        action: 'Dossier créé',
+        responsable: 'System',
+        commentaire: 'Dossier initial créé par le système.'
+      }
+    ]
+  },
+  {
+    id: 'dossier-8',
+    operateurNom: 'CAMLAIT SA',
+    promoteurNom: 'Mme. Isabelle Mbassi',
+    telephone: '655443322',
+    typeProduit: 'Lait pasteurisé',
+    responsable: 'Gestionnaire',
+    dateTransmission: new Date(2023, 11, 5).toISOString(),
+    status: 'en_attente',
+    delai: 45,
+    dateButoir: new Date(2024, 0, 19).toISOString(),
+    historique: [
+      {
+        id: generateId(),
+        dossierId: 'dossier-8',
+        date: new Date().toISOString(),
+        action: 'Dossier créé',
+        responsable: 'System',
+        commentaire: 'Dossier initial créé par le système.'
+      }
+    ]
+  },
+  {
+    id: 'dossier-9',
+    operateurNom: 'BRASSERIES DU CAMEROUN',
+    promoteurNom: 'M. Joseph Ndongo',
+    telephone: '677665544',
+    typeProduit: 'Boissons gazeuses',
+    responsable: 'Gestionnaire',
+    dateTransmission: new Date(2023, 10, 28).toISOString(),
+    status: 'en_attente',
+    delai: 60,
+    dateButoir: new Date(2024, 0, 27).toISOString(),
+    historique: [
+      {
+        id: generateId(),
+        dossierId: 'dossier-9',
+        date: new Date().toISOString(),
+        action: 'Dossier créé',
+        responsable: 'System',
+        commentaire: 'Dossier initial créé par le système.'
+      }
+    ]
+  },
+  {
+    id: 'dossier-10',
+    operateurNom: 'NESTLE Cameroun SA',
+    promoteurNom: 'Mme. Sylvie Eto\'o',
+    telephone: '699112200',
+    typeProduit: 'Céréales infantiles',
+    responsable: 'Gestionnaire',
+    dateTransmission: new Date(2023, 10, 20).toISOString(),
+    status: 'en_attente',
+    delai: 30,
+    dateButoir: new Date(2023, 11, 19).toISOString(),
+    historique: [
+      {
+        id: generateId(),
+        dossierId: 'dossier-10',
+        date: new Date().toISOString(),
+        action: 'Dossier créé',
+        responsable: 'System',
+        commentaire: 'Dossier initial créé par le système.'
+      }
+    ]
+  }
 ];
 
 export const MOCK_NOTES_FRAIS: NoteFrais[] = [
   {
-    id: '1',
-    dossierId: '1',
-    inspecteurId: '3',
-    date: '2025-03-20',
-    description: 'Inspection site de production',
-    montant: 195000,
+    id: 'note-1',
+    dossierId: 'dossier-2',
+    dateCreation: new Date().toISOString(),
+    montantTotal: 50000,
+    description: 'Frais de déplacement et de séjour pour inspection',
     status: 'en_attente',
-    deplacement: 75000,
-    hebergement: 40000,
-    restauration: 30000,
-    indemnites: 50000
   },
   {
-    id: '2',
-    dossierId: '2',
-    inspecteurId: '3',
-    date: '2025-03-10',
-    description: 'Visite de contrôle',
-    montant: 85000,
-    status: 'valide',
-    deplacement: 45000,
-    hebergement: 0,
-    restauration: 15000,
-    indemnites: 25000
-  },
-  {
-    id: '3',
-    dossierId: '3',
-    inspecteurId: '3',
-    date: '2025-02-05',
-    description: 'Inspection usine',
-    montant: 260000,
-    status: 'valide',
-    deplacement: 120000,
-    hebergement: 60000,
-    restauration: 35000,
-    indemnites: 45000
-  },
-  {
-    id: '4',
-    dossierId: '5',
-    inspecteurId: '3',
-    date: '2025-03-12',
-    description: 'Contrôle qualité',
-    montant: 160000,
-    status: 'en_attente',
-    deplacement: 60000,
-    hebergement: 45000,
-    restauration: 25000,
-    indemnites: 30000
-  },
-  {
-    id: '5',
-    dossierId: '7',
-    inspecteurId: '3',
-    date: '2025-01-30',
-    description: 'Inspection plantation',
-    montant: 315000,
-    status: 'valide',
-    deplacement: 150000,
-    hebergement: 70000,
-    restauration: 40000,
-    indemnites: 55000
+    id: 'note-2',
+    dossierId: 'dossier-3',
+    dateCreation: new Date().toISOString(),
+    montantTotal: 75000,
+    description: 'Frais de laboratoire pour analyses',
+    status: 'validee',
   },
 ];
 
 export const MOCK_INSPECTIONS: Inspection[] = [
   {
-    id: '1',
-    dossierId: '1',
-    dateInspection: '2025-03-25',
-    lieu: 'Douala, Littoral',
-    inspecteurs: ['Inspecteur'],
-    resultat: 'en_attente',
+    id: 'inspection-1',
+    dossierId: 'dossier-2',
+    datePrevue: new Date().toISOString(),
+    dateRealisation: new Date().toISOString(),
+    resultat: 'Conforme',
+    rapport: 'Rapport détaillé de l\'inspection',
   },
   {
-    id: '2',
-    dossierId: '2',
-    dateInspection: '2025-03-15',
-    lieu: 'Mbandjock, Centre',
-    inspecteurs: ['Inspecteur'],
-    resultat: 'conforme',
-    recommandations: 'Maintien des bonnes pratiques de production'
-  },
-  {
-    id: '3',
-    dossierId: '3',
-    dateInspection: '2025-02-10',
-    lieu: 'Garoua, Nord',
-    inspecteurs: ['Inspecteur'],
-    resultat: 'conforme',
-    recommandations: 'Excellente qualité des tissus'
-  },
-  {
-    id: '4',
-    dossierId: '5',
-    dateInspection: '2025-03-20',
-    lieu: 'Douala, Littoral',
-    inspecteurs: ['Inspecteur'],
-    resultat: 'en_attente',
-  },
-  {
-    id: '5',
-    dossierId: '7',
-    dateInspection: '2025-02-05',
-    lieu: 'Limbé, Sud-Ouest',
-    inspecteurs: ['Inspecteur'],
-    resultat: 'conforme',
-    recommandations: 'Respect des normes environnementales'
+    id: 'inspection-2',
+    dossierId: 'dossier-3',
+    datePrevue: new Date().toISOString(),
+    dateRealisation: new Date().toISOString(),
+    resultat: 'Non conforme',
+    rapport: 'Rapport détaillé de l\'inspection',
   },
 ];
 
 export const MOCK_CERTIFICATS: Certificat[] = [
   {
-    id: '1',
-    dossierId: '3',
-    numero: 'CERT-2025-001',
-    entreprise: 'CICAM (Cotonnière Industrielle du Cameroun)',
-    produit: 'Textile',
-    dateDelivrance: '2025-02-15',
-    dateExpiration: '2026-02-15',
-    status: 'actif',
+    id: 'certificat-1',
+    dossierId: 'dossier-2',
+    dateEmission: new Date().toISOString(),
+    dateExpiration: new Date(2025, 0, 1).toISOString(),
+    reference: 'CERT-2024-001',
+    url: 'https://example.com/certificat-1.pdf',
   },
   {
-    id: '2',
-    dossierId: '7',
-    numero: 'CERT-2025-002',
-    entreprise: 'PAMOL Plantations',
-    produit: 'Huile de palme',
-    dateDelivrance: '2025-02-01',
-    dateExpiration: '2026-02-01',
-    status: 'actif',
+    id: 'certificat-2',
+    dossierId: 'dossier-3',
+    dateEmission: new Date().toISOString(),
+    dateExpiration: new Date(2025, 0, 1).toISOString(),
+    reference: 'CERT-2024-002',
+    url: 'https://example.com/certificat-2.pdf',
   },
 ];
 
 export const MOCK_NOTIFICATIONS: Notification[] = [
   {
-    id: '1',
-    message: 'Le délai pour le dossier "SABC" arrive bientôt à expiration',
-    date: '2025-04-10',
-    lue: false,
+    id: generateId(),
+    type: 'info',
+    message: 'Nouveau dossier en attente de validation.',
+    date: new Date().toISOString(),
+    isRead: false,
+  },
+  {
+    id: generateId(),
+    type: 'success',
+    message: 'Votre note de frais a été approuvée.',
+    date: new Date().toISOString(),
+    isRead: false,
+  },
+  {
+    id: generateId(),
     type: 'warning',
-    userId: '1',
-    link: '/dossiers/1'
+    message: 'La date d\'expiration de votre certificat approche.',
+    date: new Date().toISOString(),
+    isRead: false,
+  },
+];
+
+// Add mock documents
+export const MOCK_DOCUMENTS: DocumentDossier[] = [
+  {
+    id: 'doc-1',
+    dossierId: 'dossier-1',
+    nom: 'Registre de Commerce',
+    type: 'registre_commerce',
+    url: 'https://example.com/docs/registre_commerce.pdf',
+    dateUpload: new Date(2025, 4, 1).toISOString(),
+    status: 'valide'
   },
   {
-    id: '2',
-    message: 'La note de frais pour "SOSUCAM" a été validée',
-    date: '2025-03-12',
-    lue: true,
-    type: 'info',
-    userId: '1',
-    link: '/notes-frais/2'
+    id: 'doc-2',
+    dossierId: 'dossier-1',
+    nom: 'Carte de Contribuable',
+    type: 'carte_contribuable',
+    url: 'https://example.com/docs/carte_contribuable.pdf',
+    dateUpload: new Date(2025, 4, 1).toISOString(),
+    status: 'en_attente'
   },
   {
-    id: '3',
-    message: 'Vous avez été assigné à une nouvelle inspection',
-    date: '2025-03-20',
-    lue: false,
-    type: 'info',
-    userId: '3',
-    link: '/inspections/1'
+    id: 'doc-3',
+    dossierId: 'dossier-1',
+    nom: 'Schéma du processus de production',
+    type: 'processus_production',
+    url: 'https://example.com/docs/processus.pdf',
+    dateUpload: new Date(2025, 4, 1).toISOString(),
+    status: 'en_attente'
   },
   {
-    id: '4',
-    message: 'Note de frais reçue du laboratoire pour CHOCOCAM',
-    date: '2025-03-12',
-    lue: false,
-    type: 'info',
-    userId: '1',
-    link: '/notes-frais/4'
+    id: 'doc-4',
+    dossierId: 'dossier-2',
+    nom: 'Registre de Commerce',
+    type: 'registre_commerce',
+    url: 'https://example.com/docs/registre_commerce2.pdf',
+    dateUpload: new Date(2025, 4, 1).toISOString(),
+    status: 'rejete'
   },
   {
-    id: '5',
-    message: 'Contrôle inopiné planifié pour SODECOTON',
-    date: '2025-03-05',
-    lue: false,
-    type: 'warning',
-    userId: '2',
-    link: '/inspections/6'
-  },
+    id: 'doc-5',
+    dossierId: 'dossier-2',
+    nom: 'Plan de localisation',
+    type: 'plan_localisation',
+    url: 'https://example.com/docs/plan.pdf',
+    dateUpload: new Date(2025, 4, 2).toISOString(),
+    status: 'valide'
+  }
 ];

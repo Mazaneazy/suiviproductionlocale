@@ -1,10 +1,12 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DocumentDossier, HistoriqueEvenement } from '../../../types';
 import { generateId } from '../utils';
+import { MOCK_DOCUMENTS } from '../mockData';
 
 export function useDocuments(updateDossier: (id: string, data: any) => void) {
-  const [documents, setDocuments] = useState<DocumentDossier[]>([]);
+  // Initialize with mock data for demonstration
+  const [documents, setDocuments] = useState<DocumentDossier[]>(MOCK_DOCUMENTS);
 
   const addDocument = (document: Omit<DocumentDossier, 'id'>) => {
     // Explicitly set the status to 'en_attente' as a valid DocumentDossier status

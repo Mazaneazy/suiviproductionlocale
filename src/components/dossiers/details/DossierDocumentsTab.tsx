@@ -35,6 +35,8 @@ const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({ documents }) 
     window.open(url, `_blank_${name}`);
   };
 
+  console.log("Rendering DossierDocumentsTab with documents:", documents);
+
   return (
     <ScrollArea className="h-full pr-4">
       {documents && documents.length > 0 ? (

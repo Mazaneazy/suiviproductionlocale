@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useData } from '@/contexts/DataContext';
 import {
   Dialog,
@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,6 +29,8 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
     getInspectionsByDossierId,
     getCertificatByDossierId
   } = useData();
+  
+  const [isOpen, setIsOpen] = useState(false);
 
   const dossier = getDossierById(dossierId);
   const documents = getDocumentsByDossierId(dossierId);
@@ -35,9 +38,11 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
   const certificat = getCertificatByDossierId(dossierId);
 
   if (!dossier) return null;
+  
+  console.log("Documents for dossier", dossierId, ":", documents);
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">Détails</Button>
       </DialogTrigger>
@@ -46,6 +51,9 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
           <DialogTitle className="text-xl">
             Détails du dossier: {dossier.operateurNom}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Informations détaillées sur le dossier {dossier.operateurNom}
+          </DialogDescription>
         </DialogHeader>
         
         <DossierHeader dossier={dossier} />
