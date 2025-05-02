@@ -86,16 +86,16 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
             />
             
             <DialogFooter className="mt-4">
-              <Button variant="outline" onClick={closeDialog} className="mr-2">
-                Annuler
-              </Button>
               <Button 
                 onClick={handleSubmit} 
                 disabled={!isFormValid}
-                className="bg-certif-green hover:bg-certif-green/90"
+                className="bg-certif-green hover:bg-certif-green/90 mr-2"
               >
                 <Save className="mr-2" size={16} />
                 Enregistrer
+              </Button>
+              <Button variant="outline" onClick={closeDialog}>
+                Annuler
               </Button>
             </DialogFooter>
           </>
