@@ -1,3 +1,4 @@
+
 import { Dossier, NoteFrais, Inspection, Certificat, Notification, DocumentDossier } from '../../types';
 import { generateId } from './utils';
 
@@ -228,18 +229,24 @@ export const MOCK_NOTES_FRAIS: NoteFrais[] = [
   {
     id: 'note-1',
     dossierId: 'dossier-2',
+    inspecteurId: 'insp-001',
+    date: new Date().toISOString(),
     dateCreation: new Date().toISOString(),
-    montantTotal: 50000,
     description: 'Frais de déplacement et de séjour pour inspection',
+    montant: 50000,
     status: 'en_attente',
+    fraisGestion: 10000,
+    fraisInspection: 25000,
+    fraisAnalyses: 15000
   },
   {
     id: 'note-2',
     dossierId: 'dossier-3',
-    dateCreation: new Date().toISOString(),
-    montantTotal: 75000,
+    inspecteurId: 'insp-002',
+    date: new Date().toISOString(),
     description: 'Frais de laboratoire pour analyses',
-    status: 'validee',
+    montant: 75000,
+    status: 'valide',
   },
 ];
 
@@ -247,18 +254,20 @@ export const MOCK_INSPECTIONS: Inspection[] = [
   {
     id: 'inspection-1',
     dossierId: 'dossier-2',
-    datePrevue: new Date().toISOString(),
-    dateRealisation: new Date().toISOString(),
-    resultat: 'Conforme',
-    rapport: 'Rapport détaillé de l\'inspection',
+    dateInspection: new Date().toISOString(),
+    lieu: 'Usine principale',
+    inspecteurs: ['Insp. Martin', 'Insp. Dubois'],
+    resultat: 'conforme',
+    notes: 'Rapport détaillé de l\'inspection',
   },
   {
     id: 'inspection-2',
     dossierId: 'dossier-3',
-    datePrevue: new Date().toISOString(),
-    dateRealisation: new Date().toISOString(),
-    resultat: 'Non conforme',
-    rapport: 'Rapport détaillé de l\'inspection',
+    dateInspection: new Date().toISOString(),
+    lieu: 'Site de production',
+    inspecteurs: ['Insp. Kouassi', 'Insp. Eto\'o'],
+    resultat: 'non_conforme',
+    notes: 'Rapport détaillé de l\'inspection',
   },
 ];
 
@@ -266,42 +275,46 @@ export const MOCK_CERTIFICATS: Certificat[] = [
   {
     id: 'certificat-1',
     dossierId: 'dossier-2',
-    dateEmission: new Date().toISOString(),
+    numero: 'CERT-2024-001',
+    dateDelivrance: new Date().toISOString(),
     dateExpiration: new Date(2025, 0, 1).toISOString(),
-    reference: 'CERT-2024-001',
-    url: 'https://example.com/certificat-1.pdf',
+    entreprise: 'BOIS Sarl',
+    produit: 'Eau minérale',
+    status: 'actif',
   },
   {
     id: 'certificat-2',
     dossierId: 'dossier-3',
-    dateEmission: new Date().toISOString(),
+    numero: 'CERT-2024-002',
+    dateDelivrance: new Date().toISOString(),
     dateExpiration: new Date(2025, 0, 1).toISOString(),
-    reference: 'CERT-2024-002',
-    url: 'https://example.com/certificat-2.pdf',
+    entreprise: 'CATTIN Cameroon',
+    produit: 'Conserves de légumes',
+    status: 'actif',
   },
 ];
 
 export const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: generateId(),
-    type: 'info',
     message: 'Nouveau dossier en attente de validation.',
     date: new Date().toISOString(),
-    isRead: false,
+    lue: false,
+    type: 'info',
   },
   {
     id: generateId(),
-    type: 'success',
     message: 'Votre note de frais a été approuvée.',
     date: new Date().toISOString(),
-    isRead: false,
+    lue: false,
+    type: 'info',
   },
   {
     id: generateId(),
-    type: 'warning',
     message: 'La date d\'expiration de votre certificat approche.',
     date: new Date().toISOString(),
-    isRead: false,
+    lue: false,
+    type: 'warning',
   },
 ];
 

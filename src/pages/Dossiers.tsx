@@ -9,7 +9,7 @@ import DossierFilters from '../components/dossiers/DossierFilters';
 import DossiersTable from '../components/dossiers/DossiersTable';
 
 const Dossiers = () => {
-  const { dossiers, addDossier, addDocument } = useData();
+  const { dossiers, addDossier } = useData();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('tous');
@@ -26,6 +26,7 @@ const Dossiers = () => {
     status: 'en_attente',
     delai: 30,
     dateButoir: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    historique: [],
   });
 
   // Filtrer les dossiers en fonction des critères de recherche
@@ -39,6 +40,9 @@ const Dossiers = () => {
     
     return matchesSearch && matchesStatus;
   });
+
+  console.log("Total dossiers:", dossiers.length);
+  console.log("Filtered dossiers:", filteredDossiers.length);
 
   // Check if company name already exists
   const companyNameExists = (name: string): boolean => {
@@ -59,7 +63,14 @@ const Dossiers = () => {
       return;
     }
     
-    addDossier(newDossier);
+    // Make sure historique is initialized
+    const dossierToAdd = {
+      ...newDossier,
+      historique: newDossier.historique || []
+    };
+    
+    addDossier(dossierToAdd);
+    
     toast({
       title: "Dossier ajouté",
       description: `Le dossier pour "${newDossier.operateurNom}" a été créé avec succès.`,
@@ -76,6 +87,7 @@ const Dossiers = () => {
       status: 'en_attente',
       delai: 30,
       dateButoir: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      historique: [],
     });
     
     setDialogOpen(false);

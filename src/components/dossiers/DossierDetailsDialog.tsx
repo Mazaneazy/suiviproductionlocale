@@ -51,7 +51,7 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
           <DialogTitle className="text-xl">
             Détails du dossier: {dossier.operateurNom}
           </DialogTitle>
-          <DialogDescription className="sr-only">
+          <DialogDescription className="text-gray-500">
             Informations détaillées sur le dossier {dossier.operateurNom}
           </DialogDescription>
         </DialogHeader>
@@ -66,7 +66,7 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
           </TabsList>
           
           <TabsContent value="historique" className="h-[400px]">
-            <DossierHistoryTab historique={dossier.historique} />
+            <DossierHistoryTab historique={dossier.historique || []} />
           </TabsContent>
           
           <TabsContent value="documents" className="h-[400px]">
