@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { useData } from '@/contexts/DataContext';
 import { Dossier, DocumentDossier } from '@/types';
 import DocumentsList from './document-validation/DocumentsList';
 import CommentSection from './document-validation/CommentSection';
 import ValidationActions from './document-validation/ValidationActions';
-import ParametresEvaluationForm from './ParametresEvaluationForm';
+import ParametresEvaluationForm from './parametres/ParametresEvaluationForm';
 
 interface DossierDetailPanelProps {
   dossier: Dossier;

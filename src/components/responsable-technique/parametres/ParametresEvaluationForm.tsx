@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import ParametreOption from './ParametreOption';
 
 interface ParametresEvaluationFormProps {
   parametresOptions: string[];
@@ -34,16 +33,12 @@ const ParametresEvaluationForm: React.FC<ParametresEvaluationFormProps> = ({
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {parametresOptions.map((parametre) => (
-            <div key={parametre} className="flex items-center space-x-2">
-              <Checkbox 
-                id={parametre}
-                checked={selectedParametres.includes(parametre)}
-                onCheckedChange={() => handleToggleParametre(parametre)}
-              />
-              <Label htmlFor={parametre} className="text-sm cursor-pointer">
-                {parametre}
-              </Label>
-            </div>
+            <ParametreOption
+              key={parametre}
+              parametre={parametre}
+              isSelected={selectedParametres.includes(parametre)}
+              onToggle={handleToggleParametre}
+            />
           ))}
         </div>
       </CardContent>
