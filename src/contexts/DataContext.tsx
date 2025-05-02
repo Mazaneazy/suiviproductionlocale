@@ -1,8 +1,38 @@
+
 import React, { createContext, useState, useContext } from 'react';
-import { Dossier, NoteFrais, Inspection, Certificat, Notification, Statistique, DocumentDossier, HistoriqueEvenement, ResultatConformite } from '../types';
+import { Dossier, NoteFrais, Inspection, Certificat, Notification, Statistique, DocumentDossier } from '../types';
 import { DataContextProps } from './data/types';
 import { MOCK_DOSSIERS, MOCK_NOTES_FRAIS, MOCK_INSPECTIONS, MOCK_CERTIFICATS, MOCK_NOTIFICATIONS } from './data/mockData';
-import { generateId, calculateStatistics } from './data/utils';
+import { calculateStatistics } from './data/utils';
+import { 
+  createDossier,
+  updateDossierStatus
+} from './data/services/dossierService';
+import {
+  createNoteFrais,
+  createNoteFraisHistorique
+} from './data/services/noteFraisService';
+import {
+  createInspection,
+  createInspectionHistorique,
+  createInspectionResultHistorique
+} from './data/services/inspectionService';
+import {
+  createCertificat,
+  createCertificatHistorique,
+  createCertificatStatusHistorique
+} from './data/services/certificatService';
+import {
+  createDocument,
+  createDocumentHistorique,
+  createDocumentRemovalHistorique,
+  createDocumentStatusHistorique
+} from './data/services/documentService';
+import {
+  createNotification,
+  countUnreadNotifications,
+  markNotificationAsRead as markAsRead
+} from './data/services/notificationService';
 
 // Create the context with default values
 const DataContext = createContext<DataContextProps>({
@@ -48,50 +78,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [documents, setDocuments] = useState<DocumentDossier[]>([]);
   const [statistiques, setStatistiques] = useState<Statistique>(calculateStatistics(MOCK_DOSSIERS));
 
-  const addDossier = (dossier: Partial<Dossier>) => {
-    // Extract documents if they exist in the dossier object
-    const dossierId = dossier.id || generateId();
-    let dossiersDocuments: DocumentDossier[] = [];
-    
-    if ('documents' in dossier && Array.isArray(dossier.documents)) {
-      dossiersDocuments = dossier.documents as DocumentDossier[];
-      // Add the documents to the documents state
-      setDocuments(prevDocuments => [...prevDocuments, ...dossiersDocuments]);
-      // Remove documents from the dossier object to avoid duplication
-      const { documents: _, ...dossierWithoutDocuments } = dossier;
-      dossier = dossierWithoutDocuments;
-    }
+  // Notification helper function
+  const addNotification = (notification: Omit<Notification, 'id'>) => {
+    const newNotification = createNotification(notification);
+    setNotifications(prev => [...prev, newNotification]);
+  };
 
-    const newDossier = { 
-      ...dossier,
-      id: dossierId,
-      historique: [
-        {
-          id: generateId(),
-          dossierId: dossierId,
-          date: new Date().toISOString(),
-          action: 'Création du dossier',
-          responsable: dossier.responsable || 'Système',
-          commentaire: 'Dossier créé dans le système'
-        }
-      ] 
-    } as Dossier;
+  // Dossier functions
+  const addDossier = (dossier: Partial<Dossier>) => {
+    const { newDossier, dossiersDocuments } = createDossier(dossier, addNotification);
+    
+    if (dossiersDocuments && dossiersDocuments.length > 0) {
+      setDocuments(prevDocuments => [...prevDocuments, ...dossiersDocuments]);
+    }
     
     const updatedDossiers = [...dossiers, newDossier];
     setDossiers(updatedDossiers);
     updateStatistiques(updatedDossiers);
-    
-    // Create a notification for the Responsable Technique
-    const newNotification: Notification = {
-      id: generateId(),
-      message: `Nouveau dossier pour ${dossier.operateurNom} reçu`,
-      date: new Date().toISOString(),
-      lue: false,
-      type: 'info',
-      link: '/responsable-technique'
-    };
-    
-    setNotifications([...notifications, newNotification]);
   };
   
   const updateDossier = (id: string, data: Partial<Dossier>) => {
@@ -99,16 +102,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!dossier) return;
 
     // Create historique event if status changes
-    if (data.status && data.status !== dossier.status) {
-      const historique: HistoriqueEvenement = {
-        id: generateId(),
-        dossierId: id,
-        date: new Date().toISOString(),
-        action: `Statut modifié: ${dossier.status} → ${data.status}`,
-        responsable: data.responsable || 'Système',
-      };
-      
-      data.historique = [...(dossier.historique || []), historique];
+    if (data.status) {
+      const historiqueEvent = updateDossierStatus(dossier, data.status, data.responsable);
+      if (historiqueEvent) {
+        data.historique = [...(dossier.historique || []), historiqueEvent];
+      }
     }
     
     const updated = dossiers.map(dossier => 
@@ -118,22 +116,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateStatistiques(updated);
   };
 
+  // Note de frais functions
   const addNoteFrais = (noteFrais: Omit<NoteFrais, 'id'>) => {
-    const newNoteFrais = { ...noteFrais, id: generateId() };
+    const newNoteFrais = createNoteFrais(noteFrais);
     setNotesFrais([...notesFrais, newNoteFrais]);
     
     // Add to dossier history
     const dossier = dossiers.find(d => d.id === noteFrais.dossierId);
     if (dossier) {
-      const historique: HistoriqueEvenement = {
-        id: generateId(),
-        dossierId: noteFrais.dossierId,
-        date: new Date().toISOString(),
-        action: 'Note de frais créée',
-        responsable: noteFrais.inspecteurId,
-        commentaire: `Note de frais pour un montant total de ${noteFrais.total || 0} FCFA`
-      };
-      
+      const historique = createNoteFraisHistorique(newNoteFrais);
       updateDossier(noteFrais.dossierId, {
         historique: [...(dossier.historique || []), historique]
       });
@@ -146,22 +137,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ));
   };
 
+  // Inspection functions
   const addInspection = (inspection: Omit<Inspection, 'id'>) => {
-    const newInspection = { ...inspection, id: generateId() };
+    const newInspection = createInspection(inspection);
     setInspections([...inspections, newInspection]);
     
     // Add to dossier history
     const dossier = dossiers.find(d => d.id === inspection.dossierId);
     if (dossier) {
-      const historique: HistoriqueEvenement = {
-        id: generateId(),
-        dossierId: inspection.dossierId,
-        date: new Date().toISOString(),
-        action: 'Inspection programmée',
-        responsable: inspection.inspecteurs[0] || 'Système',
-        commentaire: `Inspection programmée pour le ${new Date(inspection.dateInspection).toLocaleDateString()}`
-      };
-      
+      const historique = createInspectionHistorique(newInspection);
       updateDossier(inspection.dossierId, {
         historique: [...(dossier.historique || []), historique]
       });
@@ -177,31 +161,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ));
     
     // Add to dossier history if result changes
-    if (data.resultat && data.resultat !== inspection.resultat) {
+    if (data.resultat) {
       const dossier = dossiers.find(d => d.id === inspection.dossierId);
       if (dossier) {
-        const historique: HistoriqueEvenement = {
-          id: generateId(),
-          dossierId: inspection.dossierId,
-          date: new Date().toISOString(),
-          action: `Résultat d'inspection: ${data.resultat}`,
-          responsable: inspection.inspecteurs[0] || 'Inspecteur',
-          commentaire: data.resultat === 'conforme' 
-            ? 'Inspection validée comme conforme'
-            : data.resultat === 'non_conforme'
-              ? 'Inspection validée comme non conforme'
-              : 'Statut d\'inspection mis à jour'
-        };
-        
-        updateDossier(inspection.dossierId, {
-          historique: [...(dossier.historique || []), historique]
-        });
+        const historique = createInspectionResultHistorique(inspection, data.resultat);
+        if (historique) {
+          updateDossier(inspection.dossierId, {
+            historique: [...(dossier.historique || []), historique]
+          });
+        }
       }
     }
   };
 
+  // Certificat functions
   const addCertificat = (certificat: Omit<Certificat, 'id'>) => {
-    const newCertificat = { ...certificat, id: generateId() };
+    const newCertificat = createCertificat(certificat);
     setCertificats([...certificats, newCertificat]);
     
     // Mettre à jour le statut du dossier
@@ -210,21 +185,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Add to dossier history
     const dossier = dossiers.find(d => d.id === certificat.dossierId);
     if (dossier) {
-      const documentType = newCertificat.numero.startsWith('CERT') 
-        ? 'Certificat de conformité'
-        : newCertificat.numero.startsWith('NC')
-          ? 'Rapport de non-conformité'
-          : 'Lettre d\'actions correctives';
-          
-      const historique: HistoriqueEvenement = {
-        id: generateId(),
-        dossierId: certificat.dossierId,
-        date: new Date().toISOString(),
-        action: `${documentType} émis`,
-        responsable: 'Responsable des certificats',
-        commentaire: `Document ${newCertificat.numero} émis pour ${newCertificat.entreprise}`
-      };
-      
+      const historique = createCertificatHistorique(newCertificat);
       updateDossier(certificat.dossierId, {
         historique: [...(dossier.historique || []), historique]
       });
@@ -240,53 +201,28 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ));
     
     // Add to dossier history if status changes
-    if (data.status && data.status !== certificat.status) {
+    if (data.status) {
       const dossier = dossiers.find(d => d.id === certificat.dossierId);
       if (dossier) {
-        const documentType = certificat.numero.startsWith('CERT') 
-          ? 'Certificat de conformité'
-          : certificat.numero.startsWith('NC')
-            ? 'Rapport de non-conformité'
-            : 'Lettre d\'actions correctives';
-            
-        const historique: HistoriqueEvenement = {
-          id: generateId(),
-          dossierId: certificat.dossierId,
-          date: new Date().toISOString(),
-          action: `Statut du ${documentType} modifié: ${certificat.status} → ${data.status}`,
-          responsable: 'Responsable des certificats',
-          commentaire: `Statut du document ${certificat.numero} modifié`
-        };
-        
-        updateDossier(certificat.dossierId, {
-          historique: [...(dossier.historique || []), historique]
-        });
+        const historique = createCertificatStatusHistorique(certificat, data.status);
+        if (historique) {
+          updateDossier(certificat.dossierId, {
+            historique: [...(dossier.historique || []), historique]
+          });
+        }
       }
     }
   };
 
+  // Document functions
   const addDocument = (document: Omit<DocumentDossier, 'id'>) => {
-    // Explicitly set the status to 'en_attente' as a valid DocumentDossier status
-    const newDocument = { 
-      ...document, 
-      id: generateId(), 
-      status: 'en_attente' as 'valide' | 'rejete' | 'en_attente'
-    };
-    
+    const newDocument = createDocument(document);
     setDocuments([...documents, newDocument]);
     
     // Add to dossier history
     const dossier = dossiers.find(d => d.id === document.dossierId);
     if (dossier) {
-      const historique: HistoriqueEvenement = {
-        id: generateId(),
-        dossierId: document.dossierId,
-        date: new Date().toISOString(),
-        action: 'Document ajouté',
-        responsable: 'Utilisateur',
-        commentaire: `Document "${document.nom}" ajouté au dossier`
-      };
-      
+      const historique = createDocumentHistorique(newDocument);
       updateDossier(document.dossierId, {
         historique: [...(dossier.historique || []), historique]
       });
@@ -302,15 +238,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Add to dossier history
     const dossier = dossiers.find(d => d.id === document.dossierId);
     if (dossier) {
-      const historique: HistoriqueEvenement = {
-        id: generateId(),
-        dossierId: document.dossierId,
-        date: new Date().toISOString(),
-        action: 'Document supprimé',
-        responsable: 'Utilisateur',
-        commentaire: `Document "${document.nom}" supprimé du dossier`
-      };
-      
+      const historique = createDocumentRemovalHistorique(document);
       updateDossier(document.dossierId, {
         historique: [...(dossier.historique || []), historique]
       });
@@ -326,25 +254,20 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ));
     
     // Add to dossier history if status changes
-    if (data.status && data.status !== document.status) {
+    if (data.status) {
       const dossier = dossiers.find(d => d.id === document.dossierId);
       if (dossier) {
-        const historique: HistoriqueEvenement = {
-          id: generateId(),
-          dossierId: document.dossierId,
-          date: new Date().toISOString(),
-          action: `Statut du document modifié: ${document.status || 'non défini'} → ${data.status}`,
-          responsable: 'Utilisateur',
-          commentaire: `Statut du document "${document.nom}" modifié`
-        };
-        
-        updateDossier(document.dossierId, {
-          historique: [...(dossier.historique || []), historique]
-        });
+        const historique = createDocumentStatusHistorique(document, data.status);
+        if (historique) {
+          updateDossier(document.dossierId, {
+            historique: [...(dossier.historique || []), historique]
+          });
+        }
       }
     }
   };
 
+  // Query functions
   const getDossierById = (id: string) => {
     return dossiers.find(dossier => dossier.id === id);
   };
@@ -366,13 +289,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const markNotificationAsRead = (id: string) => {
-    setNotifications(notifications.map(notif => 
-      notif.id === id ? { ...notif, lue: true } : notif
-    ));
+    setNotifications(markAsRead(notifications, id));
   };
 
   const getUnreadNotificationsCount = () => {
-    return notifications.filter(notif => !notif.lue).length;
+    return countUnreadNotifications(notifications);
   };
 
   const updateStatistiques = (updatedDossiers: Dossier[]) => {
