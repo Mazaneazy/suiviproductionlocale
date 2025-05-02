@@ -9,6 +9,7 @@ export const useDossierForm = (
   onSubmit: () => void
 ) => {
   const { toast } = useToast();
+  const [documents, setDocuments] = useState<Array<{ name: string; file: File }>>([]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -46,8 +47,12 @@ export const useDossierForm = (
     }
   };
 
-  const handleStatusChange = (value: "complet" | "en_attente" | "rejete" | "en_cours" | "certifie" | "a_corriger") => {
-    setNewDossier({ ...newDossier, status: value });
+  const handleDocumentAdd = (file: File) => {
+    setDocuments([...documents, { name: file.name, file }]);
+  };
+
+  const handleDocumentRemove = (index: number) => {
+    setDocuments(documents.filter((_, i) => i !== index));
   };
 
   const handleAddDossier = () => {
@@ -66,7 +71,9 @@ export const useDossierForm = (
 
   return {
     handleInputChange,
-    handleStatusChange,
-    handleAddDossier
+    handleAddDossier,
+    documents,
+    handleDocumentAdd,
+    handleDocumentRemove
   };
 };

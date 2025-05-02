@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Dossier } from '@/types';
 import DossierBasicFields from './fields/DossierBasicFields';
 import DossierDateFields from './fields/DossierDateFields';
-import DossierStatusField from './fields/DossierStatusField';
 import { useDossierForm } from './hooks/useDossierForm';
+import DocumentFields from './fields/DocumentFields';
 
 interface DossierFormProps {
   newDossier: Omit<Dossier, 'id'>;
@@ -15,7 +15,13 @@ interface DossierFormProps {
 }
 
 const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierFormProps) => {
-  const { handleInputChange, handleStatusChange, handleAddDossier } = useDossierForm(
+  const { 
+    handleInputChange, 
+    handleAddDossier,
+    documents,
+    handleDocumentAdd,
+    handleDocumentRemove
+  } = useDossierForm(
     newDossier, 
     setNewDossier, 
     onSubmit
@@ -33,16 +39,21 @@ const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierF
         handleInputChange={handleInputChange} 
       />
       
-      <DossierStatusField 
-        status={newDossier.status} 
-        onStatusChange={handleStatusChange} 
+      <DocumentFields 
+        documents={documents}
+        onDocumentAdd={handleDocumentAdd}
+        onDocumentRemove={handleDocumentRemove}
       />
       
-      <div className="flex justify-end gap-2 pt-2">
+      <div className="flex justify-end gap-2 pt-4">
         <Button variant="outline" onClick={onCancel}>
           Annuler
         </Button>
-        <Button onClick={handleAddDossier} className="bg-certif-green hover:bg-certif-green/90">
+        <Button 
+          onClick={handleAddDossier} 
+          className="bg-certif-green hover:bg-certif-green/90"
+          disabled={!newDossier.operateurNom || !newDossier.typeProduit}
+        >
           Enregistrer
         </Button>
       </div>
