@@ -164,11 +164,6 @@ const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierF
           className="col-span-3 bg-gray-50"
         />
       </div>
-      <div className="flex justify-end gap-2 pt-2">
-        <Button onClick={handleAddDossier} className="bg-certif-green hover:bg-certif-green/90">
-          Enregistrer
-        </Button>
-      </div>
     </div>
   );
 };

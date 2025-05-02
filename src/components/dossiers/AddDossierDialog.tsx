@@ -13,11 +13,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, FileImage } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Dossier } from '@/types';
+import { Dossier, DocumentDossier } from '@/types';
 import DossierForm from './DossierForm';
 import { useAuth } from '@/hooks/useAuth';
+import PdfAttachment from './PdfAttachment';
 
 interface AddDossierDialogProps {
   open: boolean;
@@ -38,6 +39,7 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
   const { createProducteurAccount } = useAuth();
   const [createAccount, setCreateAccount] = useState(false);
   const [producteurCredentials, setProducteurCredentials] = useState<{email: string, password: string} | null>(null);
+  const [attachments, setAttachments] = useState<File[]>([]);
 
   const handleSubmit = () => {
     // Valider le formulaire
@@ -87,6 +89,28 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
     onOpenChange(false);
     setProducteurCredentials(null);
     setCreateAccount(false);
+    setAttachments([]);
+  };
+
+  const handleAddAttachment = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      const pdfFiles = newFiles.filter(file => file.type === 'application/pdf');
+      
+      if (pdfFiles.length !== newFiles.length) {
+        toast({
+          title: "Format non supporté",
+          description: "Seuls les fichiers PDF sont acceptés",
+          variant: "destructive",
+        });
+      }
+      
+      setAttachments(prev => [...prev, ...pdfFiles]);
+    }
+  };
+
+  const handleRemoveAttachment = (index: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -125,6 +149,15 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
               onSubmit={handleSubmit}
               onCancel={closeDialog}
             />
+            
+            <div className="space-y-4 my-4">
+              <Label className="text-sm font-medium">Pièces jointes (PDF)</Label>
+              <PdfAttachment 
+                attachments={attachments} 
+                onAddAttachment={handleAddAttachment} 
+                onRemoveAttachment={handleRemoveAttachment} 
+              />
+            </div>
             
             <div className="flex items-center space-x-2 my-4">
               <Checkbox 

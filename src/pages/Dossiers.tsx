@@ -9,7 +9,7 @@ import DossierFilters from '../components/dossiers/DossierFilters';
 import DossiersTable from '../components/dossiers/DossiersTable';
 
 const Dossiers = () => {
-  const { dossiers, addDossier } = useData();
+  const { dossiers, addDossier, addDocument } = useData();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('tous');
