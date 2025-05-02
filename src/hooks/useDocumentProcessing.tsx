@@ -47,6 +47,7 @@ export function useDocumentProcessing() {
         status: 'en_attente'
       });
       
+      // Fix: Check if newDoc exists before pushing it to addedDocuments
       if (newDoc) {
         addedDocuments.push(newDoc);
       }
