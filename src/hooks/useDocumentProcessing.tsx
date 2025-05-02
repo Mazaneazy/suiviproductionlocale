@@ -37,22 +37,42 @@ export function useDocumentProcessing() {
       // Créer une URL fictive pour le fichier PDF
       const fileUrl = `https://storage.example.com/${dossierId}/${file.name}`;
       
-      // Ajouter le document au dossier avec le statut en attente par défaut
-      const newDoc = addDocument({
+      // Créer l'objet document avant de l'ajouter pour éviter l'erreur TypeScript
+      const newDocData = {
         dossierId: dossierId as string,
         nom: file.name,
         type: documentType,
         dateUpload: new Date().toISOString(),
         url: fileUrl,
         status: 'en_attente'
-      });
+      };
       
-      // Fix: Check if newDoc exists before pushing it to addedDocuments
-      if (newDoc) {
-        addedDocuments.push(newDoc);
+      // Ajouter le document au dossier avec le statut en attente par défaut
+      const result = addDocument(newDocData);
+      
+      // Obtenir le nouveau document depuis localStorage si addDocument ne retourne pas l'objet
+      let newDoc: DocumentDossier | undefined;
+      
+      try {
+        const storedDocuments = localStorage.getItem('documents');
+        if (storedDocuments) {
+          const allDocs = JSON.parse(storedDocuments);
+          // Chercher le document qui correspond aux données qu'on vient d'ajouter
+          newDoc = allDocs.find((doc: any) => 
+            doc.dossierId === newDocData.dossierId && 
+            doc.nom === newDocData.nom &&
+            doc.dateUpload === newDocData.dateUpload
+          );
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération du document depuis localStorage:", error);
       }
       
-      console.log(`Document ajouté: ${file.name} (Type: ${documentType}) pour le dossier ${dossierId}`);
+      // Si on a pu trouver ou créer le document, l'ajouter à notre liste
+      if (newDoc) {
+        addedDocuments.push(newDoc);
+        console.log(`Document ajouté: ${file.name} (Type: ${documentType}) pour le dossier ${dossierId}`);
+      }
     });
     
     // Notification du succès
