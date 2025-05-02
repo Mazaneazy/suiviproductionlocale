@@ -1,3 +1,4 @@
+
 export interface Dossier {
   id: string;
   operateurNom: string;
@@ -11,8 +12,7 @@ export interface Dossier {
   dateButoir: string;
   historique?: HistoriqueEvenement[];
   parametresEvaluation?: string[];
-  commentaires?: string;
-  documents?: Omit<DocumentDossier, 'id'>[] | DocumentDossier[];
+  commentaires?: string; // Added property
 }
 
 export interface NoteFrais {
@@ -20,23 +20,23 @@ export interface NoteFrais {
   dossierId: string;
   inspecteurId: string;
   date: string;
-  dateCreation?: string;
+  dateCreation?: string; // Added property
   description: string;
   montant: number;
   status: 'en_attente' | 'valide' | 'rejete';
   total?: number;
-  deplacement?: number;
-  hebergement?: number;
-  restauration?: number;
-  indemnites?: number;
-  commentaire?: string;
-  fichierUrl?: string;
-  notificationEnvoyee?: boolean;
-  operateurNotifie?: boolean;
-  fraisGestion?: number;
-  fraisInspection?: number;
-  fraisAnalyses?: number;
-  fraisSurveillance?: number;
+  deplacement?: number; // Added property
+  hebergement?: number; // Added property
+  restauration?: number; // Added property
+  indemnites?: number; // Added property
+  commentaire?: string; // Added property
+  fichierUrl?: string; // Added property
+  notificationEnvoyee?: boolean; // Added property
+  operateurNotifie?: boolean; // Added property
+  fraisGestion?: number; // Added property
+  fraisInspection?: number; // Added property
+  fraisAnalyses?: number; // Added property
+  fraisSurveillance?: number; // Added property
 }
 
 export interface Inspection {
@@ -47,8 +47,8 @@ export interface Inspection {
   inspecteurs: string[];
   resultat: 'conforme' | 'non_conforme' | 'en_attente';
   notes?: string;
-  recommandations?: string;
-  actionsCorrectives?: string;
+  recommandations?: string; // Added property
+  actionsCorrectives?: string; // Added property
 }
 
 export interface Certificat {
@@ -76,9 +76,9 @@ export interface Notification {
   message: string;
   date: string;
   lue: boolean;
-  userId?: string;
-  type?: 'warning' | 'alert' | 'info';
-  link?: string;
+  userId?: string; // Added property
+  type?: 'warning' | 'alert' | 'info'; // Added property
+  link?: string; // Added property
 }
 
 export interface Statistique {
@@ -97,7 +97,7 @@ export interface DocumentDossier {
   dateUpload: string;
   url: string;
   status?: 'valide' | 'rejete' | 'en_attente';
-  commentaire?: string;
+  commentaire?: string; // Added property
 }
 
 export interface HistoriqueEvenement {
@@ -117,10 +117,10 @@ export interface User {
   email: string;
   role: UserRole;
   avatar?: string;
-  password?: string;
+  password?: string; // Only used for mock authentication
   permissions?: string[];
   actions?: UserAction[];
-  producteurDossierId?: string;
+  producteurDossierId?: string; // ID du dossier associé au compte producteur
 }
 
 export interface UserAction {

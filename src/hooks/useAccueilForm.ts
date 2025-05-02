@@ -1,3 +1,4 @@
+
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -12,7 +13,6 @@ interface DocumentUpload {
 }
 
 export const useAccueilForm = () => {
-  
   const navigate = useNavigate();
   const { toast } = useToast();
   const { addDossier } = useData();
@@ -32,8 +32,6 @@ export const useAccueilForm = () => {
     { type: 'plan_localisation', file: null, label: 'Plan de localisation', required: true },
   ]);
   
-  
-
   const fileInputRefs = {
     registre_commerce: useRef<HTMLInputElement>(null),
     carte_contribuable: useRef<HTMLInputElement>(null),
@@ -129,7 +127,7 @@ export const useAccueilForm = () => {
         nom: doc.file!.name,
         url: URL.createObjectURL(doc.file!),  // In a real app, this would be uploaded to a server
         dateUpload: new Date().toISOString(),
-        status: 'en_attente' as 'en_attente' | 'valide' | 'rejete'
+        status: 'en_attente'
       }));
     
     // Create the dossier with documents
