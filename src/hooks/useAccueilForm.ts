@@ -3,6 +3,7 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useData } from '@/contexts/DataContext';
+import { DocumentDossier } from '@/types';
 
 interface DocumentUpload {
   type: 'registre_commerce' | 'carte_contribuable' | 'processus_production' | 'certificats_conformite' | 'liste_personnel' | 'plan_localisation';
@@ -77,7 +78,7 @@ export const useAccueilForm = () => {
         title: "Formulaire incomplet",
         description: "Veuillez remplir tous les champs obligatoires.",
       });
-      return;
+      return false;
     }
     
     // Check required documents
@@ -91,7 +92,7 @@ export const useAccueilForm = () => {
         title: "Documents manquants",
         description: `Veuillez télécharger les documents requis: ${missingDocuments.join(', ')}`,
       });
-      return;
+      return false;
     }
 
     // Mark the form as validated
@@ -101,6 +102,8 @@ export const useAccueilForm = () => {
       title: "Dossier validé",
       description: "Le dossier a été validé avec succès. Vous pouvez maintenant le transmettre.",
     });
+    
+    return true;
   };
 
   const handleFinalSubmit = (e: React.FormEvent) => {
@@ -116,38 +119,29 @@ export const useAccueilForm = () => {
     }
     
     // Create document objects from files
-    const documentObjects = documents
+    const documentObjects: Omit<DocumentDossier, 'id'>[] = documents
       .filter(doc => doc.file)
       .map(doc => ({
-        id: Math.random().toString(36).substring(2, 11),
-        dossierId: '',  // To be filled after dossier creation
+        dossierId: '',  // Will be filled by the createDossier function
         type: doc.type,
         nom: doc.file!.name,
         url: URL.createObjectURL(doc.file!),  // In a real app, this would be uploaded to a server
         dateUpload: new Date().toISOString(),
+        status: 'en_attente'
       }));
     
-    // Add the dossier
-    const newDossierId = Math.random().toString(36).substring(2, 11);
-    
-    // Update document IDs with the new dossier ID
-    const updatedDocuments = documentObjects.map(doc => ({
-      ...doc,
-      dossierId: newDossierId
-    }));
-    
+    // Create the dossier with documents
     const newDossier = {
-      id: newDossierId,
       operateurNom: entreprise,
       promoteurNom: promoteur,
       telephone,
       typeProduit: produits,
       dateTransmission: new Date().toISOString().split('T')[0],
-      responsable: 'Responsable Technique', // Set the responsible correctly
+      responsable: 'Responsable Technique',
       status: 'en_attente' as const,
       delai: 30,
       dateButoir: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      documents: updatedDocuments,
+      documents: documentObjects
     };
     
     addDossier(newDossier);
