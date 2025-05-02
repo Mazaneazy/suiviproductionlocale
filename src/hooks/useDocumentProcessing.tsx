@@ -48,30 +48,25 @@ export function useDocumentProcessing() {
       };
       
       try {
-        // Ajouter le document au dossier
-        const result = addDocument(newDocData);
+        // Ajouter le document au dossier (sans vérifier la valeur retournée)
+        addDocument(newDocData);
+        console.log(`Document ajouté: ${file.name}`);
         
-        // Si addDocument retourne le document créé, l'ajouter à notre liste de documents ajoutés
-        if (result && typeof result === 'object' && 'id' in result) {
-          addedDocuments.push(result);
-          console.log(`Document ajouté avec succès: ${file.name} (ID: ${result.id})`);
-        } else {
-          // Si addDocument ne retourne pas le document, essayer de le récupérer depuis localStorage
-          console.log("Le document a été ajouté mais l'objet n'a pas été retourné, tentative de récupération...");
-          const storedDocuments = localStorage.getItem('documents');
-          if (storedDocuments) {
-            const allDocs = JSON.parse(storedDocuments);
-            // Chercher le document qui correspond aux données qu'on vient d'ajouter
-            const newDoc = allDocs.find((doc: any) => 
-              doc.dossierId === newDocData.dossierId && 
-              doc.nom === newDocData.nom &&
-              doc.dateUpload === newDocData.dateUpload
-            );
-            
-            if (newDoc) {
-              addedDocuments.push(newDoc);
-              console.log(`Document récupéré depuis localStorage: ${newDoc.nom} (ID: ${newDoc.id})`);
-            }
+        // La fonction addDocument ne retourne pas toujours l'objet,
+        // donc on récupère toujours depuis localStorage pour être sûr
+        const storedDocuments = localStorage.getItem('documents');
+        if (storedDocuments) {
+          const allDocs = JSON.parse(storedDocuments);
+          // Chercher le document qui correspond aux données qu'on vient d'ajouter
+          const newDoc = allDocs.find((doc: any) => 
+            doc.dossierId === newDocData.dossierId && 
+            doc.nom === newDocData.nom &&
+            doc.dateUpload === newDocData.dateUpload
+          );
+          
+          if (newDoc) {
+            addedDocuments.push(newDoc);
+            console.log(`Document récupéré depuis localStorage: ${newDoc.nom} (ID: ${newDoc.id})`);
           }
         }
       } catch (error) {
