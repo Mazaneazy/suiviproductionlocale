@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -119,8 +120,8 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
         ) : (
           <>
             <DossierForm
-              dossier={newDossier}
-              setDossier={setNewDossier}
+              newDossier={newDossier}
+              setNewDossier={setNewDossier}
             />
             
             <div className="flex items-center space-x-2 my-4">

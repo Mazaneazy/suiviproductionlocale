@@ -50,13 +50,15 @@ const NotesFrais = () => {
   const [newNoteFrais, setNewNoteFrais] = useState({
     dossierId: '',
     inspecteurId: currentUser?.id || '',
-    dateCreation: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().split('T')[0],
     deplacement: 0,
     hebergement: 0,
     restauration: 0,
     indemnites: 0,
-    status: 'en_attente' as 'en_attente' | 'validee' | 'rejetee',
+    status: 'en_attente' as 'en_attente' | 'valide' | 'rejete',
     commentaire: '',
+    description: '',
+    montant: 0,
     fichierUrl: '',
     notificationEnvoyee: false,
     operateurNotifie: false
@@ -140,6 +142,13 @@ const NotesFrais = () => {
       return;
     }
 
+    // Calculer le montant total
+    const total = 
+      newNoteFrais.deplacement + 
+      newNoteFrais.hebergement + 
+      newNoteFrais.restauration + 
+      newNoteFrais.indemnites;
+    
     // Simuler l'upload du fichier (dans une vraie application, cela serait fait vers un service de stockage)
     let fichierUrl = '';
     if (uploadedFile) {
@@ -148,14 +157,22 @@ const NotesFrais = () => {
       fichierUrl = URL.createObjectURL(uploadedFile);
     }
 
-    const noteFraisToAdd = {
-      ...newNoteFrais,
-      fichierUrl,
+    addNoteFrais({
+      dossierId: newNoteFrais.dossierId,
+      inspecteurId: newNoteFrais.inspecteurId,
+      date: newNoteFrais.date,
+      description: `Note de frais - ${new Date(newNoteFrais.date).toLocaleDateString()}`,
+      montant: total,
+      status: newNoteFrais.status,
+      deplacement: newNoteFrais.deplacement,
+      hebergement: newNoteFrais.hebergement,
+      restauration: newNoteFrais.restauration,
+      indemnites: newNoteFrais.indemnites,
+      commentaire: newNoteFrais.commentaire || undefined,
+      fichierUrl: fichierUrl || undefined,
       notificationEnvoyee: false,
       operateurNotifie: false
-    };
-
-    addNoteFrais(noteFraisToAdd);
+    });
     
     toast({
       title: "Note de frais ajoutée",
@@ -166,13 +183,15 @@ const NotesFrais = () => {
     setNewNoteFrais({
       dossierId: '',
       inspecteurId: currentUser?.id || '',
-      dateCreation: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split('T')[0],
       deplacement: 0,
       hebergement: 0,
       restauration: 0,
       indemnites: 0,
-      status: 'en_attente' as 'en_attente' | 'validee' | 'rejetee',
+      status: 'en_attente',
       commentaire: '',
+      description: '',
+      montant: 0,
       fichierUrl: '',
       notificationEnvoyee: false,
       operateurNotifie: false
@@ -187,7 +206,7 @@ const NotesFrais = () => {
 
   // Fonction pour valider une note de frais
   const handleValidateNoteFrais = (id: string) => {
-    updateNoteFrais(id, { status: 'validee' });
+    updateNoteFrais(id, { status: 'valide' });
     toast({
       title: "Note de frais validée",
       description: "La note de frais a été validée avec succès.",
@@ -196,7 +215,7 @@ const NotesFrais = () => {
 
   // Fonction pour rejeter une note de frais
   const handleRejectNoteFrais = (id: string) => {
-    updateNoteFrais(id, { status: 'rejetee' });
+    updateNoteFrais(id, { status: 'rejete' });
     toast({
       title: "Note de frais rejetée",
       description: "La note de frais a été rejetée.",
@@ -208,9 +227,9 @@ const NotesFrais = () => {
     switch (status) {
       case 'en_attente':
         return 'bg-yellow-500 text-white';
-      case 'validee':
+      case 'valide':
         return 'bg-green-500 text-white';
-      case 'rejetee':
+      case 'rejete':
         return 'bg-red-500 text-white';
       default:
         return 'bg-gray-500 text-white';
@@ -222,9 +241,9 @@ const NotesFrais = () => {
     switch (status) {
       case 'en_attente':
         return 'En attente';
-      case 'validee':
+      case 'valide':
         return 'Validée';
-      case 'rejetee':
+      case 'rejete':
         return 'Rejetée';
       default:
         return status;
@@ -232,8 +251,13 @@ const NotesFrais = () => {
   };
 
   // Calculer le total d'une note de frais
-  const calculerTotal = (note: any) => {
-    return note.deplacement + note.hebergement + note.restauration + note.indemnites;
+  const calculerTotal = (note: NoteFrais) => {
+    return (
+      (note.deplacement || 0) + 
+      (note.hebergement || 0) + 
+      (note.restauration || 0) + 
+      (note.indemnites || 0)
+    );
   };
 
   // Afficher les détails d'une note
@@ -286,14 +310,14 @@ const NotesFrais = () => {
                 </Select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="dateCreation" className="text-right font-medium text-sm">
+                <label htmlFor="date" className="text-right font-medium text-sm">
                   Date
                 </label>
                 <Input
-                  id="dateCreation"
-                  name="dateCreation"
+                  id="date"
+                  name="date"
                   type="date"
-                  value={newNoteFrais.dateCreation}
+                  value={newNoteFrais.date}
                   onChange={handleInputChange}
                   className="col-span-3"
                 />
@@ -419,8 +443,8 @@ const NotesFrais = () => {
             <SelectContent>
               <SelectItem value="tous">Tous les statuts</SelectItem>
               <SelectItem value="en_attente">En attente</SelectItem>
-              <SelectItem value="validee">Validée</SelectItem>
-              <SelectItem value="rejetee">Rejetée</SelectItem>
+              <SelectItem value="valide">Validée</SelectItem>
+              <SelectItem value="rejete">Rejetée</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -445,16 +469,16 @@ const NotesFrais = () => {
               {filteredNotesFrais.length > 0 ? (
                 filteredNotesFrais.map((note) => {
                   const dossier = dossiers.find(d => d.id === note.dossierId);
-                  const total = calculerTotal(note);
+                  const total = note.montant || calculerTotal(note);
                   
                   return (
                     <TableRow key={note.id}>
-                      <TableCell>{new Date(note.dateCreation).toLocaleDateString()}</TableCell>
+                      <TableCell>{new Date(note.date).toLocaleDateString()}</TableCell>
                       <TableCell className="font-medium">{dossier?.operateurNom}</TableCell>
-                      <TableCell className="text-right">{note.deplacement.toFixed(2)} €</TableCell>
-                      <TableCell className="text-right">{note.hebergement.toFixed(2)} €</TableCell>
-                      <TableCell className="text-right">{note.restauration.toFixed(2)} €</TableCell>
-                      <TableCell className="text-right">{note.indemnites.toFixed(2)} €</TableCell>
+                      <TableCell className="text-right">{note.deplacement?.toFixed(2) || '0.00'} €</TableCell>
+                      <TableCell className="text-right">{note.hebergement?.toFixed(2) || '0.00'} €</TableCell>
+                      <TableCell className="text-right">{note.restauration?.toFixed(2) || '0.00'} €</TableCell>
+                      <TableCell className="text-right">{note.indemnites?.toFixed(2) || '0.00'} €</TableCell>
                       <TableCell className="text-right font-medium">{total.toFixed(2)} €</TableCell>
                       <TableCell>
                         <Badge className={getStatusColor(note.status)}>
@@ -494,7 +518,7 @@ const NotesFrais = () => {
                               </Button>
                             </>
                           )}
-                          {note.status === 'validee' && !note.notificationEnvoyee && (
+                          {note.status === 'valide' && note.notificationEnvoyee === false && (
                             <Button 
                               variant="outline" 
                               size="icon"
@@ -555,7 +579,7 @@ const NotesFrais = () => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Date</p>
-                  <p>{new Date(selectedNote.dateCreation).toLocaleDateString()}</p>
+                  <p>{new Date(selectedNote.date).toLocaleDateString()}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Statut</p>
@@ -565,7 +589,7 @@ const NotesFrais = () => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Total</p>
-                  <p className="font-bold">{calculerTotal(selectedNote).toFixed(2)} €</p>
+                  <p className="font-bold">{(selectedNote.montant || calculerTotal(selectedNote)).toFixed(2)} €</p>
                 </div>
               </div>
 
@@ -573,13 +597,13 @@ const NotesFrais = () => {
                 <h3 className="font-medium mb-2">Détails des frais</h3>
                 <div className="grid grid-cols-2 gap-2">
                   <p className="text-sm">Déplacement:</p>
-                  <p className="text-sm text-right">{selectedNote.deplacement.toFixed(2)} €</p>
+                  <p className="text-sm text-right">{selectedNote.deplacement?.toFixed(2) || '0.00'} €</p>
                   <p className="text-sm">Hébergement:</p>
-                  <p className="text-sm text-right">{selectedNote.hebergement.toFixed(2)} €</p>
+                  <p className="text-sm text-right">{selectedNote.hebergement?.toFixed(2) || '0.00'} €</p>
                   <p className="text-sm">Restauration:</p>
-                  <p className="text-sm text-right">{selectedNote.restauration.toFixed(2)} €</p>
+                  <p className="text-sm text-right">{selectedNote.restauration?.toFixed(2) || '0.00'} €</p>
                   <p className="text-sm">Indemnités:</p>
-                  <p className="text-sm text-right">{selectedNote.indemnites.toFixed(2)} €</p>
+                  <p className="text-sm text-right">{selectedNote.indemnites?.toFixed(2) || '0.00'} €</p>
                 </div>
               </div>
 

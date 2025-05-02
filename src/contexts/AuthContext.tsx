@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { User, UserRole } from '../types';
 import { generateId } from './data/utils';
@@ -12,6 +13,8 @@ interface AuthContextProps {
   getUserById: (id: string) => User | undefined;
   createUser: (user: Omit<User, 'id'>) => Promise<boolean>;
   hasAccess: (moduleName: string) => boolean;
+  hasRole: (roles: UserRole | UserRole[]) => boolean; // Added method
+  isAuthenticated: boolean; // Added property
   getUserActions: (userId: string) => any[];
   createProducteurAccount: (dossier: Dossier) => User;
 }
@@ -25,6 +28,8 @@ const AuthContext = createContext<AuthContextProps>({
   getUserById: () => undefined,
   createUser: async () => false,
   hasAccess: () => false,
+  hasRole: () => false, // Added method
+  isAuthenticated: false, // Added property
   getUserActions: () => [],
   createProducteurAccount: () => ({} as User),
 });
@@ -183,7 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return mockUsers;
   };
 
-    // Get user by ID
+  // Get user by ID
   const getUserById = (id: string) => {
     return mockUsers.find(user => user.id === id);
   };
@@ -209,6 +214,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return currentUser.permissions?.includes(moduleName) || currentUser.permissions?.includes('*');
   };
 
+  // Check if user has a specific role
+  const hasRole = (roles: UserRole | UserRole[]) => {
+    if (!currentUser) return false;
+    if (Array.isArray(roles)) {
+      return roles.includes(currentUser.role);
+    }
+    return currentUser.role === roles;
+  };
+
   // Add user action
   const addUserAction = (userId: string, action: string, details: string, module: string) => {
     const user = mockUsers.find(user => user.id === userId);
@@ -231,7 +245,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return user?.actions || [];
   };
 
-  // Ajouter le contexte pour le compte producteur
+  // Create producteur account
   const createProducteurAccount = (dossier: Dossier) => {
     const newUser: User = {
       id: generateId(),
@@ -248,6 +262,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return newUser;
   };
 
+  const isAuthenticated = currentUser !== null;
+
   return (
     <AuthContext.Provider value={{
       currentUser,
@@ -257,6 +273,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       getUserById,
       createUser,
       hasAccess,
+      hasRole,
+      isAuthenticated,
       getUserActions,
       createProducteurAccount
     }}>

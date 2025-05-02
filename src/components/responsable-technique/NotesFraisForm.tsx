@@ -58,7 +58,10 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({ dossier, onNoteFraisCre
     addNoteFrais({
       dossierId: dossier.id,
       inspecteurId: currentUser.id,
-      dateCreation: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split('T')[0],
+      description: `Frais pour certification ${dossier.typeProduit}`,
+      montant: total,
+      status: 'en_attente',
       deplacement: 0,
       hebergement: 0,
       restauration: 0,
@@ -67,8 +70,6 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({ dossier, onNoteFraisCre
       fraisInspection: noteFrais.fraisInspection,
       fraisAnalyses: noteFrais.fraisAnalyses,
       fraisSurveillance: noteFrais.fraisSurveillance,
-      total: total,
-      status: 'en_attente',
       commentaire: noteFrais.commentaire || undefined,
     });
     

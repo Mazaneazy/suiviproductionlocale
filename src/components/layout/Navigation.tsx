@@ -1,12 +1,20 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FileCheck, FileText, ClipboardCheck, Home, BarChart, UserRound, Shield, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { UserRole } from '../../types';
 
 interface NavigationProps {
   className?: string;
   onItemClick?: () => void;
+}
+
+interface NavLink {
+  to: string;
+  icon: React.ReactNode;
+  label: string;
+  module: string | null;
+  excludeRoles?: UserRole[]; // Added this property
 }
 
 const Navigation: React.FC<NavigationProps> = ({ className = '', onItemClick }) => {
@@ -14,7 +22,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onItemClick }) 
   const location = useLocation();
 
   // Définir les liens de navigation avec les modules associés et les titres spécifiques par rôle
-  const navLinks = [
+  const navLinks: NavLink[] = [
     { to: '/dashboard', icon: <Home size={20} />, label: 'Tableau de bord', module: null }, // Accessible à tous
     { to: '/accueil', icon: <FileText size={20} />, label: 'Poste d\'Accueil', module: 'acceuil' },
     { to: '/dossiers', icon: <FileText size={20} />, label: 'Dossiers en cours', module: 'dossiers' },
@@ -42,8 +50,8 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onItemClick }) 
     return (link.module === null || hasAccess(link.module)) && !shouldExcludeByRole;
   });
 
-  // Adapter le titre du lien selon le rôle de l'utilisateur
-  const adaptLinkLabels = (link: any) => {
+  
+  const adaptLinkLabels = (link: NavLink) => {
     const roleTitles: Record<string, Record<string, string>> = {
       'acceuil': { '/accueil': 'Poste d\'Accueil' },
       'inspecteur': { '/inspections': 'Chef des Inspections' },

@@ -130,56 +130,66 @@ export const MOCK_NOTES_FRAIS: NoteFrais[] = [
     id: '1',
     dossierId: '1',
     inspecteurId: '3',
-    dateCreation: '2025-03-20',
+    date: '2025-03-20',
+    description: 'Inspection site de production',
+    montant: 195000,
+    status: 'en_attente',
     deplacement: 75000,
     hebergement: 40000,
     restauration: 30000,
-    indemnites: 50000,
-    status: 'en_attente',
+    indemnites: 50000
   },
   {
     id: '2',
     dossierId: '2',
     inspecteurId: '3',
-    dateCreation: '2025-03-10',
+    date: '2025-03-10',
+    description: 'Visite de contrôle',
+    montant: 85000,
+    status: 'valide',
     deplacement: 45000,
     hebergement: 0,
     restauration: 15000,
-    indemnites: 25000,
-    status: 'validee',
+    indemnites: 25000
   },
   {
     id: '3',
     dossierId: '3',
     inspecteurId: '3',
-    dateCreation: '2025-02-05',
+    date: '2025-02-05',
+    description: 'Inspection usine',
+    montant: 260000,
+    status: 'valide',
     deplacement: 120000,
     hebergement: 60000,
     restauration: 35000,
-    indemnites: 45000,
-    status: 'validee',
+    indemnites: 45000
   },
   {
     id: '4',
     dossierId: '5',
     inspecteurId: '3',
-    dateCreation: '2025-03-12',
+    date: '2025-03-12',
+    description: 'Contrôle qualité',
+    montant: 160000,
+    status: 'en_attente',
     deplacement: 60000,
     hebergement: 45000,
     restauration: 25000,
-    indemnites: 30000,
-    status: 'en_attente',
+    indemnites: 30000
   },
   {
     id: '5',
     dossierId: '7',
     inspecteurId: '3',
-    dateCreation: '2025-01-30',
+    date: '2025-01-30',
+    description: 'Inspection plantation',
+    montant: 315000,
+    status: 'valide',
     deplacement: 150000,
     hebergement: 70000,
     restauration: 40000,
-    indemnites: 55000,
-    status: 'validee',
+    indemnites: 55000
   },
 ];
 
@@ -199,7 +209,7 @@ export const MOCK_INSPECTIONS: Inspection[] = [
     lieu: 'Mbandjock, Centre',
     inspecteurs: ['Inspecteur'],
     resultat: 'conforme',
-    recommandations: 'Maintien des bonnes pratiques de production',
+    recommandations: 'Maintien des bonnes pratiques de production'
   },
   {
     id: '3',
@@ -208,7 +218,7 @@ export const MOCK_INSPECTIONS: Inspection[] = [
     lieu: 'Garoua, Nord',
     inspecteurs: ['Inspecteur'],
     resultat: 'conforme',
-    recommandations: 'Excellente qualité des tissus',
+    recommandations: 'Excellente qualité des tissus'
   },
   {
     id: '4',
@@ -225,7 +235,7 @@ export const MOCK_INSPECTIONS: Inspection[] = [
     lieu: 'Limbé, Sud-Ouest',
     inspecteurs: ['Inspecteur'],
     resultat: 'conforme',
-    recommandations: 'Respect des normes environnementales',
+    recommandations: 'Respect des normes environnementales'
   },
 ];
 
@@ -255,47 +265,47 @@ export const MOCK_CERTIFICATS: Certificat[] = [
 export const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: '1',
-    userId: '1',
     message: 'Le délai pour le dossier "SABC" arrive bientôt à expiration',
-    type: 'warning',
-    lue: false,
     date: '2025-04-10',
-    link: '/dossiers/1',
+    lue: false,
+    type: 'warning',
+    userId: '1',
+    link: '/dossiers/1'
   },
   {
     id: '2',
-    userId: '1',
     message: 'La note de frais pour "SOSUCAM" a été validée',
-    type: 'info',
-    lue: true,
     date: '2025-03-12',
-    link: '/notes-frais/2',
+    lue: true,
+    type: 'info',
+    userId: '1',
+    link: '/notes-frais/2'
   },
   {
     id: '3',
-    userId: '3',
     message: 'Vous avez été assigné à une nouvelle inspection',
-    type: 'info',
-    lue: false,
     date: '2025-03-20',
-    link: '/inspections/1',
+    lue: false,
+    type: 'info',
+    userId: '3',
+    link: '/inspections/1'
   },
   {
     id: '4',
-    userId: '1',
     message: 'Note de frais reçue du laboratoire pour CHOCOCAM',
-    type: 'info',
-    lue: false,
     date: '2025-03-12',
-    link: '/notes-frais/4',
+    lue: false,
+    type: 'info',
+    userId: '1',
+    link: '/notes-frais/4'
   },
   {
     id: '5',
-    userId: '2',
     message: 'Contrôle inopiné planifié pour SODECOTON',
-    type: 'warning',
-    lue: false,
     date: '2025-03-05',
-    link: '/inspections/6',
+    lue: false,
+    type: 'warning',
+    userId: '2',
+    link: '/inspections/6'
   },
 ];
