@@ -1,15 +1,28 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DocumentDossier } from '../../../types';
 import { MOCK_DOCUMENTS } from '../mockData';
 import { generateId } from '../utils';
 
 export function useDocuments(updateDossier: (id: string, data: any) => void) {
-  // Initialize with mock documents
-  const [documents, setDocuments] = useState<DocumentDossier[]>(MOCK_DOCUMENTS);
+  // Initialize with documents from localStorage if available
+  const [documents, setDocuments] = useState<DocumentDossier[]>(() => {
+    try {
+      const storedDocuments = localStorage.getItem('documents');
+      if (storedDocuments) {
+        const parsedDocs = JSON.parse(storedDocuments);
+        console.log("Documents chargés depuis localStorage:", parsedDocs.length);
+        return Array.isArray(parsedDocs) ? parsedDocs : MOCK_DOCUMENTS;
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des documents depuis localStorage:', error);
+    }
+    return MOCK_DOCUMENTS;
+  });
 
   const addDocument = (document: Omit<DocumentDossier, 'id'>) => {
     const newDocument = { ...document, id: generateId() };
+    console.log("Ajout d'un nouveau document:", newDocument);
     
     // Add to state
     setDocuments(prevDocuments => {
@@ -18,8 +31,9 @@ export function useDocuments(updateDossier: (id: string, data: any) => void) {
       // Save to localStorage for persistence
       try {
         localStorage.setItem('documents', JSON.stringify(updatedDocuments));
+        console.log(`Document ajouté et sauvegardé, total: ${updatedDocuments.length}`);
       } catch (error) {
-        console.error('Error saving documents to localStorage:', error);
+        console.error('Erreur lors de l\'enregistrement des documents dans localStorage:', error);
       }
       
       return updatedDocuments;
@@ -34,7 +48,7 @@ export function useDocuments(updateDossier: (id: string, data: any) => void) {
       try {
         localStorage.setItem('documents', JSON.stringify(updatedDocuments));
       } catch (error) {
-        console.error('Error saving documents to localStorage:', error);
+        console.error('Erreur lors de l\'enregistrement des documents dans localStorage:', error);
       }
       
       return updatedDocuments;
@@ -51,7 +65,7 @@ export function useDocuments(updateDossier: (id: string, data: any) => void) {
       try {
         localStorage.setItem('documents', JSON.stringify(updatedDocuments));
       } catch (error) {
-        console.error('Error saving documents to localStorage:', error);
+        console.error('Erreur lors de l\'enregistrement des documents dans localStorage:', error);
       }
       
       return updatedDocuments;
@@ -59,23 +73,52 @@ export function useDocuments(updateDossier: (id: string, data: any) => void) {
   };
 
   const getDocumentsByDossierId = (dossierId: string) => {
-    // Try to load from localStorage first for the most recent data
+    console.log(`Recherche des documents pour le dossier: ${dossierId}`);
+    
     try {
-      const storedDocuments = JSON.parse(localStorage.getItem('documents') || '[]');
-      if (Array.isArray(storedDocuments) && storedDocuments.length > 0) {
-        const dossiersDocuments = storedDocuments.filter((doc: DocumentDossier) => doc.dossierId === dossierId);
-        console.log(`Found ${dossiersDocuments.length} documents for dossier ${dossierId} in localStorage`);
-        return dossiersDocuments;
+      // Essayer d'abord de charger depuis localStorage pour les données les plus récentes
+      const storedDocuments = localStorage.getItem('documents');
+      if (storedDocuments) {
+        const parsedDocs = JSON.parse(storedDocuments);
+        if (Array.isArray(parsedDocs)) {
+          const filteredDocs = parsedDocs.filter(doc => doc.dossierId === dossierId);
+          console.log(`Trouvé ${filteredDocs.length} documents pour le dossier ${dossierId} dans localStorage`);
+          return filteredDocs;
+        }
       }
     } catch (error) {
-      console.error('Error loading documents from localStorage:', error);
+      console.error('Erreur lors du chargement des documents depuis localStorage:', error);
     }
     
-    // Fallback to state if localStorage fails
-    const dossiersDocuments = documents.filter(doc => doc.dossierId === dossierId);
-    console.log(`Found ${dossiersDocuments.length} documents for dossier ${dossierId} in state`);
-    return dossiersDocuments;
+    // Repli sur l'état si localStorage échoue
+    const dossierDocuments = documents.filter(doc => doc.dossierId === dossierId);
+    console.log(`Trouvé ${dossierDocuments.length} documents pour le dossier ${dossierId} dans l'état`);
+    return dossierDocuments;
   };
+
+  // Effet pour synchroniser les documents avec localStorage
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const storedDocuments = localStorage.getItem('documents');
+        if (storedDocuments) {
+          const parsedDocs = JSON.parse(storedDocuments);
+          if (Array.isArray(parsedDocs)) {
+            setDocuments(parsedDocs);
+            console.log("Documents mis à jour depuis localStorage:", parsedDocs.length);
+          }
+        }
+      } catch (error) {
+        console.error('Erreur lors de la synchronisation des documents:', error);
+      }
+    };
+
+    // Écouter les changements de stockage (utile en cas de modifications dans d'autres onglets)
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   return {
     documents,

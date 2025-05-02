@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dossier, DocumentDossier } from '@/types';
+import { useData } from '@/contexts/DataContext';
 
 // Import tab content components
 import DossierHistoryTab from './DossierHistoryTab';
@@ -17,11 +18,22 @@ interface DossierDetailsTabsProps {
 
 const DossierDetailsTabs: React.FC<DossierDetailsTabsProps> = ({ 
   dossier, 
-  documents, 
+  documents: initialDocuments, 
   inspections, 
   certificat 
 }) => {
-  console.log("DossierDetailsTabs reçoit documents:", documents);
+  const { getDocumentsByDossierId } = useData();
+  const [documents, setDocuments] = useState<DocumentDossier[]>(initialDocuments);
+  
+  // Rafraîchir les documents chaque fois que le dossier change ou que le composant est monté
+  useEffect(() => {
+    if (dossier && dossier.id) {
+      console.log(`Rafraîchissement des documents pour le dossier: ${dossier.id}`);
+      const refreshedDocs = getDocumentsByDossierId(dossier.id);
+      console.log("Documents rafraîchis:", refreshedDocs);
+      setDocuments(refreshedDocs);
+    }
+  }, [dossier, getDocumentsByDossierId]);
   
   return (
     <Tabs defaultValue="historique">

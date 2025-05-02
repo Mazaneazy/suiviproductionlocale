@@ -14,6 +14,7 @@ const Dossiers = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('tous');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [latestDossierId, setLatestDossierId] = useState<string | undefined>(undefined);
   
   // État pour le nouveau dossier
   const [newDossier, setNewDossier] = useState<Omit<Dossier, 'id'>>({
@@ -71,6 +72,20 @@ const Dossiers = () => {
     
     addDossier(dossierToAdd);
     
+    // Récupérer l'ID du dossier qui vient d'être créé
+    setTimeout(() => {
+      try {
+        const storedDossiers = JSON.parse(localStorage.getItem('dossiers') || '[]');
+        if (storedDossiers.length > 0) {
+          const createdDossierId = storedDossiers[storedDossiers.length - 1].id;
+          setLatestDossierId(createdDossierId);
+          console.log("ID du dossier créé:", createdDossierId);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération de l'ID du dossier:", error);
+      }
+    }, 100);
+    
     toast({
       title: "Dossier ajouté",
       description: `Le dossier pour "${newDossier.operateurNom}" a été créé avec succès.`,
@@ -103,6 +118,7 @@ const Dossiers = () => {
           newDossier={newDossier}
           setNewDossier={setNewDossier}
           onSubmit={handleAddDossier}
+          latestDossierId={latestDossierId}
         />
       </div>
 

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -19,6 +19,7 @@ interface AddDossierDialogProps {
   newDossier: Omit<Dossier, 'id'>;
   setNewDossier: React.Dispatch<React.SetStateAction<Omit<Dossier, 'id'>>>;
   onSubmit: () => void;
+  latestDossierId?: string;
 }
 
 const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
@@ -26,7 +27,8 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
   onOpenChange,
   newDossier,
   setNewDossier,
-  onSubmit
+  onSubmit,
+  latestDossierId
 }) => {
   const handleCloseDialog = () => {
     onOpenChange(false);
@@ -53,6 +55,7 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
           setNewDossier={setNewDossier}
           onSubmit={onSubmit}
           onClose={handleCloseDialog}
+          dossierIdAfterSubmit={latestDossierId}
         />
       </DialogContent>
     </Dialog>

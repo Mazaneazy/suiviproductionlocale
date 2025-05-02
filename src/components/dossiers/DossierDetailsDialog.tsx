@@ -36,17 +36,26 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
   // Charger les données lorsque le dialogue est ouvert
   useEffect(() => {
     if (isOpen && dossierId) {
-      const currentDossier = getDossierById(dossierId);
-      const currentDocuments = getDocumentsByDossierId(dossierId);
-      const currentInspections = getInspectionsByDossierId(dossierId);
-      const currentCertificat = getCertificatByDossierId(dossierId);
+      const loadData = () => {
+        const currentDossier = getDossierById(dossierId);
+        const currentDocuments = getDocumentsByDossierId(dossierId);
+        const currentInspections = getInspectionsByDossierId(dossierId);
+        const currentCertificat = getCertificatByDossierId(dossierId);
 
-      console.log(`Dialogue ouvert - Chargement des documents pour ${dossierId}:`, currentDocuments);
+        console.log(`Dialogue ouvert - Chargement des documents pour ${dossierId}:`, currentDocuments);
+        
+        setDossier(currentDossier);
+        setDocuments(currentDocuments);
+        setInspections(currentInspections);
+        setCertificat(currentCertificat);
+      };
+
+      loadData();
       
-      setDossier(currentDossier);
-      setDocuments(currentDocuments);
-      setInspections(currentInspections);
-      setCertificat(currentCertificat);
+      // Ajouter un petit délai pour permettre aux documents d'être ajoutés si nécessaire
+      const refreshTimer = setTimeout(loadData, 1000);
+      
+      return () => clearTimeout(refreshTimer);
     }
   }, [isOpen, dossierId, getDossierById, getDocumentsByDossierId, getInspectionsByDossierId, getCertificatByDossierId]);
 

@@ -16,13 +16,15 @@ interface DossierDialogContentProps {
   setNewDossier: React.Dispatch<React.SetStateAction<Omit<Dossier, 'id'>>>;
   onSubmit: () => void;
   onClose: () => void;
+  dossierIdAfterSubmit?: string;
 }
 
 const DossierDialogContent: React.FC<DossierDialogContentProps> = ({
   newDossier,
   setNewDossier,
   onSubmit,
-  onClose
+  onClose,
+  dossierIdAfterSubmit
 }) => {
   const { toast } = useToast();
   const { 
@@ -62,7 +64,10 @@ const DossierDialogContent: React.FC<DossierDialogContentProps> = ({
     }
     
     // Ajouter les pièces jointes au dossier
-    processAttachments(attachments);
+    console.log("Traitement des pièces jointes avec ID:", dossierIdAfterSubmit);
+    setTimeout(() => {
+      processAttachments(attachments, dossierIdAfterSubmit);
+    }, 500);
   };
 
   if (producteurCredentials) {
