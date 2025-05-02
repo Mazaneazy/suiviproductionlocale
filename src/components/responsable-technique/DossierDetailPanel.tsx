@@ -2,12 +2,9 @@
 import React, { useState } from 'react';
 import { useData } from '@/contexts/DataContext';
 import { Dossier, DocumentDossier } from '@/types';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, X, AlertCircle, FileText, File } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
+import DocumentsList from './document-validation/DocumentsList';
+import CommentSection from './document-validation/CommentSection';
+import ValidationActions from './document-validation/ValidationActions';
 import ParametresEvaluationForm from './ParametresEvaluationForm';
 
 interface DossierDetailPanelProps {
@@ -44,28 +41,6 @@ const DossierDetailPanel: React.FC<DossierDetailPanelProps> = ({
   // État pour suivre les validations de documents
   const [documentStatuses, setDocumentStatuses] = useState<Record<string, string>>({});
   
-  // Formater le type de document pour l'affichage
-  const formatDocumentType = (type: string) => {
-    switch (type) {
-      case 'registre_commerce':
-        return 'Registre de Commerce';
-      case 'carte_contribuable':
-        return 'Carte de Contribuable (NIU)';
-      case 'processus_production':
-        return 'Schéma du processus de production';
-      case 'certificats_conformite':
-        return 'Certificats de Conformité';
-      case 'liste_personnel':
-        return 'Liste du personnel';
-      case 'plan_localisation':
-        return 'Plan de localisation';
-      case 'pdf':
-        return 'Document PDF';
-      default:
-        return type;
-    }
-  };
-  
   // Fonction pour valider ou rejeter un document
   const handleDocumentValidation = (docId: string, status: 'valide' | 'rejete') => {
     updateDocument(docId, { 
@@ -77,11 +52,6 @@ const DossierDetailPanel: React.FC<DossierDetailPanelProps> = ({
       ...documentStatuses,
       [docId]: status
     });
-  };
-  
-  // View PDF document
-  const viewDocument = (url: string, name: string) => {
-    window.open(url, `_blank_${name}`);
   };
   
   // Vérifier si tous les documents sont validés
@@ -146,96 +116,25 @@ const DossierDetailPanel: React.FC<DossierDetailPanelProps> = ({
         </div>
       </div>
       
-      <div>
-        <h3 className="text-lg font-medium mb-3">Documents du dossier</h3>
-        {documents.length > 0 ? (
-          <div className="space-y-3">
-            {documents.map((doc) => (
-              <Card key={doc.id} className="overflow-hidden">
-                <CardHeader className="p-4 pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center">
-                    {doc.type === 'pdf' ? (
-                      <File size={16} className="mr-2 text-red-500" />
-                    ) : (
-                      <FileText size={16} className="mr-2" />
-                    )}
-                    {doc.type === 'pdf' ? doc.nom : formatDocumentType(doc.type)}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  <p className="text-sm">
-                    {doc.type === 'pdf' 
-                      ? `Téléversé le ${new Date(doc.dateUpload).toLocaleDateString()}` 
-                      : doc.nom}
-                  </p>
-                </CardContent>
-                <CardFooter className="p-4 pt-0 flex justify-between">
-                  <div className="flex items-center gap-2">
-                    {doc.status === 'valide' || documentStatuses[doc.id] === 'valide' ? (
-                      <Badge className="bg-green-500">Validé</Badge>
-                    ) : doc.status === 'rejete' || documentStatuses[doc.id] === 'rejete' ? (
-                      <Badge className="bg-red-500">Rejeté</Badge>
-                    ) : (
-                      <Badge>En attente</Badge>
-                    )}
-                    {doc.type === 'pdf' && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => viewDocument(doc.url, doc.nom)}
-                        className="text-certif-blue hover:text-certif-blue/80"
-                      >
-                        Visualiser
-                      </Button>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="border-green-500 text-green-500 hover:bg-green-50"
-                      onClick={() => handleDocumentValidation(doc.id, 'valide')}
-                      disabled={doc.status === 'valide' || documentStatuses[doc.id] === 'valide'}
-                    >
-                      <Check size={16} className="mr-1" /> Valider
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="border-red-500 text-red-500 hover:bg-red-50"
-                      onClick={() => handleDocumentValidation(doc.id, 'rejete')}
-                      disabled={doc.status === 'rejete' || documentStatuses[doc.id] === 'rejete'}
-                    >
-                      <X size={16} className="mr-1" /> Rejeter
-                    </Button>
-                  </div>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-500">Aucun document disponible</p>
-        )}
-      </div>
+      <DocumentsList 
+        documents={documents}
+        onValidate={handleDocumentValidation}
+        documentStatuses={documentStatuses}
+      />
       
-      <div>
-        <h3 className="text-lg font-medium mb-3">Commentaires</h3>
-        <Textarea
-          placeholder="Ajouter des commentaires sur le dossier"
-          value={commentaire}
-          onChange={(e) => setCommentaire(e.target.value)}
-          rows={3}
-        />
-      </div>
+      <CommentSection
+        commentaire={commentaire}
+        setCommentaire={setCommentaire}
+      />
       
       {allDocumentsProcessed() && !showParametres && (
         <div className="flex justify-center">
-          <Button 
-            className="bg-certif-green hover:bg-certif-green/90"
+          <button 
+            className="bg-certif-green hover:bg-certif-green/90 text-white px-4 py-2 rounded"
             onClick={() => setShowParametres(true)}
           >
             Sélectionner paramètres d'évaluation
-          </Button>
+          </button>
         </div>
       )}
       
@@ -247,24 +146,12 @@ const DossierDetailPanel: React.FC<DossierDetailPanelProps> = ({
         />
       )}
       
-      <div className="flex justify-end gap-3">
-        <Button 
-          variant="destructive" 
-          onClick={handleMarkRejected}
-          disabled={!commentaire}
-        >
-          <AlertCircle size={16} className="mr-2" /> 
-          Marquer "À corriger"
-        </Button>
-        <Button 
-          className="bg-certif-blue hover:bg-certif-blue/90"
-          onClick={handleMarkComplet}
-          disabled={!allDocumentsProcessed() || parametresSelected.length === 0}
-        >
-          <Check size={16} className="mr-2" /> 
-          Valider et continuer
-        </Button>
-      </div>
+      <ValidationActions
+        onMarkComplet={handleMarkComplet}
+        onMarkRejected={handleMarkRejected}
+        disableComplete={!allDocumentsProcessed() || parametresSelected.length === 0}
+        disableReject={!commentaire}
+      />
     </div>
   );
 };
