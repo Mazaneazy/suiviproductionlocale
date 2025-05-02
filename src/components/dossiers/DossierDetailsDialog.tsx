@@ -38,11 +38,32 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
     if (isOpen && dossierId) {
       const loadData = () => {
         const currentDossier = getDossierById(dossierId);
-        const currentDocuments = getDocumentsByDossierId(dossierId);
+        
+        // Essayer d'abord de récupérer les documents directement depuis localStorage
+        let currentDocuments = [];
+        try {
+          const storedDocuments = localStorage.getItem('documents');
+          if (storedDocuments) {
+            const allDocuments = JSON.parse(storedDocuments);
+            if (Array.isArray(allDocuments)) {
+              currentDocuments = allDocuments.filter(doc => doc.dossierId === dossierId);
+              console.log(`Documents trouvés dans localStorage pour ${dossierId}:`, currentDocuments.length);
+            }
+          }
+        } catch (error) {
+          console.error("Erreur lors de la lecture des documents depuis localStorage:", error);
+        }
+        
+        // Si aucun document n'est trouvé dans localStorage, utiliser getDocumentsByDossierId
+        if (currentDocuments.length === 0) {
+          currentDocuments = getDocumentsByDossierId(dossierId);
+          console.log(`Documents récupérés via getDocumentsByDossierId pour ${dossierId}:`, currentDocuments);
+        }
+        
         const currentInspections = getInspectionsByDossierId(dossierId);
         const currentCertificat = getCertificatByDossierId(dossierId);
 
-        console.log(`Dialogue ouvert - Chargement des documents pour ${dossierId}:`, currentDocuments);
+        console.log(`Dialogue ouvert - Documents chargés pour ${dossierId}:`, currentDocuments);
         
         setDossier(currentDossier);
         setDocuments(currentDocuments);

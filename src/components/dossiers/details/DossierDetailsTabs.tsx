@@ -23,17 +23,39 @@ const DossierDetailsTabs: React.FC<DossierDetailsTabsProps> = ({
   certificat 
 }) => {
   const { getDocumentsByDossierId } = useData();
-  const [documents, setDocuments] = useState<DocumentDossier[]>(initialDocuments);
+  const [documents, setDocuments] = useState<DocumentDossier[]>(initialDocuments || []);
   
   // Rafraîchir les documents chaque fois que le dossier change ou que le composant est monté
   useEffect(() => {
     if (dossier && dossier.id) {
       console.log(`Rafraîchissement des documents pour le dossier: ${dossier.id}`);
+      
+      try {
+        // Essayer d'obtenir les documents directement depuis localStorage pour les données les plus récentes
+        const storedDocuments = localStorage.getItem('documents');
+        if (storedDocuments) {
+          const allDocuments = JSON.parse(storedDocuments);
+          if (Array.isArray(allDocuments)) {
+            const dossiersDocuments = allDocuments.filter(doc => doc.dossierId === dossier.id);
+            console.log("Documents trouvés dans localStorage:", dossiersDocuments.length);
+            if (dossiersDocuments.length > 0) {
+              setDocuments(dossiersDocuments);
+              return;
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Erreur lors de l'accès aux documents dans localStorage:", error);
+      }
+      
+      // Si localStorage échoue ou ne contient pas de documents pour ce dossier, utiliser getDocumentsByDossierId
       const refreshedDocs = getDocumentsByDossierId(dossier.id);
-      console.log("Documents rafraîchis:", refreshedDocs);
-      setDocuments(refreshedDocs);
+      console.log("Documents rafraîchis via getDocumentsByDossierId:", refreshedDocs);
+      setDocuments(refreshedDocs || []);
     }
   }, [dossier, getDocumentsByDossierId]);
+  
+  console.log("Documents actuellement dans DossierDetailsTabs:", documents);
   
   return (
     <Tabs defaultValue="historique">

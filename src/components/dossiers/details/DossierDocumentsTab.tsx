@@ -4,12 +4,15 @@ import { DocumentDossier } from '@/types';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { File, FileText, Download } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface DossierDocumentsTabProps {
   documents: DocumentDossier[];
 }
 
 const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({ documents }) => {
+  const { toast } = useToast();
+
   // Format document type name for better display
   const formatDocumentType = (type: string) => {
     switch (type) {
@@ -32,16 +35,26 @@ const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({ documents }) 
 
   // Helper function to view a PDF document
   const viewDocument = (url: string, name: string) => {
+    // Dans un environnement réel, ceci ouvrirait le PDF
     window.open(url, `_blank_${name}`);
+    
+    // Comme nous utilisons des URL fictives, affichons un message
+    toast({
+      title: "Visualisation du document",
+      description: `Ouverture de ${name}`,
+    });
   };
 
   console.log("Rendering DossierDocumentsTab with documents:", documents);
 
+  // S'assurer que documents est un tableau même s'il est undefined
+  const docsToDisplay = Array.isArray(documents) ? documents : [];
+
   return (
     <ScrollArea className="h-full pr-4">
-      {documents && documents.length > 0 ? (
+      {docsToDisplay && docsToDisplay.length > 0 ? (
         <div className="space-y-4">
-          {documents.map((doc) => (
+          {docsToDisplay.map((doc) => (
             <div key={doc.id} className="flex items-center justify-between p-3 border rounded-md bg-white shadow-sm">
               <div className="flex items-center">
                 {doc.type === 'pdf' ? (

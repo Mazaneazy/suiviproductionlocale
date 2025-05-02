@@ -1,49 +1,73 @@
 
 import { useData } from '@/contexts/DataContext';
 import { useToast } from '@/hooks/use-toast';
+import { DocumentDossier } from '@/types';
 
 export function useDocumentProcessing() {
   const { addDocument, getDossierById } = useData();
   const { toast } = useToast();
 
   const processAttachments = (attachments: File[], dossierId?: string) => {
-    if (attachments.length === 0) return;
-
-    // Récupérer le dernier dossier créé ou utiliser l'ID fourni
-    setTimeout(() => {
-      const latestDossierId = dossierId || getLatestDossierId();
+    if (attachments.length === 0) return [];
+    
+    console.log(`Traitement de ${attachments.length} pièces jointes pour le dossier ${dossierId || 'inconnu'}`);
+    
+    if (!dossierId) {
+      dossierId = getLatestDossierId();
+      console.log(`ID de dossier fourni non valide, utilisation de l'ID récupéré: ${dossierId}`);
+    }
+    
+    if (!dossierId) {
+      console.error("Impossible de trouver un ID de dossier valide pour ajouter les pièces jointes");
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ajouter les pièces jointes. ID de dossier non valide.",
+        variant: "destructive",
+      });
+      return [];
+    }
+    
+    const addedDocuments: DocumentDossier[] = [];
+    
+    // Traitement immédiat des pièces jointes
+    attachments.forEach((file) => {
+      // Déterminer le type de document en fonction du nom du fichier
+      let documentType = determineDocumentType(file.name);
       
-      if (latestDossierId && attachments.length > 0) {
-        console.log(`Traitement de ${attachments.length} pièces jointes pour le dossier ${latestDossierId}`);
-        
-        attachments.forEach((file) => {
-          // Déterminer le type de document en fonction du nom du fichier
-          let documentType = determineDocumentType(file.name);
-          
-          // Créer une URL fictive pour le fichier PDF
-          const fileUrl = `https://storage.example.com/${latestDossierId}/${file.name}`;
-          
-          // Ajouter le document au dossier avec le statut en attente par défaut
-          addDocument({
-            dossierId: latestDossierId,
-            nom: file.name,
-            type: documentType,
-            dateUpload: new Date().toISOString(),
-            url: fileUrl,
-            status: 'en_attente'
-          });
-          
-          console.log(`Document ajouté: ${file.name} (Type: ${documentType}) pour le dossier ${latestDossierId}`);
-        });
-        
-        toast({
-          title: "Pièces jointes ajoutées",
-          description: `${attachments.length} fichier(s) ajouté(s) au dossier`,
-        });
-      } else {
-        console.error("Impossible de trouver un ID de dossier valide pour ajouter les pièces jointes");
+      // Créer une URL fictive pour le fichier PDF
+      const fileUrl = `https://storage.example.com/${dossierId}/${file.name}`;
+      
+      // Ajouter le document au dossier avec le statut en attente par défaut
+      const newDoc = addDocument({
+        dossierId: dossierId as string,
+        nom: file.name,
+        type: documentType,
+        dateUpload: new Date().toISOString(),
+        url: fileUrl,
+        status: 'en_attente'
+      });
+      
+      if (newDoc) {
+        addedDocuments.push(newDoc);
       }
-    }, 500);
+      
+      console.log(`Document ajouté: ${file.name} (Type: ${documentType}) pour le dossier ${dossierId}`);
+    });
+    
+    // Notification du succès
+    if (addedDocuments.length > 0) {
+      toast({
+        title: "Pièces jointes ajoutées",
+        description: `${addedDocuments.length} fichier(s) ajouté(s) au dossier`,
+      });
+      
+      // Déclencher un événement pour signaler que les documents ont été mis à jour
+      window.dispatchEvent(new CustomEvent('documents-updated', { 
+        detail: { dossierId } 
+      }));
+    }
+    
+    return addedDocuments;
   };
   
   // Récupère l'ID du dernier dossier créé depuis localStorage

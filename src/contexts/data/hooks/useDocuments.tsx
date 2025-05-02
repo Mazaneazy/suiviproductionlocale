@@ -32,21 +32,36 @@ export function useDocuments(updateDossier: (id: string, data: any) => void) {
       try {
         localStorage.setItem('documents', JSON.stringify(updatedDocuments));
         console.log(`Document ajouté et sauvegardé, total: ${updatedDocuments.length}`);
+        
+        // Déclencher un événement personnalisé pour signaler que les documents ont été mis à jour
+        window.dispatchEvent(new CustomEvent('documents-updated', { 
+          detail: { dossierId: newDocument.dossierId } 
+        }));
       } catch (error) {
         console.error('Erreur lors de l\'enregistrement des documents dans localStorage:', error);
       }
       
       return updatedDocuments;
     });
+    
+    return newDocument;
   };
 
   const removeDocument = (id: string) => {
     setDocuments(prevDocuments => {
+      const docToRemove = prevDocuments.find(doc => doc.id === id);
       const updatedDocuments = prevDocuments.filter(doc => doc.id !== id);
       
       // Save to localStorage for persistence
       try {
         localStorage.setItem('documents', JSON.stringify(updatedDocuments));
+        
+        if (docToRemove) {
+          // Déclencher un événement personnalisé pour signaler que les documents ont été mis à jour
+          window.dispatchEvent(new CustomEvent('documents-updated', { 
+            detail: { dossierId: docToRemove.dossierId } 
+          }));
+        }
       } catch (error) {
         console.error('Erreur lors de l\'enregistrement des documents dans localStorage:', error);
       }
@@ -57,6 +72,7 @@ export function useDocuments(updateDossier: (id: string, data: any) => void) {
 
   const updateDocument = (id: string, data: Partial<DocumentDossier>) => {
     setDocuments(prevDocuments => {
+      const docToUpdate = prevDocuments.find(doc => doc.id === id);
       const updatedDocuments = prevDocuments.map(doc => 
         doc.id === id ? { ...doc, ...data } : doc
       );
@@ -64,6 +80,13 @@ export function useDocuments(updateDossier: (id: string, data: any) => void) {
       // Save to localStorage for persistence
       try {
         localStorage.setItem('documents', JSON.stringify(updatedDocuments));
+        
+        if (docToUpdate) {
+          // Déclencher un événement personnalisé pour signaler que les documents ont été mis à jour
+          window.dispatchEvent(new CustomEvent('documents-updated', { 
+            detail: { dossierId: docToUpdate.dossierId } 
+          }));
+        }
       } catch (error) {
         console.error('Erreur lors de l\'enregistrement des documents dans localStorage:', error);
       }
@@ -98,25 +121,30 @@ export function useDocuments(updateDossier: (id: string, data: any) => void) {
 
   // Effet pour synchroniser les documents avec localStorage
   useEffect(() => {
-    const handleStorageChange = () => {
-      try {
-        const storedDocuments = localStorage.getItem('documents');
-        if (storedDocuments) {
-          const parsedDocs = JSON.parse(storedDocuments);
-          if (Array.isArray(parsedDocs)) {
-            setDocuments(parsedDocs);
-            console.log("Documents mis à jour depuis localStorage:", parsedDocs.length);
+    const handleStorageChange = (e) => {
+      if (e.key === 'documents' || !e.key) {
+        try {
+          const storedDocuments = localStorage.getItem('documents');
+          if (storedDocuments) {
+            const parsedDocs = JSON.parse(storedDocuments);
+            if (Array.isArray(parsedDocs)) {
+              setDocuments(parsedDocs);
+              console.log("Documents mis à jour depuis localStorage:", parsedDocs.length);
+            }
           }
+        } catch (error) {
+          console.error('Erreur lors de la synchronisation des documents:', error);
         }
-      } catch (error) {
-        console.error('Erreur lors de la synchronisation des documents:', error);
       }
     };
 
     // Écouter les changements de stockage (utile en cas de modifications dans d'autres onglets)
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('documents-updated', handleStorageChange);
+    
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('documents-updated', handleStorageChange);
     };
   }, []);
 
