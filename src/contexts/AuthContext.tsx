@@ -13,8 +13,8 @@ interface AuthContextProps {
   getUserById: (id: string) => User | undefined;
   createUser: (user: Omit<User, 'id'>) => Promise<boolean>;
   hasAccess: (moduleName: string) => boolean;
-  hasRole: (roles: UserRole | UserRole[]) => boolean; // Added method
-  isAuthenticated: boolean; // Added property
+  hasRole: (roles: UserRole | UserRole[]) => boolean; 
+  isAuthenticated: boolean; 
   getUserActions: (userId: string) => any[];
   createProducteurAccount: (dossier: Dossier) => User;
 }
@@ -28,11 +28,40 @@ const AuthContext = createContext<AuthContextProps>({
   getUserById: () => undefined,
   createUser: async () => false,
   hasAccess: () => false,
-  hasRole: () => false, // Added method
-  isAuthenticated: false, // Added property
+  hasRole: () => false, 
+  isAuthenticated: false,
   getUserActions: () => [],
   createProducteurAccount: () => ({} as User),
 });
+
+// Define role to permission mapping
+const rolePermissionsMap: Record<UserRole, string[]> = {
+  'admin': ['*'], // Admin access to all modules
+  'acceuil': ['acceuil'],
+  'inspecteur': ['inspections'],
+  'certificats': ['resultats'],
+  'analyste': ['statistiques'],
+  'comptable': ['notes-frais'],
+  'responsable_technique': ['responsable-technique'],
+  'chef_mission': ['inspections'],
+  'surveillant': ['inspections'],
+  'directeur': ['resultats'],
+  'directeur_general': ['*'], // Director general access to all modules
+  'gestionnaire': ['dossiers'],
+  'producteur': ['dashboard'] // Producteurs can only access their dashboard
+};
+
+// Module names for navigation and access control
+export const moduleNames = {
+  'acceuil': 'Poste d\'Accueil',
+  'dossiers': 'Gestion des Dossiers',
+  'inspections': 'Inspections',
+  'resultats': 'Certificats émis',
+  'statistiques': 'Statistiques',
+  'notes-frais': 'Notes de frais',
+  'responsable-technique': 'Responsable Technique',
+  'user-management': 'Gestion des utilisateurs'
+};
 
 // Mock user data (replace with a real database or API)
 const MOCK_USERS: User[] = [
@@ -193,11 +222,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return mockUsers.find(user => user.id === id);
   };
 
-  // Create user
+  // Helper to get permissions based on role
+  const getPermissionsForRole = (role: UserRole): string[] => {
+    return rolePermissionsMap[role] || [];
+  };
+
+  // Create user with automatic permissions based on role
   const createUser = async (user: Omit<User, 'id'>) => {
+    // Assign permissions based on role
+    const permissions = getPermissionsForRole(user.role);
+    
     const newUser: User = {
       id: generateId(),
       ...user,
+      permissions,
       password: 'password', // Default password
       actions: []
     };
