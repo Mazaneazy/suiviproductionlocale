@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Dossier, DocumentDossier } from '@/types';
 import DossierForm from './DossierForm';
 import { useAuth } from '@/hooks/useAuth';
+import { useData } from '@/contexts/DataContext';
 import PdfAttachment from './PdfAttachment';
 
 interface AddDossierDialogProps {
@@ -37,6 +38,7 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
 }) => {
   const { toast } = useToast();
   const { createProducteurAccount } = useAuth();
+  const { addDocument } = useData();
   const [createAccount, setCreateAccount] = useState(false);
   const [producteurCredentials, setProducteurCredentials] = useState<{email: string, password: string} | null>(null);
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -79,6 +81,32 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
         }
       }, 300);
     }
+    
+    // Ajouter les pièces jointes au dossier
+    setTimeout(() => {
+      const latestDossier = JSON.parse(localStorage.getItem('dossiers') || '[]').pop();
+      if (latestDossier && attachments.length > 0) {
+        attachments.forEach((file, index) => {
+          // Créer une URL fictive pour le fichier PDF (dans une vraie application, ce serait une URL de stockage cloud)
+          const fileUrl = `https://storage.example.com/${latestDossier.id}/${file.name}`;
+          
+          // Ajouter le document au dossier
+          addDocument({
+            dossierId: latestDossier.id,
+            nom: file.name,
+            type: 'pdf',
+            dateUpload: new Date().toISOString(),
+            url: fileUrl,
+            status: 'en_attente'
+          });
+        });
+        
+        toast({
+          title: "Pièces jointes ajoutées",
+          description: `${attachments.length} fichier(s) ajouté(s) au dossier`,
+        });
+      }
+    }, 500);
   };
 
   const handleAccountCreationToggle = () => {
