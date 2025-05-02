@@ -30,9 +30,6 @@ const ProgrammerInspectionForm: React.FC<ProgrammerInspectionFormProps> = ({ dos
     }
   };
 
-  console.log('Available inspectors:', inspecteurs);
-  console.log('Selected inspectors:', formData.inspecteurs);
-
   return (
     <form onSubmit={onSubmitWrapper} className="space-y-4">
       <div>

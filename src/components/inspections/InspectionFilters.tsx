@@ -2,7 +2,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ClipboardCheck } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 
 interface InspectionFiltersProps {
   searchTerm: string;
@@ -26,7 +26,7 @@ const InspectionFilters: React.FC<InspectionFiltersProps> = ({
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10"
         />
-        <ClipboardCheck className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
       </div>
       <Select value={statusFilter} onValueChange={setStatusFilter}>
         <SelectTrigger className="w-[180px]">

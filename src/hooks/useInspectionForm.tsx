@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useData } from '@/contexts/DataContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,7 +12,7 @@ export const useInspectionForm = (dossierId: string) => {
   const dossier = getDossierById(dossierId);
   const allUsers = getAllUsers();
   
-  // Filtrer les inspecteurs (utilisateurs avec le rôle inspecteur, surveillant ou chef_mission)
+  // Filtrer les utilisateurs avec le rôle inspecteur, surveillant ou chef_mission
   const inspecteurs = allUsers
     .filter(user => ['inspecteur', 'surveillant', 'chef_mission'].includes(user.role))
     .map(user => ({
