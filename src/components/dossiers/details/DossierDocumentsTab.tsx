@@ -40,7 +40,7 @@ const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({ documents }) 
       {documents && documents.length > 0 ? (
         <div className="space-y-4">
           {documents.map((doc) => (
-            <div key={doc.id} className="flex items-center justify-between p-3 border rounded-md">
+            <div key={doc.id} className="flex items-center justify-between p-3 border rounded-md bg-white shadow-sm">
               <div className="flex items-center">
                 {doc.type === 'pdf' ? (
                   <File className="mr-3 text-red-500" size={20} />
@@ -54,6 +54,17 @@ const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({ documents }) 
                   <div className="text-sm text-gray-500">
                     Téléversé le {new Date(doc.dateUpload).toLocaleDateString()}
                   </div>
+                  {doc.status && (
+                    <div className={`text-xs mt-1 font-medium ${
+                      doc.status === 'valide' ? 'text-green-500' : 
+                      doc.status === 'rejete' ? 'text-red-500' : 
+                      'text-yellow-500'
+                    }`}>
+                      {doc.status === 'valide' ? 'Validé' : 
+                       doc.status === 'rejete' ? 'Rejeté' : 
+                       'En attente'}
+                    </div>
+                  )}
                 </div>
               </div>
               <Button 
@@ -67,8 +78,10 @@ const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({ documents }) 
           ))}
         </div>
       ) : (
-        <div className="text-center p-4 text-gray-500">
-          Aucune pièce jointe disponible
+        <div className="text-center py-12 px-4 text-gray-500 bg-gray-50 rounded-md">
+          <FileText className="mx-auto mb-3 text-gray-400" size={40} />
+          <p className="text-lg font-medium">Aucune pièce jointe disponible</p>
+          <p className="mt-1">Aucun document n'a encore été téléversé pour ce dossier.</p>
         </div>
       )}
     </ScrollArea>
