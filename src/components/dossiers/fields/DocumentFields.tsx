@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { DocumentUpload } from '../hooks/useDossierForm';
-import { PaperClip, Upload, X } from 'lucide-react';
+import { Paperclip, Upload, X } from 'lucide-react';
 
 interface DocumentFieldsProps {
   documents: DocumentUpload[];
@@ -28,7 +28,7 @@ const DocumentFields: React.FC<DocumentFieldsProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center">
-        <PaperClip className="mr-2 h-4 w-4" />
+        <Paperclip className="mr-2 h-4 w-4" />
         <h3 className="text-sm font-medium">Documents requis</h3>
       </div>
       <Separator />
