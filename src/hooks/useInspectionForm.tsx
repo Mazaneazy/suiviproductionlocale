@@ -64,10 +64,15 @@ export const useInspectionForm = (dossierId: string) => {
   };
 
   const addInspecteur = () => {
-    if (formData.inspecteurs.length < inspecteurs.length) {
+    // Make sure we don't add duplicate inspectors
+    const availableInspecteurs = inspecteurs.filter(
+      insp => !formData.inspecteurs.includes(insp.value)
+    );
+    
+    if (availableInspecteurs.length > 0) {
       setFormData({
         ...formData,
-        inspecteurs: [...formData.inspecteurs, inspecteurs[0].value],
+        inspecteurs: [...formData.inspecteurs, availableInspecteurs[0].value],
       });
     }
   };
