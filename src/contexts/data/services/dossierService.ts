@@ -15,7 +15,9 @@ export const createDossier = (
   if ('documents' in dossier && Array.isArray(dossier.documents)) {
     dossiersDocuments = dossier.documents.map(doc => ({
       ...doc,
-      dossierId: dossierId
+      id: generateId(),
+      dossierId: dossierId,
+      status: doc.status || 'en_attente'
     }));
     
     // Remove documents from the dossier object to avoid duplication

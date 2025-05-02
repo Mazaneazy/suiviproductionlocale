@@ -6,7 +6,7 @@ export const createDocument = (document: Omit<DocumentDossier, 'id'>) => {
   return { 
     ...document, 
     id: generateId(), 
-    status: 'en_attente' as 'valide' | 'rejete' | 'en_attente'
+    status: document.status || 'en_attente' as 'valide' | 'rejete' | 'en_attente'
   };
 };
 

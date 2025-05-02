@@ -10,8 +10,6 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -40,17 +38,7 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
   const [producteurCredentials, setProducteurCredentials] = useState<{email: string, password: string} | null>(null);
 
   const handleSubmit = () => {
-    // Valider le formulaire
-    if (!newDossier.operateurNom || !newDossier.typeProduit) {
-      toast({
-        title: "Erreur de validation",
-        description: "Veuillez remplir tous les champs obligatoires",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Submit the dossier to parent component
+    // Formulaire maintenant validé dans useDossierForm
     onSubmit();
     
     // Si l'option est cochée, créer un compte producteur après la soumission du dossier
@@ -97,7 +85,7 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
           Nouveau dossier
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Ajouter un nouveau dossier</DialogTitle>
           <DialogDescription>
@@ -122,8 +110,8 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
             <DossierForm
               newDossier={newDossier}
               setNewDossier={setNewDossier}
-              onSubmit={() => {}}
-              onCancel={() => {}}
+              onSubmit={handleSubmit}
+              onCancel={closeDialog}
             />
             
             <div className="flex items-center space-x-2 my-4">
@@ -139,11 +127,6 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
                 Créer un compte producteur
               </label>
             </div>
-            
-            <DialogFooter>
-              <Button variant="outline" onClick={closeDialog}>Annuler</Button>
-              <Button onClick={handleSubmit}>Ajouter le dossier</Button>
-            </DialogFooter>
           </>
         )}
       </DialogContent>

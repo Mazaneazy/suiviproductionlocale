@@ -1,4 +1,3 @@
-
 export interface Dossier {
   id: string;
   operateurNom: string;
@@ -13,6 +12,7 @@ export interface Dossier {
   historique?: HistoriqueEvenement[];
   parametresEvaluation?: string[];
   commentaires?: string; // Added property
+  documents?: DocumentDossier[] | Omit<DocumentDossier, 'id'>[]; // Added property for documents
 }
 
 export interface NoteFrais {
