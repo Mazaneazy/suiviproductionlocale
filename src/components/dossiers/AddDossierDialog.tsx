@@ -61,7 +61,9 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
     if (createAccount) {
       // Le dossier est créé par la fonction onSubmit, donc on doit attendre un peu avant de créer le compte
       setTimeout(() => {
-        const latestDossier = JSON.parse(localStorage.getItem('dossiers') || '[]').pop();
+        const latestDossiers = JSON.parse(localStorage.getItem('dossiers') || '[]');
+        const latestDossier = latestDossiers.length > 0 ? latestDossiers[latestDossiers.length - 1] : null;
+        
         if (latestDossier) {
           const producteur = createProducteurAccount(latestDossier);
           
@@ -83,30 +85,51 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
     }
     
     // Ajouter les pièces jointes au dossier
-    setTimeout(() => {
-      const latestDossier = JSON.parse(localStorage.getItem('dossiers') || '[]').pop();
-      if (latestDossier && attachments.length > 0) {
-        attachments.forEach((file, index) => {
-          // Créer une URL fictive pour le fichier PDF (dans une vraie application, ce serait une URL de stockage cloud)
-          const fileUrl = `https://storage.example.com/${latestDossier.id}/${file.name}`;
-          
-          // Ajouter le document au dossier
-          addDocument({
-            dossierId: latestDossier.id,
-            nom: file.name,
-            type: 'pdf',
-            dateUpload: new Date().toISOString(),
-            url: fileUrl,
-            status: 'en_attente'
-          });
-        });
+    if (attachments.length > 0) {
+      setTimeout(() => {
+        const latestDossiers = JSON.parse(localStorage.getItem('dossiers') || '[]');
+        const latestDossier = latestDossiers.length > 0 ? latestDossiers[latestDossiers.length - 1] : null;
         
-        toast({
-          title: "Pièces jointes ajoutées",
-          description: `${attachments.length} fichier(s) ajouté(s) au dossier`,
-        });
-      }
-    }, 500);
+        if (latestDossier && attachments.length > 0) {
+          attachments.forEach((file, index) => {
+            // Déterminer le type de document en fonction du nom du fichier
+            let documentType = 'pdf';
+            
+            // Vérification basique du nom du fichier pour déterminer le type
+            const fileName = file.name.toLowerCase();
+            if (fileName.includes('registre') || fileName.includes('rccm')) {
+              documentType = 'registre_commerce';
+            } else if (fileName.includes('contribuable') || fileName.includes('niu')) {
+              documentType = 'carte_contribuable';
+            } else if (fileName.includes('processus') || fileName.includes('production')) {
+              documentType = 'processus_production';
+            } else if (fileName.includes('personnel') || fileName.includes('liste')) {
+              documentType = 'liste_personnel';
+            } else if (fileName.includes('plan') || fileName.includes('localisation')) {
+              documentType = 'plan_localisation';
+            }
+            
+            // Créer une URL fictive pour le fichier PDF (dans une vraie application, ce serait une URL de stockage cloud)
+            const fileUrl = `https://storage.example.com/${latestDossier.id}/${file.name}`;
+            
+            // Ajouter le document au dossier avec le statut en attente par défaut
+            addDocument({
+              dossierId: latestDossier.id,
+              nom: file.name,
+              type: documentType,
+              dateUpload: new Date().toISOString(),
+              url: fileUrl,
+              status: 'en_attente'
+            });
+          });
+          
+          toast({
+            title: "Pièces jointes ajoutées",
+            description: `${attachments.length} fichier(s) ajouté(s) au dossier`,
+          });
+        }
+      }, 500);
+    }
   };
 
   const handleAccountCreationToggle = () => {
