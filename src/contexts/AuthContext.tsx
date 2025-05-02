@@ -44,9 +44,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const user = mockUsers.find(user => user.email === email && user.password === password);
     if (user) {
       setCurrentUser(user);
-
-      // Add login action
-      addUserAction(user.id, 'Connexion', 'Connexion réussie', 'auth');
       return true;
     }
     return false;
@@ -54,10 +51,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Logout function
   const logout = () => {
-    if (currentUser) {
-      // Add logout action
-      addUserAction(currentUser.id, 'Déconnexion', 'Déconnexion réussie', 'auth');
-    }
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
   };
@@ -77,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return rolePermissionsMap[role] || [];
   };
 
-  // Create user with automatic permissions based on role
+  // Create user with automatic permissions based on role and password
   const createUser = async (user: Omit<User, 'id'>) => {
     // Assign permissions based on role
     const permissions = getPermissionsForRole(user.role);
@@ -86,13 +79,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: generateId(),
       ...user,
       permissions,
-      password: 'password', // Default password
       actions: []
     };
     mockUsers.push(newUser);
-
-    // Add creation action
-    addUserAction(newUser.id, 'Création de compte', `Compte créé avec le rôle ${newUser.role}`, 'user-management');
     return true;
   };
 

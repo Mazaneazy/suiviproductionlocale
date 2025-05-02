@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
@@ -31,7 +31,7 @@ import {
 } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
 import { useToast } from '../hooks/use-toast';
-import { UserRound, PlusCircle, Search, FileText } from 'lucide-react';
+import { PlusCircle, Search, FileText } from 'lucide-react';
 import { User, UserRole } from '../types';
 
 const UserManagement = () => {
@@ -46,7 +46,7 @@ const UserManagement = () => {
     name: '',
     email: '',
     role: '' as UserRole,
-    avatar: ''
+    password: '' // Ajout du mot de passe
   });
 
   const roleLabels: Record<string, string> = {
@@ -81,7 +81,7 @@ const UserManagement = () => {
   };
 
   const handleAddUser = async () => {
-    if (!newUser.name || !newUser.email || !newUser.role) {
+    if (!newUser.name || !newUser.email || !newUser.role || !newUser.password) {
       toast({
         variant: "destructive",
         title: "Erreur",
@@ -102,7 +102,7 @@ const UserManagement = () => {
     }
 
     try {
-      const success = await createUser(newUser);
+      const success = await createUser({...newUser});
       if (success) {
         toast({
           title: "Utilisateur créé",
@@ -114,7 +114,7 @@ const UserManagement = () => {
           name: '',
           email: '',
           role: '' as UserRole,
-          avatar: ''
+          password: ''
         });
       }
     } catch (error) {
@@ -178,16 +178,15 @@ const UserManagement = () => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="avatar" className="text-right font-medium text-sm">
-                  URL Photo
+                <label htmlFor="password" className="text-right font-medium text-sm">
+                  Mot de passe
                 </label>
                 <Input
-                  id="avatar"
-                  name="avatar"
-                  type="url"
-                  value={newUser.avatar}
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={newUser.password}
                   onChange={handleInputChange}
-                  placeholder="https://exemple.com/photo.jpg"
                   className="col-span-3"
                 />
               </div>
@@ -246,20 +245,7 @@ const UserManagement = () => {
               {filteredUsers.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">
-                    <div className="flex items-center space-x-2">
-                      {user.avatar ? (
-                        <img 
-                          src={user.avatar} 
-                          alt={user.name} 
-                          className="h-6 w-6 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="bg-gray-100 p-1 rounded-full">
-                          <UserRound size={20} className="text-gray-500" />
-                        </div>
-                      )}
-                      <span>{user.name}</span>
-                    </div>
+                    {user.name}
                   </TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
