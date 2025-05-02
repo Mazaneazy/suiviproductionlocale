@@ -1,6 +1,8 @@
 
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { useData } from '@/contexts/DataContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,8 +11,17 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { PlusCircle, Upload, X, CheckCircle, Save } from 'lucide-react';
 import { useAccueilForm } from '@/hooks/useAccueilForm';
 
+interface DocumentUpload {
+  type: 'registre_commerce' | 'carte_contribuable' | 'processus_production' | 'certificats_conformite' | 'liste_personnel' | 'plan_localisation';
+  file: File | null;
+  label: string;
+  required: boolean;
+}
+
 const AccueilForm = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { addDossier } = useData();
   
   const {
     entreprise, setEntreprise,

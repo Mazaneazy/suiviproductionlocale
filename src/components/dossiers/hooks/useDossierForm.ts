@@ -1,14 +1,7 @@
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Dossier, DocumentDossier } from '@/types';
-
-export interface DocumentUpload {
-  type: 'registre_commerce' | 'carte_contribuable' | 'processus_production' | 'certificats_conformite' | 'liste_personnel' | 'plan_localisation';
-  file: File | null;
-  label: string;
-  required: boolean;
-}
+import { Dossier } from '@/types';
 
 export const useDossierForm = (
   newDossier: Omit<Dossier, 'id'>,
@@ -16,24 +9,6 @@ export const useDossierForm = (
   onSubmit: () => void
 ) => {
   const { toast } = useToast();
-  
-  const [documents, setDocuments] = useState<DocumentUpload[]>([
-    { type: 'registre_commerce', file: null, label: 'Registre de Commerce', required: true },
-    { type: 'carte_contribuable', file: null, label: 'Carte de Contribuable (NIU)', required: true },
-    { type: 'processus_production', file: null, label: 'Schéma du processus de production', required: true },
-    { type: 'certificats_conformite', file: null, label: 'Certificats de Conformité', required: false },
-    { type: 'liste_personnel', file: null, label: 'Liste du personnel (sur papier entête)', required: true },
-    { type: 'plan_localisation', file: null, label: 'Plan de localisation', required: true },
-  ]);
-  
-  const fileInputRefs = {
-    registre_commerce: useRef<HTMLInputElement>(null),
-    carte_contribuable: useRef<HTMLInputElement>(null),
-    processus_production: useRef<HTMLInputElement>(null),
-    certificats_conformite: useRef<HTMLInputElement>(null),
-    liste_personnel: useRef<HTMLInputElement>(null),
-    plan_localisation: useRef<HTMLInputElement>(null),
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -71,33 +46,8 @@ export const useDossierForm = (
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
-    const file = e.target.files?.[0] || null;
-    
-    if (file && !file.type.includes('pdf')) {
-      toast({
-        variant: "destructive",
-        title: "Format invalide",
-        description: "Veuillez télécharger un fichier PDF uniquement.",
-      });
-      return;
-    }
-    
-    setDocuments(documents.map(doc => 
-      doc.type === type ? { ...doc, file } : doc
-    ));
-  };
-
-  const removeFile = (type: string) => {
-    setDocuments(documents.map(doc => 
-      doc.type === type ? { ...doc, file: null } : doc
-    ));
-    
-    // Reset the file input
-    const ref = fileInputRefs[type as keyof typeof fileInputRefs];
-    if (ref.current) {
-      ref.current.value = '';
-    }
+  const handleStatusChange = (value: "complet" | "en_attente" | "rejete" | "en_cours" | "certifie" | "a_corriger") => {
+    setNewDossier({ ...newDossier, status: value });
   };
 
   const handleAddDossier = () => {
@@ -111,38 +61,12 @@ export const useDossierForm = (
       return;
     }
     
-    // Remove document validation check to make button work without attachments
-    
-    // Create document objects from files that exist (if any)
-    const documentObjects: Omit<DocumentDossier, 'id'>[] = documents
-      .filter(doc => doc.file)
-      .map(doc => ({
-        dossierId: '',  // Will be filled by the createDossier function
-        type: doc.type,
-        nom: doc.file!.name,
-        url: URL.createObjectURL(doc.file!),  // In a real app, this would be uploaded to a server
-        dateUpload: new Date().toISOString(),
-        status: 'en_attente' as 'valide' | 'rejete' | 'en_attente'
-      }));
-    
-    // Add documents to the dossier
-    setNewDossier(prevDossier => ({
-      ...prevDossier,
-      documents: documentObjects
-    }));
-    
-    // Call onSubmit after updating the state
-    setTimeout(() => {
-      onSubmit();
-    }, 0);
+    onSubmit();
   };
-  
+
   return {
     handleInputChange,
-    handleAddDossier,
-    documents,
-    fileInputRefs,
-    handleFileChange,
-    removeFile
+    handleStatusChange,
+    handleAddDossier
   };
 };

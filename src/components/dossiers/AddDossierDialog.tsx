@@ -10,7 +10,10 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Save } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Dossier } from '@/types';
 import DossierForm from './DossierForm';
@@ -33,20 +36,58 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
 }) => {
   const { toast } = useToast();
   const { createProducteurAccount } = useAuth();
+  const [createAccount, setCreateAccount] = useState(false);
   const [producteurCredentials, setProducteurCredentials] = useState<{email: string, password: string} | null>(null);
 
   const handleSubmit = () => {
-    // Formulaire maintenant validé dans useDossierForm
+    // Valider le formulaire
+    if (!newDossier.operateurNom || !newDossier.typeProduit) {
+      toast({
+        title: "Erreur de validation",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Submit the dossier to parent component
     onSubmit();
+    
+    // Si l'option est cochée, créer un compte producteur après la soumission du dossier
+    if (createAccount) {
+      // Le dossier est créé par la fonction onSubmit, donc on doit attendre un peu avant de créer le compte
+      setTimeout(() => {
+        const latestDossier = JSON.parse(localStorage.getItem('dossiers') || '[]').pop();
+        if (latestDossier) {
+          const producteur = createProducteurAccount(latestDossier);
+          
+          if (producteur) {
+            setProducteurCredentials({
+              email: producteur.email,
+              password: 'password'
+            });
+          } else {
+            setCreateAccount(false);
+            toast({
+              title: "Erreur",
+              description: "Impossible de créer le compte producteur",
+              variant: "destructive",
+            });
+          }
+        }
+      }, 300);
+    }
+  };
+
+  const handleAccountCreationToggle = () => {
+    setCreateAccount(!createAccount);
   };
 
   const closeDialog = () => {
     onOpenChange(false);
     setProducteurCredentials(null);
+    setCreateAccount(false);
   };
-
-  // Check if required fields are filled
-  const isFormValid = newDossier.operateurNom && newDossier.typeProduit;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -56,7 +97,7 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
           Nouveau dossier
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Ajouter un nouveau dossier</DialogTitle>
           <DialogDescription>
@@ -81,23 +122,28 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
             <DossierForm
               newDossier={newDossier}
               setNewDossier={setNewDossier}
-              onSubmit={handleSubmit}
-              onCancel={closeDialog}
+              onSubmit={() => {}}
+              onCancel={() => {}}
             />
             
-            <div className="flex justify-end space-x-2 mt-6 pb-2">
-              <Button 
-                onClick={handleSubmit} 
-                disabled={!isFormValid}
-                className="bg-certif-green hover:bg-certif-green/90"
+            <div className="flex items-center space-x-2 my-4">
+              <Checkbox 
+                id="create-account" 
+                checked={createAccount} 
+                onCheckedChange={handleAccountCreationToggle} 
+              />
+              <label
+                htmlFor="create-account"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                <Save className="mr-2" size={16} />
-                Enregistrer
-              </Button>
-              <Button variant="outline" onClick={closeDialog}>
-                Annuler
-              </Button>
+                Créer un compte producteur
+              </label>
             </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={closeDialog}>Annuler</Button>
+              <Button onClick={handleSubmit}>Ajouter le dossier</Button>
+            </DialogFooter>
           </>
         )}
       </DialogContent>

@@ -1,11 +1,11 @@
 
 import React from 'react';
+import { Button } from '@/components/ui/button';
 import { Dossier } from '@/types';
 import DossierBasicFields from './fields/DossierBasicFields';
 import DossierDateFields from './fields/DossierDateFields';
-import DocumentFields from './fields/DocumentFields';
+import DossierStatusField from './fields/DossierStatusField';
 import { useDossierForm } from './hooks/useDossierForm';
-import { Separator } from '@/components/ui/separator';
 
 interface DossierFormProps {
   newDossier: Omit<Dossier, 'id'>;
@@ -15,14 +15,7 @@ interface DossierFormProps {
 }
 
 const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierFormProps) => {
-  const { 
-    handleInputChange, 
-    handleFileChange,
-    handleAddDossier,
-    documents,
-    fileInputRefs,
-    removeFile
-  } = useDossierForm(
+  const { handleInputChange, handleStatusChange, handleAddDossier } = useDossierForm(
     newDossier, 
     setNewDossier, 
     onSubmit
@@ -35,21 +28,24 @@ const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierF
         handleInputChange={handleInputChange} 
       />
       
-      <Separator className="my-2" />
-      
       <DossierDateFields 
         newDossier={newDossier} 
         handleInputChange={handleInputChange} 
       />
       
-      <Separator className="my-2" />
-      
-      <DocumentFields
-        documents={documents}
-        fileInputRefs={fileInputRefs}
-        handleFileChange={handleFileChange}
-        removeFile={removeFile}
+      <DossierStatusField 
+        status={newDossier.status} 
+        onStatusChange={handleStatusChange} 
       />
+      
+      <div className="flex justify-end gap-2 pt-2">
+        <Button variant="outline" onClick={onCancel}>
+          Annuler
+        </Button>
+        <Button onClick={handleAddDossier} className="bg-certif-green hover:bg-certif-green/90">
+          Enregistrer
+        </Button>
+      </div>
     </div>
   );
 };
