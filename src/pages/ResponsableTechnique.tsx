@@ -15,6 +15,7 @@ const ResponsableTechnique = () => {
   const [selectedDossierId, setSelectedDossierId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('dossiers');
   
+  // Show both complete and pending dossiers for the Responsable Technique
   const filteredDossiers = dossiers.filter(
     dossier => dossier.status === 'complet' || dossier.status === 'en_attente'
   );

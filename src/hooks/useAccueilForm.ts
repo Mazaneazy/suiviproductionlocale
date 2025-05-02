@@ -128,17 +128,26 @@ export const useAccueilForm = () => {
       }));
     
     // Add the dossier
+    const newDossierId = Math.random().toString(36).substring(2, 11);
+    
+    // Update document IDs with the new dossier ID
+    const updatedDocuments = documentObjects.map(doc => ({
+      ...doc,
+      dossierId: newDossierId
+    }));
+    
     const newDossier = {
+      id: newDossierId,
       operateurNom: entreprise,
       promoteurNom: promoteur,
       telephone,
       typeProduit: produits,
       dateTransmission: new Date().toISOString().split('T')[0],
-      responsable: 'Responsable Technique',
+      responsable: 'Responsable Technique', // Set the responsible correctly
       status: 'en_attente' as const,
       delai: 30,
       dateButoir: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      documents: documentObjects,
+      documents: updatedDocuments,
     };
     
     addDossier(newDossier);
@@ -155,6 +164,11 @@ export const useAccueilForm = () => {
     setProduits('');
     setDocuments(documents.map(doc => ({ ...doc, file: null })));
     setValidated(false);
+    
+    // Clear all file inputs
+    Object.values(fileInputRefs).forEach(ref => {
+      if (ref.current) ref.current.value = '';
+    });
     
     navigate('/dossiers');
   };
