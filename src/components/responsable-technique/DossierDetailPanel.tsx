@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { useData } from '@/contexts/DataContext';
 import { Dossier, DocumentDossier } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, X, AlertCircle, FileText, FilePdf } from 'lucide-react';
+import { Check, X, AlertCircle, FileText, File } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -154,7 +155,7 @@ const DossierDetailPanel: React.FC<DossierDetailPanelProps> = ({
                 <CardHeader className="p-4 pb-2">
                   <CardTitle className="text-sm font-medium flex items-center">
                     {doc.type === 'pdf' ? (
-                      <FilePdf size={16} className="mr-2 text-red-500" />
+                      <File size={16} className="mr-2 text-red-500" />
                     ) : (
                       <FileText size={16} className="mr-2" />
                     )}

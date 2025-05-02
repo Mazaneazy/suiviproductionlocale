@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Calendar, Clock, User, FileCheck, FilePdf } from 'lucide-react';
+import { FileText, Calendar, Clock, User, FileCheck, File } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -163,7 +163,7 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
                     <div key={doc.id} className="flex items-center justify-between p-3 border rounded-md">
                       <div className="flex items-center">
                         {doc.type === 'pdf' ? (
-                          <FilePdf className="mr-3 text-red-500" size={20} />
+                          <File className="mr-3 text-red-500" size={20} />
                         ) : (
                           <FileText className="mr-3 text-certif-blue" size={20} />
                         )}
