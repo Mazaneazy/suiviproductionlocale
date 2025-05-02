@@ -15,6 +15,7 @@ export const createDossier = (
   if ('documents' in dossier && Array.isArray(dossier.documents)) {
     dossiersDocuments = dossier.documents.map(doc => ({
       ...doc,
+      id: generateId(),
       dossierId: dossierId
     }));
     
