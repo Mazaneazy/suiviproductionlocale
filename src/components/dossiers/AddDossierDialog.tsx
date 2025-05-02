@@ -139,6 +139,11 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
                 Créer un compte producteur
               </label>
             </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={closeDialog}>Annuler</Button>
+              <Button onClick={handleSubmit}>Ajouter le dossier</Button>
+            </DialogFooter>
           </>
         )}
       </DialogContent>
