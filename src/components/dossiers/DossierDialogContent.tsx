@@ -63,7 +63,8 @@ const DossierDialogContent: React.FC<DossierDialogContentProps> = ({
       return;
     }
 
-    // Submit the dossier to parent component
+    // Submit the dossier to parent component which will create the dossier
+    // and set dossierIdAfterSubmit, triggering the useEffect above
     onSubmit();
     
     // Si l'option est cochée, créer un compte producteur après la soumission du dossier
@@ -77,7 +78,11 @@ const DossierDialogContent: React.FC<DossierDialogContentProps> = ({
       <AccountCreationSuccess 
         email={producteurCredentials.email}
         password={producteurCredentials.password}
-        onClose={onClose}
+        onClose={() => {
+          resetAttachments();
+          resetProducteurState();
+          onClose();
+        }}
       />
     );
   }

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import Layout from '../components/Layout';
 import { useToast } from '../hooks/use-toast';
@@ -90,22 +90,36 @@ const Dossiers = () => {
       title: "Dossier ajouté",
       description: `Le dossier pour "${newDossier.operateurNom}" a été créé avec succès.`,
     });
-    
-    // Reset the form
-    setNewDossier({
-      operateurNom: '',
-      promoteurNom: '',
-      telephone: '',
-      typeProduit: '',
-      responsable: 'Gestionnaire',
-      dateTransmission: new Date().toISOString().split('T')[0],
-      status: 'en_attente',
-      delai: 30,
-      dateButoir: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      historique: [],
-    });
-    
-    setDialogOpen(false);
+  };
+
+  // Utiliser un effet pour réinitialiser le formulaire après l'ajout d'un dossier
+  useEffect(() => {
+    // Si le dialogue est fermé et un ID de dossier a été généré, réinitialiser le formulaire
+    if (!dialogOpen && latestDossierId) {
+      setNewDossier({
+        operateurNom: '',
+        promoteurNom: '',
+        telephone: '',
+        typeProduit: '',
+        responsable: 'Gestionnaire',
+        dateTransmission: new Date().toISOString().split('T')[0],
+        status: 'en_attente',
+        delai: 30,
+        dateButoir: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        historique: [],
+      });
+      
+      // Garder l'ID du dernier dossier créé pour traiter les pièces jointes
+      // Mais ne le réinitialiser que lors d'une nouvelle ouverture du dialogue
+    }
+  }, [dialogOpen, latestDossierId]);
+
+  // Réinitialiser l'ID du dossier quand on ouvre le dialogue
+  const handleOpenDialog = (open: boolean) => {
+    if (open) {
+      setLatestDossierId(undefined);
+    }
+    setDialogOpen(open);
   };
 
   return (
@@ -114,7 +128,7 @@ const Dossiers = () => {
         <h1 className="text-3xl font-bold text-certif-blue">Transmission dossiers</h1>
         <AddDossierDialog
           open={dialogOpen}
-          onOpenChange={setDialogOpen}
+          onOpenChange={handleOpenDialog}
           newDossier={newDossier}
           setNewDossier={setNewDossier}
           onSubmit={handleAddDossier}

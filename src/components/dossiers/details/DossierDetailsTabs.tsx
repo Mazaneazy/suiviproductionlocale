@@ -15,13 +15,15 @@ interface DossierDetailsTabsProps {
   documents: DocumentDossier[];
   inspections: any[];
   certificat: any;
+  isLoading?: boolean;
 }
 
 const DossierDetailsTabs: React.FC<DossierDetailsTabsProps> = ({ 
   dossier, 
   documents: initialDocuments, 
   inspections, 
-  certificat 
+  certificat,
+  isLoading = false
 }) => {
   const { getDocumentsByDossierId } = useData();
   const { toast } = useToast();
@@ -53,13 +55,23 @@ const DossierDetailsTabs: React.FC<DossierDetailsTabsProps> = ({
       
       // Si localStorage échoue ou ne contient pas de documents pour ce dossier, utiliser getDocumentsByDossierId
       const refreshedDocs = getDocumentsByDossierId(dossier.id);
-      console.log("Documents rafraîchis via getDocumentsByDossierId:", refreshedDocs);
+      console.log("Documents rafraîchis via getDocumentsByDossierId:", refreshedDocs.length);
       setDocuments(refreshedDocs || []);
     }
-  }, [dossier, getDocumentsByDossierId]);
+  }, [dossier, getDocumentsByDossierId, initialDocuments]);
+  
+  // Mettre à jour les documents quand initialDocuments change
+  useEffect(() => {
+    if (initialDocuments && initialDocuments.length > 0) {
+      console.log("Mise à jour des documents depuis les props:", initialDocuments.length);
+      setDocuments(initialDocuments);
+    }
+  }, [initialDocuments]);
   
   // Ajouter un écouteur d'événements pour les mises à jour de documents
   useEffect(() => {
+    if (!dossier) return;
+    
     const handleDocumentsUpdated = (event: CustomEvent) => {
       if (event.detail && event.detail.dossierId === dossier.id) {
         console.log("Événement de mise à jour de documents détecté pour le dossier:", dossier.id);
@@ -101,7 +113,7 @@ const DossierDetailsTabs: React.FC<DossierDetailsTabsProps> = ({
     };
   }, [dossier, toast, activeTab]);
   
-  console.log("Documents actuellement dans DossierDetailsTabs:", documents);
+  console.log("Documents actuellement dans DossierDetailsTabs:", documents?.length || 0);
   
   return (
     <Tabs defaultValue="historique" value={activeTab} onValueChange={setActiveTab}>
@@ -109,7 +121,7 @@ const DossierDetailsTabs: React.FC<DossierDetailsTabsProps> = ({
         <TabsTrigger value="historique">Historique</TabsTrigger>
         <TabsTrigger value="documents">
           Pièces jointes
-          {documents.length > 0 && (
+          {documents && documents.length > 0 && (
             <span className="ml-2 bg-certif-blue text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
               {documents.length}
             </span>
@@ -123,7 +135,11 @@ const DossierDetailsTabs: React.FC<DossierDetailsTabsProps> = ({
       </TabsContent>
       
       <TabsContent value="documents" className="h-[400px]">
-        <DossierDocumentsTab documents={documents || []} />
+        <DossierDocumentsTab 
+          documents={documents || []} 
+          isLoading={isLoading}
+          dossierId={dossier.id}
+        />
       </TabsContent>
       
       <TabsContent value="elements" className="h-[400px]">

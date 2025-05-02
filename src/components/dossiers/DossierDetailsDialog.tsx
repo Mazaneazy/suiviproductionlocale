@@ -32,43 +32,54 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
   const [inspections, setInspections] = useState([]);
   const [certificat, setCertificat] = useState(null);
   const [dossier, setDossier] = useState(null);
+  const [loadingDocuments, setLoadingDocuments] = useState(false);
 
   // Charger les données lorsque le dialogue est ouvert
   useEffect(() => {
     if (isOpen && dossierId) {
-      const loadData = () => {
-        const currentDossier = getDossierById(dossierId);
+      const loadData = async () => {
+        setLoadingDocuments(true);
         
-        // Essayer d'abord de récupérer les documents directement depuis localStorage
-        let currentDocuments = [];
         try {
-          const storedDocuments = localStorage.getItem('documents');
-          if (storedDocuments) {
-            const allDocuments = JSON.parse(storedDocuments);
-            if (Array.isArray(allDocuments)) {
-              currentDocuments = allDocuments.filter(doc => doc.dossierId === dossierId);
-              console.log(`Documents trouvés dans localStorage pour ${dossierId}:`, currentDocuments.length);
+          const currentDossier = getDossierById(dossierId);
+          setDossier(currentDossier);
+          
+          // Chargement des documents
+          let currentDocuments = [];
+          try {
+            // Essayer d'abord de récupérer les documents directement depuis localStorage
+            const storedDocuments = localStorage.getItem('documents');
+            if (storedDocuments) {
+              const allDocuments = JSON.parse(storedDocuments);
+              if (Array.isArray(allDocuments)) {
+                currentDocuments = allDocuments.filter(doc => doc.dossierId === dossierId);
+                console.log(`Documents trouvés dans localStorage pour ${dossierId}:`, currentDocuments.length);
+              }
             }
+          } catch (error) {
+            console.error("Erreur lors de la lecture des documents depuis localStorage:", error);
           }
-        } catch (error) {
-          console.error("Erreur lors de la lecture des documents depuis localStorage:", error);
-        }
-        
-        // Si aucun document n'est trouvé dans localStorage, utiliser getDocumentsByDossierId
-        if (currentDocuments.length === 0) {
-          currentDocuments = getDocumentsByDossierId(dossierId);
-          console.log(`Documents récupérés via getDocumentsByDossierId pour ${dossierId}:`, currentDocuments);
-        }
-        
-        const currentInspections = getInspectionsByDossierId(dossierId);
-        const currentCertificat = getCertificatByDossierId(dossierId);
+          
+          // Si aucun document n'est trouvé dans localStorage, utiliser getDocumentsByDossierId
+          if (currentDocuments.length === 0) {
+            currentDocuments = getDocumentsByDossierId(dossierId);
+            console.log(`Documents récupérés via getDocumentsByDossierId pour ${dossierId}:`, currentDocuments.length);
+          }
+          
+          // Chargement des inspections et certificats
+          const currentInspections = getInspectionsByDossierId(dossierId);
+          const currentCertificat = getCertificatByDossierId(dossierId);
 
-        console.log(`Dialogue ouvert - Documents chargés pour ${dossierId}:`, currentDocuments);
-        
-        setDossier(currentDossier);
-        setDocuments(currentDocuments);
-        setInspections(currentInspections);
-        setCertificat(currentCertificat);
+          console.log(`Dialogue ouvert - Documents chargés pour ${dossierId}:`, currentDocuments.length);
+          
+          setDocuments(currentDocuments);
+          setInspections(currentInspections);
+          setCertificat(currentCertificat);
+        } catch (error) {
+          console.error("Erreur lors du chargement des données du dossier:", error);
+        } finally {
+          setLoadingDocuments(false);
+        }
       };
 
       loadData();
@@ -116,6 +127,7 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
             documents={documents}
             inspections={inspections}
             certificat={certificat}
+            isLoading={loadingDocuments}
           />
         )}
       </DialogContent>

@@ -37,7 +37,7 @@ export function useDocumentProcessing() {
       // Créer une URL fictive pour le fichier PDF
       const fileUrl = `https://storage.example.com/${dossierId}/${file.name}`;
       
-      // Créer l'objet document avant de l'ajouter pour éviter l'erreur TypeScript
+      // Créer l'objet document avec le statut en attente
       const newDocData: Omit<DocumentDossier, 'id'> = {
         dossierId: dossierId as string,
         nom: file.name,
@@ -47,32 +47,35 @@ export function useDocumentProcessing() {
         status: 'en_attente' // Using a specific string literal that matches the expected type
       };
       
-      // Ajouter le document au dossier avec le statut en attente par défaut
+      // Ajouter le document au dossier
       const result = addDocument(newDocData);
       
-      // Obtenir le nouveau document depuis localStorage si addDocument ne retourne pas l'objet
-      let newDoc: DocumentDossier | undefined;
-      
-      try {
-        const storedDocuments = localStorage.getItem('documents');
-        if (storedDocuments) {
-          const allDocs = JSON.parse(storedDocuments);
-          // Chercher le document qui correspond aux données qu'on vient d'ajouter
-          newDoc = allDocs.find((doc: any) => 
-            doc.dossierId === newDocData.dossierId && 
-            doc.nom === newDocData.nom &&
-            doc.dateUpload === newDocData.dateUpload
-          );
+      // Si addDocument nous retourne le document créé, l'utiliser, sinon essayer de le récupérer
+      if (result && result.id) {
+        addedDocuments.push(result);
+      } else {
+        // Obtenir le nouveau document depuis localStorage si addDocument ne retourne pas l'objet
+        try {
+          const storedDocuments = localStorage.getItem('documents');
+          if (storedDocuments) {
+            const allDocs = JSON.parse(storedDocuments);
+            // Chercher le document qui correspond aux données qu'on vient d'ajouter
+            const newDoc = allDocs.find((doc: any) => 
+              doc.dossierId === newDocData.dossierId && 
+              doc.nom === newDocData.nom &&
+              doc.dateUpload === newDocData.dateUpload
+            );
+            
+            if (newDoc) {
+              addedDocuments.push(newDoc);
+            }
+          }
+        } catch (error) {
+          console.error("Erreur lors de la récupération du document depuis localStorage:", error);
         }
-      } catch (error) {
-        console.error("Erreur lors de la récupération du document depuis localStorage:", error);
       }
       
-      // Si on a pu trouver ou créer le document, l'ajouter à notre liste
-      if (newDoc) {
-        addedDocuments.push(newDoc);
-        console.log(`Document ajouté: ${file.name} (Type: ${documentType}) pour le dossier ${dossierId}`);
-      }
+      console.log(`Document ajouté: ${file.name} (Type: ${documentType}) pour le dossier ${dossierId}`);
     });
     
     // Notification du succès
@@ -95,12 +98,15 @@ export function useDocumentProcessing() {
   const getLatestDossierId = () => {
     try {
       const latestDossiers = JSON.parse(localStorage.getItem('dossiers') || '[]');
-      const latestDossier = latestDossiers.length > 0 ? latestDossiers[latestDossiers.length - 1] : null;
-      return latestDossier?.id;
+      if (latestDossiers.length > 0) {
+        const latestDossier = latestDossiers[latestDossiers.length - 1];
+        console.log("Dernier dossier trouvé:", latestDossier);
+        return latestDossier?.id;
+      }
     } catch (error) {
       console.error('Erreur lors de la récupération du dernier dossier:', error);
-      return null;
     }
+    return null;
   };
   
   // Détermine le type de document en fonction du nom du fichier

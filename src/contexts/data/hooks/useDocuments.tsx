@@ -121,8 +121,10 @@ export function useDocuments(updateDossier: (id: string, data: any) => void) {
 
   // Effet pour synchroniser les documents avec localStorage
   useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === 'documents' || !e.key) {
+    const handleStorageChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      
+      if (e.type === 'storage' || e.type === 'documents-updated') {
         try {
           const storedDocuments = localStorage.getItem('documents');
           if (storedDocuments) {
@@ -130,6 +132,11 @@ export function useDocuments(updateDossier: (id: string, data: any) => void) {
             if (Array.isArray(parsedDocs)) {
               setDocuments(parsedDocs);
               console.log("Documents mis à jour depuis localStorage:", parsedDocs.length);
+              
+              if (customEvent.detail?.dossierId) {
+                console.log(`Mise à jour pour le dossier ${customEvent.detail.dossierId}:`, 
+                  parsedDocs.filter(doc => doc.dossierId === customEvent.detail.dossierId).length);
+              }
             }
           }
         } catch (error) {
