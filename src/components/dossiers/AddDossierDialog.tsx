@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -10,7 +9,6 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Dossier } from '@/types';
@@ -113,20 +111,6 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
               onSubmit={handleSubmit}
               onCancel={closeDialog}
             />
-            
-            <div className="flex items-center space-x-2 my-4">
-              <Checkbox 
-                id="create-account" 
-                checked={createAccount} 
-                onCheckedChange={handleAccountCreationToggle} 
-              />
-              <label
-                htmlFor="create-account"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Créer un compte producteur
-              </label>
-            </div>
           </>
         )}
       </DialogContent>
