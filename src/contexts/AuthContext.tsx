@@ -27,12 +27,20 @@ export { moduleNames } from '@/constants/authConstants';
 // AuthProvider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Initialize mockUsers from the imported data
-  let mockUsers = [...MOCK_USERS];
+  const [mockUsers, setMockUsers] = useState<User[]>(() => {
+    const storedUsers = localStorage.getItem('mockUsers');
+    return storedUsers ? JSON.parse(storedUsers) : [...MOCK_USERS];
+  });
 
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const storedUser = localStorage.getItem('currentUser');
     return storedUser ? JSON.parse(storedUser) : null;
   });
+
+  // Save mockUsers to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('mockUsers', JSON.stringify(mockUsers));
+  }, [mockUsers]);
 
   useEffect(() => {
     // Save current user to local storage
@@ -81,7 +89,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       permissions,
       actions: []
     };
-    mockUsers.push(newUser);
+    
+    setMockUsers(prevUsers => [...prevUsers, newUser]);
     return true;
   };
 
@@ -102,18 +111,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Add user action
   const addUserAction = (userId: string, action: string, details: string, module: string) => {
-    const user = mockUsers.find(user => user.id === userId);
-    if (user) {
-      const newAction = {
-        id: generateId(),
-        userId: userId,
-        date: new Date().toISOString(),
-        action: action,
-        details: details,
-        module: module
-      };
-      user.actions = [...(user.actions || []), newAction];
-    }
+    const updatedUsers = mockUsers.map(user => {
+      if (user.id === userId) {
+        const newAction = {
+          id: generateId(),
+          userId: userId,
+          date: new Date().toISOString(),
+          action: action,
+          details: details,
+          module: module
+        };
+        return {
+          ...user,
+          actions: [...(user.actions || []), newAction]
+        };
+      }
+      return user;
+    });
+    
+    setMockUsers(updatedUsers);
   };
 
   // Get user actions
@@ -135,7 +151,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       actions: []
     };
     
-    mockUsers.push(newUser);
+    setMockUsers(prevUsers => [...prevUsers, newUser]);
     return newUser;
   };
 
