@@ -8,10 +8,10 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Upload, X, CheckCircle } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { useData } from '@/contexts/DataContext';
 import DossierForm from './DossierForm';
-import { Dossier, DocumentDossier } from '@/types';
+import { Dossier } from '@/types';
 import { useDossierForm, DocumentUpload } from './hooks/useDossierForm';
 
 const initialDossier: Omit<Dossier, 'id'> = {
@@ -33,7 +33,7 @@ const AddDossierDialog: React.FC = () => {
   
   const handleAddDossierWithDocuments = (documents?: DocumentUpload[]) => {
     // Create document objects from files
-    const documentObjects: Omit<DocumentDossier, 'id'>[] = documents
+    const documentObjects = documents
       ? documents
           .filter(doc => doc.file)
           .map(doc => ({
@@ -46,11 +46,13 @@ const AddDossierDialog: React.FC = () => {
           }))
       : [];
     
-    // Add documents to the dossier
-    addDossier({
+    // Add documents to the dossier - using a structure compatible with Dossier type
+    const dossierToAdd = {
       ...newDossier,
       documents: documentObjects
-    });
+    };
+    
+    addDossier(dossierToAdd);
     
     // Reset form and close dialog
     setNewDossier(initialDossier);

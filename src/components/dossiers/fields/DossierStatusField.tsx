@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Dossier } from '@/types';
 import {
   Select,
   SelectContent,

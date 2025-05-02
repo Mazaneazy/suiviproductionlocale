@@ -3,9 +3,9 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { Dossier } from '@/types';
-import { DossierBasicFields } from './fields/DossierBasicFields';
-import { DossierDateFields } from './fields/DossierDateFields';
-import { DossierStatusField } from './fields/DossierStatusField';
+import DossierBasicFields from './fields/DossierBasicFields';
+import DossierDateFields from './fields/DossierDateFields';
+import DossierStatusField from './fields/DossierStatusField';
 import { Upload, X, CheckCircle } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { DocumentUpload } from './hooks/useDossierForm';
@@ -44,11 +44,11 @@ const DossierForm = ({
   };
 
   return (
-    <Form>
+    <div>
       <form onSubmit={handleFormSubmit} className="space-y-6">
-        <DossierBasicFields dossier={dossier} onInputChange={onInputChange} />
-        <DossierDateFields dossier={dossier} onInputChange={onInputChange} />
-        <DossierStatusField dossier={dossier} onStatusChange={onStatusChange} />
+        <DossierBasicFields newDossier={dossier} handleInputChange={onInputChange} />
+        <DossierDateFields newDossier={dossier} handleInputChange={onInputChange} />
+        <DossierStatusField status={dossier.status} onStatusChange={onStatusChange} />
         
         {documents && fileInputRefs && handleFileChange && removeFile && (
           <div className="space-y-4">
@@ -112,7 +112,7 @@ const DossierForm = ({
           </Button>
         </div>
       </form>
-    </Form>
+    </div>
   );
 };
 
