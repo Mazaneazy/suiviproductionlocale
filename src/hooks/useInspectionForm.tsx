@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useData } from '@/contexts/DataContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,8 +15,8 @@ export const useInspectionForm = (dossierId: string) => {
   const inspecteurs = allUsers
     .filter(user => ['inspecteur', 'surveillant', 'chef_mission'].includes(user.role))
     .map(user => ({
-      value: user.name,
-      label: user.name
+      value: user.name,  // Utiliser le nom de l'utilisateur comme valeur
+      label: user.name   // Utiliser le nom de l'utilisateur comme étiquette
     }));
 
   const [formData, setFormData] = useState({
