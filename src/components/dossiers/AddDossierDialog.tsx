@@ -42,7 +42,7 @@ const AddDossierDialog: React.FC = () => {
             nom: doc.file!.name,
             url: URL.createObjectURL(doc.file!),
             dateUpload: new Date().toISOString(),
-            status: 'en_attente'
+            status: 'en_attente' as 'en_attente' | 'valide' | 'rejete'
           }))
       : [];
     

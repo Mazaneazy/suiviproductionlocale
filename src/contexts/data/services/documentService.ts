@@ -1,4 +1,3 @@
-
 import { DocumentDossier, HistoriqueEvenement } from '../../../types';
 import { generateId } from '../utils';
 
@@ -6,7 +5,7 @@ export const createDocument = (document: Omit<DocumentDossier, 'id'>) => {
   return { 
     ...document, 
     id: generateId(), 
-    status: 'en_attente' as 'valide' | 'rejete' | 'en_attente'
+    status: document.status || 'en_attente' as 'valide' | 'rejete' | 'en_attente'
   };
 };
 
@@ -34,7 +33,7 @@ export const createDocumentRemovalHistorique = (document: DocumentDossier): Hist
 
 export const createDocumentStatusHistorique = (
   document: DocumentDossier,
-  newStatus: string
+  newStatus: 'valide' | 'rejete' | 'en_attente'
 ): HistoriqueEvenement | undefined => {
   if (newStatus && newStatus !== document.status) {
     return {
