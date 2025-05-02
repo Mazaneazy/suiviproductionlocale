@@ -38,13 +38,13 @@ export function useDocumentProcessing() {
       const fileUrl = `https://storage.example.com/${dossierId}/${file.name}`;
       
       // Créer l'objet document avant de l'ajouter pour éviter l'erreur TypeScript
-      const newDocData = {
+      const newDocData: Omit<DocumentDossier, 'id'> = {
         dossierId: dossierId as string,
         nom: file.name,
         type: documentType,
         dateUpload: new Date().toISOString(),
         url: fileUrl,
-        status: 'en_attente'
+        status: 'en_attente' // Using a specific string literal that matches the expected type
       };
       
       // Ajouter le document au dossier avec le statut en attente par défaut
