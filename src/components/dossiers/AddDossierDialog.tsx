@@ -85,11 +85,11 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
               onCancel={closeDialog}
             />
             
-            <DialogFooter className="mt-4">
+            <DialogFooter className="flex justify-between mt-4">
               <Button 
                 onClick={handleSubmit} 
                 disabled={!isFormValid}
-                className="bg-certif-green hover:bg-certif-green/90 mr-2"
+                className="bg-certif-green hover:bg-certif-green/90"
               >
                 <Save className="mr-2" size={16} />
                 Enregistrer
