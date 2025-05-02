@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext } from 'react';
 import { Dossier, NoteFrais, Inspection, Certificat, Notification, Statistique, DocumentDossier, HistoriqueEvenement, ResultatConformite } from '../types';
 import { DataContextProps } from './data/types';
@@ -48,52 +49,32 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [documents, setDocuments] = useState<DocumentDossier[]>([]);
   const [statistiques, setStatistiques] = useState<Statistique>(calculateStatistics(MOCK_DOSSIERS));
 
-  const addDossier = (dossier: Partial<Dossier>) => {
-    // Extract documents if they exist in the dossier object
-    const dossierId = dossier.id || generateId();
-    let dossiersDocuments: DocumentDossier[] = [];
-    
-    if ('documents' in dossier && Array.isArray(dossier.documents)) {
-      dossiersDocuments = dossier.documents as DocumentDossier[];
-      // Add the documents to the documents state
-      setDocuments(prevDocuments => [...prevDocuments, ...dossiersDocuments]);
-      // Remove documents from the dossier object to avoid duplication
-      const { documents: _, ...dossierWithoutDocuments } = dossier;
-      dossier = dossierWithoutDocuments;
-    }
-
+  const addDossier = (dossier: Omit<Dossier, 'id'>) => {
     const newDossier = { 
-      ...dossier,
-      id: dossierId,
+      ...dossier, 
+      id: generateId(),
       historique: [
         {
           id: generateId(),
-          dossierId: dossierId,
+          dossierId: '',  // Will be updated below
           date: new Date().toISOString(),
           action: 'Création du dossier',
           responsable: dossier.responsable || 'Système',
           commentaire: 'Dossier créé dans le système'
         }
       ] 
-    } as Dossier;
+    };
+    
+    // Set the correct dossierId in the historique
+    if (newDossier.historique) {
+      newDossier.historique[0].dossierId = newDossier.id;
+    }
     
     const updatedDossiers = [...dossiers, newDossier];
     setDossiers(updatedDossiers);
     updateStatistiques(updatedDossiers);
-    
-    // Create a notification for the Responsable Technique
-    const newNotification: Notification = {
-      id: generateId(),
-      message: `Nouveau dossier pour ${dossier.operateurNom} reçu`,
-      date: new Date().toISOString(),
-      lue: false,
-      type: 'info',
-      link: '/responsable-technique'
-    };
-    
-    setNotifications([...notifications, newNotification]);
   };
-  
+
   const updateDossier = (id: string, data: Partial<Dossier>) => {
     const dossier = dossiers.find(d => d.id === id);
     if (!dossier) return;

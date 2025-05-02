@@ -27,20 +27,12 @@ export { moduleNames } from '@/constants/authConstants';
 // AuthProvider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Initialize mockUsers from the imported data
-  const [mockUsers, setMockUsers] = useState<User[]>(() => {
-    const storedUsers = localStorage.getItem('mockUsers');
-    return storedUsers ? JSON.parse(storedUsers) : [...MOCK_USERS];
-  });
+  let mockUsers = [...MOCK_USERS];
 
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const storedUser = localStorage.getItem('currentUser');
     return storedUser ? JSON.parse(storedUser) : null;
   });
-
-  // Save mockUsers to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('mockUsers', JSON.stringify(mockUsers));
-  }, [mockUsers]);
 
   useEffect(() => {
     // Save current user to local storage
@@ -52,6 +44,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const user = mockUsers.find(user => user.email === email && user.password === password);
     if (user) {
       setCurrentUser(user);
+
+      // Add login action
+      addUserAction(user.id, 'Connexion', 'Connexion réussie', 'auth');
       return true;
     }
     return false;
@@ -59,6 +54,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Logout function
   const logout = () => {
+    if (currentUser) {
+      // Add logout action
+      addUserAction(currentUser.id, 'Déconnexion', 'Déconnexion réussie', 'auth');
+    }
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
   };
@@ -78,7 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return rolePermissionsMap[role] || [];
   };
 
-  // Create user with automatic permissions based on role and password
+  // Create user with automatic permissions based on role
   const createUser = async (user: Omit<User, 'id'>) => {
     // Assign permissions based on role
     const permissions = getPermissionsForRole(user.role);
@@ -87,10 +86,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: generateId(),
       ...user,
       permissions,
+      password: 'password', // Default password
       actions: []
     };
-    
-    setMockUsers(prevUsers => [...prevUsers, newUser]);
+    mockUsers.push(newUser);
+
+    // Add creation action
+    addUserAction(newUser.id, 'Création de compte', `Compte créé avec le rôle ${newUser.role}`, 'user-management');
     return true;
   };
 
@@ -111,25 +113,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Add user action
   const addUserAction = (userId: string, action: string, details: string, module: string) => {
-    const updatedUsers = mockUsers.map(user => {
-      if (user.id === userId) {
-        const newAction = {
-          id: generateId(),
-          userId: userId,
-          date: new Date().toISOString(),
-          action: action,
-          details: details,
-          module: module
-        };
-        return {
-          ...user,
-          actions: [...(user.actions || []), newAction]
-        };
-      }
-      return user;
-    });
-    
-    setMockUsers(updatedUsers);
+    const user = mockUsers.find(user => user.id === userId);
+    if (user) {
+      const newAction = {
+        id: generateId(),
+        userId: userId,
+        date: new Date().toISOString(),
+        action: action,
+        details: details,
+        module: module
+      };
+      user.actions = [...(user.actions || []), newAction];
+    }
   };
 
   // Get user actions
@@ -151,7 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       actions: []
     };
     
-    setMockUsers(prevUsers => [...prevUsers, newUser]);
+    mockUsers.push(newUser);
     return newUser;
   };
 

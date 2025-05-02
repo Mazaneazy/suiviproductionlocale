@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, Users, MapPin } from 'lucide-react';
 import { useInspectionForm } from '@/hooks/useInspectionForm';
 
@@ -14,6 +15,7 @@ interface ProgrammerInspectionFormProps {
 const ProgrammerInspectionForm: React.FC<ProgrammerInspectionFormProps> = ({ dossierId, onSuccess }) => {
   const {
     formData,
+    inspecteurs,
     handleChange,
     handleInspecteurChange,
     addInspecteur,
@@ -74,13 +76,21 @@ const ProgrammerInspectionForm: React.FC<ProgrammerInspectionFormProps> = ({ dos
           <div key={index} className="flex items-center mb-2">
             <div className="relative flex-1">
               <Users className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-              <Input
-                value={inspecteur}
-                onChange={(e) => handleInspecteurChange(index, e.target.value)}
-                placeholder="Nom de l'inspecteur"
-                className="pl-10"
-                required
-              />
+              <Select 
+                value={inspecteur} 
+                onValueChange={(value) => handleInspecteurChange(index, value)}
+              >
+                <SelectTrigger className="pl-10">
+                  <SelectValue placeholder="Sélectionner un inspecteur" />
+                </SelectTrigger>
+                <SelectContent>
+                  {inspecteurs.map((insp) => (
+                    <SelectItem key={insp.value} value={insp.value}>
+                      {insp.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             {formData.inspecteurs.length > 1 && (
               <Button
@@ -95,15 +105,17 @@ const ProgrammerInspectionForm: React.FC<ProgrammerInspectionFormProps> = ({ dos
             )}
           </div>
         ))}
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={addInspecteur}
-          className="mt-1"
-        >
-          Ajouter un inspecteur
-        </Button>
+        {formData.inspecteurs.length < inspecteurs.length && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addInspecteur}
+            className="mt-1"
+          >
+            Ajouter un inspecteur
+          </Button>
+        )}
       </div>
 
       <div>

@@ -7,9 +7,19 @@ import { useToast } from '@/hooks/use-toast';
 export const useInspectionForm = (dossierId: string) => {
   const { addInspection, updateDossier, getDossierById } = useData();
   const { toast } = useToast();
+  const { getAllUsers } = useAuth();
   
   const dossier = getDossierById(dossierId);
+  const allUsers = getAllUsers();
   
+  // Filtrer les inspecteurs (utilisateurs avec le rôle inspecteur, surveillant ou chef_mission)
+  const inspecteurs = allUsers
+    .filter(user => ['inspecteur', 'surveillant', 'chef_mission'].includes(user.role))
+    .map(user => ({
+      value: user.name,
+      label: user.name
+    }));
+
   const [formData, setFormData] = useState({
     dossierId: dossierId,
     dateInspection: '',
@@ -19,6 +29,14 @@ export const useInspectionForm = (dossierId: string) => {
   });
   
   useEffect(() => {
+    // Si des inspecteurs sont disponibles, initialiser avec le premier
+    if (inspecteurs.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        inspecteurs: [inspecteurs[0].value]
+      }));
+    }
+    
     // Définir la date par défaut à demain
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -26,7 +44,7 @@ export const useInspectionForm = (dossierId: string) => {
       ...prev,
       dateInspection: tomorrow.toISOString().split('T')[0]
     }));
-  }, []);
+  }, [inspecteurs]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -46,10 +64,12 @@ export const useInspectionForm = (dossierId: string) => {
   };
 
   const addInspecteur = () => {
-    setFormData({
-      ...formData,
-      inspecteurs: [...formData.inspecteurs, ''],
-    });
+    if (formData.inspecteurs.length < inspecteurs.length) {
+      setFormData({
+        ...formData,
+        inspecteurs: [...formData.inspecteurs, inspecteurs[0].value],
+      });
+    }
   };
 
   const removeInspecteur = (index: number) => {
@@ -66,7 +86,7 @@ export const useInspectionForm = (dossierId: string) => {
     e.preventDefault();
 
     // Validation de base
-    if (!formData.dateInspection || !formData.lieu || formData.inspecteurs.length === 0 || formData.inspecteurs.some(i => !i.trim())) {
+    if (!formData.dateInspection || !formData.lieu || formData.inspecteurs.length === 0) {
       toast({
         title: 'Erreur de validation',
         description: 'Veuillez remplir tous les champs requis.',
@@ -111,13 +131,14 @@ export const useInspectionForm = (dossierId: string) => {
       dossierId: dossierId,
       dateInspection: formData.dateInspection,
       lieu: '',
-      inspecteurs: [''],
+      inspecteurs: [formData.inspecteurs[0]],
       notes: '',
     });
   };
 
   return {
     formData,
+    inspecteurs,
     handleChange,
     handleInspecteurChange,
     addInspecteur,

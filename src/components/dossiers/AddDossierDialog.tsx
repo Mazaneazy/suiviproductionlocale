@@ -10,6 +10,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -120,8 +122,8 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
             <DossierForm
               newDossier={newDossier}
               setNewDossier={setNewDossier}
-              onSubmit={handleSubmit}
-              onCancel={closeDialog}
+              onSubmit={() => {}}
+              onCancel={() => {}}
             />
             
             <div className="flex items-center space-x-2 my-4">
@@ -137,6 +139,11 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
                 Créer un compte producteur
               </label>
             </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={closeDialog}>Annuler</Button>
+              <Button onClick={handleSubmit}>Ajouter le dossier</Button>
+            </DialogFooter>
           </>
         )}
       </DialogContent>

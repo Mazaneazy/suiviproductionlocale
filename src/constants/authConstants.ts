@@ -4,7 +4,7 @@ import { UserRole } from '@/types';
 // Define role to permission mapping
 export const rolePermissionsMap: Record<UserRole, string[]> = {
   'admin': ['*'], // Admin access to all modules
-  'acceuil': ['acceuil', 'dossiers'], // Added dossiers access
+  'acceuil': ['acceuil'],
   'inspecteur': ['inspections'],
   'certificats': ['resultats'],
   'analyste': ['statistiques'],
@@ -12,7 +12,7 @@ export const rolePermissionsMap: Record<UserRole, string[]> = {
   'responsable_technique': ['responsable-technique'],
   'chef_mission': ['inspections'],
   'surveillant': ['inspections'],
-  'directeur': ['resultats', 'dossiers', 'inspections', 'user-management'], // Updated permissions
+  'directeur': ['resultats'],
   'directeur_general': ['*'], // Director general access to all modules
   'gestionnaire': ['dossiers'],
   'producteur': ['dashboard'] // Producteurs can only access their dashboard
