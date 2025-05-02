@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -44,6 +44,14 @@ const DossierDialogContent: React.FC<DossierDialogContentProps> = ({
   
   const { processAttachments } = useDocumentProcessing();
 
+  // Effect to process attachments when dossierIdAfterSubmit becomes available
+  useEffect(() => {
+    if (dossierIdAfterSubmit && attachments.length > 0) {
+      console.log("Traitement des pièces jointes pour le dossier:", dossierIdAfterSubmit);
+      processAttachments(attachments, dossierIdAfterSubmit);
+    }
+  }, [dossierIdAfterSubmit, attachments, processAttachments]);
+
   const handleSubmit = () => {
     // Valider le formulaire
     if (!newDossier.operateurNom || !newDossier.typeProduit) {
@@ -62,12 +70,6 @@ const DossierDialogContent: React.FC<DossierDialogContentProps> = ({
     if (createAccount) {
       createProducteurAccountFromDossier();
     }
-    
-    // Ajouter les pièces jointes au dossier
-    console.log("Traitement des pièces jointes avec ID:", dossierIdAfterSubmit);
-    setTimeout(() => {
-      processAttachments(attachments, dossierIdAfterSubmit);
-    }, 500);
   };
 
   if (producteurCredentials) {

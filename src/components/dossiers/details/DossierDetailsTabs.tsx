@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dossier, DocumentDossier } from '@/types';
 import { useData } from '@/contexts/DataContext';
+import { useToast } from '@/hooks/use-toast';
 
 // Import tab content components
 import DossierHistoryTab from './DossierHistoryTab';
@@ -23,7 +24,9 @@ const DossierDetailsTabs: React.FC<DossierDetailsTabsProps> = ({
   certificat 
 }) => {
   const { getDocumentsByDossierId } = useData();
+  const { toast } = useToast();
   const [documents, setDocuments] = useState<DocumentDossier[]>(initialDocuments || []);
+  const [activeTab, setActiveTab] = useState('historique');
   
   // Rafraîchir les documents chaque fois que le dossier change ou que le composant est monté
   useEffect(() => {
@@ -70,6 +73,17 @@ const DossierDetailsTabs: React.FC<DossierDetailsTabsProps> = ({
               const dossiersDocuments = allDocuments.filter(doc => doc.dossierId === dossier.id);
               console.log("Documents mis à jour trouvés dans localStorage:", dossiersDocuments.length);
               setDocuments(dossiersDocuments);
+              
+              // Afficher une notification
+              toast({
+                title: "Documents mis à jour",
+                description: `${dossiersDocuments.length} document(s) associé(s) à ce dossier`,
+              });
+              
+              // Basculer vers l'onglet documents si de nouveaux documents sont détectés
+              if (dossiersDocuments.length > 0 && activeTab !== 'documents') {
+                setActiveTab('documents');
+              }
             }
           }
         } catch (error) {
@@ -85,15 +99,22 @@ const DossierDetailsTabs: React.FC<DossierDetailsTabsProps> = ({
     return () => {
       window.removeEventListener('documents-updated', handleDocumentsUpdated as EventListener);
     };
-  }, [dossier]);
+  }, [dossier, toast, activeTab]);
   
   console.log("Documents actuellement dans DossierDetailsTabs:", documents);
   
   return (
-    <Tabs defaultValue="historique">
+    <Tabs defaultValue="historique" value={activeTab} onValueChange={setActiveTab}>
       <TabsList className="grid grid-cols-3 mb-4">
         <TabsTrigger value="historique">Historique</TabsTrigger>
-        <TabsTrigger value="documents">Pièces jointes</TabsTrigger>
+        <TabsTrigger value="documents">
+          Pièces jointes
+          {documents.length > 0 && (
+            <span className="ml-2 bg-certif-blue text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {documents.length}
+            </span>
+          )}
+        </TabsTrigger>
         <TabsTrigger value="elements">Éléments du dossier</TabsTrigger>
       </TabsList>
       

@@ -1,15 +1,14 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Dossier } from '@/types';
 import DossierDialogContent from './DossierDialogContent';
 
@@ -30,31 +29,23 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
   onSubmit,
   latestDossierId
 }) => {
-  const handleCloseDialog = () => {
-    onOpenChange(false);
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button className="bg-certif-blue hover:bg-certif-blue/90">
-          <PlusCircle className="mr-2" size={16} />
-          Nouveau dossier
+        <Button>
+          <Plus className="mr-2" size={16} />
+          Ajouter un dossier
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Ajouter un nouveau dossier</DialogTitle>
-          <DialogDescription>
-            Enregistrer les informations de base du dossier.
-          </DialogDescription>
         </DialogHeader>
-        
-        <DossierDialogContent 
+        <DossierDialogContent
           newDossier={newDossier}
           setNewDossier={setNewDossier}
           onSubmit={onSubmit}
-          onClose={handleCloseDialog}
+          onClose={() => onOpenChange(false)}
           dossierIdAfterSubmit={latestDossierId}
         />
       </DialogContent>

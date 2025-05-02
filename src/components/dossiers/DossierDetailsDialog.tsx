@@ -73,10 +73,21 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
 
       loadData();
       
-      // Ajouter un petit délai pour permettre aux documents d'être ajoutés si nécessaire
-      const refreshTimer = setTimeout(loadData, 1000);
+      // Ajouter un écouteur d'événements pour les mises à jour de documents
+      const handleDocumentsUpdated = (event: CustomEvent) => {
+        if (event.detail && event.detail.dossierId === dossierId) {
+          console.log("Événement de mise à jour de documents détecté dans le dialogue:", dossierId);
+          loadData();
+        }
+      };
       
-      return () => clearTimeout(refreshTimer);
+      // Ajouter l'écouteur d'événements
+      window.addEventListener('documents-updated', handleDocumentsUpdated as EventListener);
+      
+      // Nettoyer l'écouteur lors du démontage ou de la fermeture
+      return () => {
+        window.removeEventListener('documents-updated', handleDocumentsUpdated as EventListener);
+      };
     }
   }, [isOpen, dossierId, getDossierById, getDocumentsByDossierId, getInspectionsByDossierId, getCertificatByDossierId]);
 

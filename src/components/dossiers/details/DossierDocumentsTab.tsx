@@ -3,7 +3,7 @@ import React from 'react';
 import { DocumentDossier } from '@/types';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { File, FileText, Download } from 'lucide-react';
+import { File, FileText, Download, Paperclip } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -67,35 +67,57 @@ const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({ documents }) 
     );
   }
 
+  if (docsToDisplay.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full p-4 text-center">
+        <div>
+          <Paperclip className="mx-auto mb-3 text-gray-400" size={40} />
+          <p className="text-lg font-medium text-gray-600">Aucune pièce jointe</p>
+          <p className="mt-1 text-gray-500">Ce dossier ne contient pas encore de pièces jointes.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <ScrollArea className="h-full pr-4">
-      {docsToDisplay && docsToDisplay.length > 0 ? (
-        <div className="space-y-4">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-medium">
+            Pièces jointes ({docsToDisplay.length})
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3">
           {docsToDisplay.map((doc) => (
-            <div key={doc.id} className="flex items-center justify-between p-3 border rounded-md bg-white shadow-sm">
-              <div className="flex items-center">
+            <div 
+              key={doc.id} 
+              className={`border rounded-md p-3 flex items-center justify-between
+                ${doc.status === 'valide' ? 'bg-green-50 border-green-200' : 
+                  doc.status === 'rejete' ? 'bg-red-50 border-red-200' : 
+                  'bg-white'}`}
+            >
+              <div className="flex items-center space-x-3">
                 {doc.type === 'pdf' ? (
-                  <File className="mr-3 text-red-500" size={20} />
+                  <File className="text-red-500 flex-shrink-0" size={24} />
                 ) : (
-                  <FileText className="mr-3 text-certif-blue" size={20} />
+                  <FileText className="text-certif-blue flex-shrink-0" size={24} />
                 )}
                 <div>
-                  <div className="font-medium">
+                  <p className="font-medium">
                     {doc.type !== 'pdf' ? formatDocumentType(doc.type) : doc.nom}
-                  </div>
-                  <div className="text-sm text-gray-500">
+                  </p>
+                  <p className="text-sm text-gray-500">
                     Téléversé le {new Date(doc.dateUpload).toLocaleDateString()}
-                  </div>
+                  </p>
                   {doc.status && (
-                    <div className={`text-xs mt-1 font-medium ${
-                      doc.status === 'valide' ? 'text-green-500' : 
-                      doc.status === 'rejete' ? 'text-red-500' : 
-                      'text-yellow-500'
-                    }`}>
+                    <span className={`text-xs px-2 py-1 rounded-full inline-block mt-1
+                      ${doc.status === 'valide' ? 'bg-green-100 text-green-700' : 
+                        doc.status === 'rejete' ? 'bg-red-100 text-red-700' : 
+                        'bg-yellow-100 text-yellow-700'}`}>
                       {doc.status === 'valide' ? 'Validé' : 
-                       doc.status === 'rejete' ? 'Rejeté' : 
-                       'En attente'}
-                    </div>
+                        doc.status === 'rejete' ? 'Rejeté' : 'En attente'}
+                    </span>
                   )}
                 </div>
               </div>
@@ -103,21 +125,15 @@ const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({ documents }) 
                 variant="outline" 
                 size="sm" 
                 onClick={() => viewDocument(doc.url, doc.nom)}
-                className="gap-1"
+                className="flex-shrink-0"
               >
-                <Download size={16} />
-                {doc.type === 'pdf' ? 'Visualiser' : 'Télécharger'}
+                <Download size={16} className="mr-2" />
+                Visualiser
               </Button>
             </div>
           ))}
         </div>
-      ) : (
-        <div className="text-center py-12 px-4 text-gray-500 bg-gray-50 rounded-md">
-          <FileText className="mx-auto mb-3 text-gray-400" size={40} />
-          <p className="text-lg font-medium">Aucune pièce jointe disponible</p>
-          <p className="mt-1">Aucun document n'a encore été téléversé pour ce dossier.</p>
-        </div>
-      )}
+      </div>
     </ScrollArea>
   );
 };
