@@ -55,6 +55,38 @@ const DossierDetailsTabs: React.FC<DossierDetailsTabsProps> = ({
     }
   }, [dossier, getDocumentsByDossierId]);
   
+  // Ajouter un écouteur d'événements pour les mises à jour de documents
+  useEffect(() => {
+    const handleDocumentsUpdated = (event: CustomEvent) => {
+      if (event.detail && event.detail.dossierId === dossier.id) {
+        console.log("Événement de mise à jour de documents détecté pour le dossier:", dossier.id);
+        
+        // Rafraîchir les documents depuis localStorage
+        try {
+          const storedDocuments = localStorage.getItem('documents');
+          if (storedDocuments) {
+            const allDocuments = JSON.parse(storedDocuments);
+            if (Array.isArray(allDocuments)) {
+              const dossiersDocuments = allDocuments.filter(doc => doc.dossierId === dossier.id);
+              console.log("Documents mis à jour trouvés dans localStorage:", dossiersDocuments.length);
+              setDocuments(dossiersDocuments);
+            }
+          }
+        } catch (error) {
+          console.error("Erreur lors de l'accès aux documents mis à jour dans localStorage:", error);
+        }
+      }
+    };
+    
+    // Ajouter l'écouteur d'événements
+    window.addEventListener('documents-updated', handleDocumentsUpdated as EventListener);
+    
+    // Nettoyer l'écouteur lors du démontage
+    return () => {
+      window.removeEventListener('documents-updated', handleDocumentsUpdated as EventListener);
+    };
+  }, [dossier]);
+  
   console.log("Documents actuellement dans DossierDetailsTabs:", documents);
   
   return (

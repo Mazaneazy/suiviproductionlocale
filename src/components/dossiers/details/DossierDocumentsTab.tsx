@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { File, FileText, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 interface DossierDocumentsTabProps {
   documents: DocumentDossier[];
@@ -12,6 +13,10 @@ interface DossierDocumentsTabProps {
 
 const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({ documents }) => {
   const { toast } = useToast();
+  const { hasRole } = useAuth();
+  
+  // Vérifier si l'utilisateur a le rôle nécessaire pour voir les documents
+  const canViewDocuments = hasRole(['responsable_technique', 'chef_mission', 'directeur', 'directeur_general', 'gestionnaire']);
 
   // Format document type name for better display
   const formatDocumentType = (type: string) => {
@@ -35,7 +40,7 @@ const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({ documents }) 
 
   // Helper function to view a PDF document
   const viewDocument = (url: string, name: string) => {
-    // Dans un environnement réel, ceci ouvrirait le PDF
+    // Dans un environnement réel, ceci ouvrirait le PDF dans une nouvelle fenêtre
     window.open(url, `_blank_${name}`);
     
     // Comme nous utilisons des URL fictives, affichons un message
@@ -49,6 +54,18 @@ const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({ documents }) 
 
   // S'assurer que documents est un tableau même s'il est undefined
   const docsToDisplay = Array.isArray(documents) ? documents : [];
+
+  if (!canViewDocuments) {
+    return (
+      <div className="flex items-center justify-center h-full p-4 text-center">
+        <div>
+          <FileText className="mx-auto mb-3 text-gray-400" size={40} />
+          <p className="text-lg font-medium text-gray-600">Accès restreint</p>
+          <p className="mt-1 text-gray-500">Vous n'avez pas les autorisations nécessaires pour consulter les documents.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ScrollArea className="h-full pr-4">
