@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { DataContextProps } from './data/types';
-import { DataProvider as DataProviderImplementation } from './data/DataProvider';
 
 // Create the context with default values
 const DataContext = React.createContext<DataContextProps>({
@@ -37,11 +36,12 @@ const DataContext = React.createContext<DataContextProps>({
   getUnreadNotificationsCount: () => 0,
 });
 
-// Re-export the Provider with the same name for backward compatibility
-export const DataProvider = DataProviderImplementation;
+// Export the context for the implementation to use
+export default DataContext;
 
 // Export the useData hook for components to use
 export const useData = () => React.useContext(DataContext);
 
-// Export the context for the implementation to use
-export default DataContext;
+// Import and re-export the Provider from a separate file
+import { DataProvider as DataProviderImplementation } from './data/DataProvider';
+export const DataProvider = DataProviderImplementation;
