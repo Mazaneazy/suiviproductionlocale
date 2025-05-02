@@ -3,7 +3,7 @@ import React from 'react';
 import { DocumentDossier } from '@/types';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { File, FileText } from 'lucide-react';
+import { File, FileText, Download } from 'lucide-react';
 
 interface DossierDocumentsTabProps {
   documents: DocumentDossier[];
@@ -73,7 +73,9 @@ const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({ documents }) 
                 variant="outline" 
                 size="sm" 
                 onClick={() => viewDocument(doc.url, doc.nom)}
+                className="gap-1"
               >
+                <Download size={16} />
                 {doc.type === 'pdf' ? 'Visualiser' : 'Télécharger'}
               </Button>
             </div>

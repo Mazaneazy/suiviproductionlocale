@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useData } from '@/contexts/DataContext';
 import {
   Dialog,
@@ -28,13 +28,29 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
   } = useData();
   
   const [isOpen, setIsOpen] = useState(false);
+  const [documents, setDocuments] = useState([]);
+  const [inspections, setInspections] = useState([]);
+  const [certificat, setCertificat] = useState(null);
+  const [dossier, setDossier] = useState(null);
 
-  const dossier = getDossierById(dossierId);
-  const documents = getDocumentsByDossierId(dossierId);
-  const inspections = getInspectionsByDossierId(dossierId);
-  const certificat = getCertificatByDossierId(dossierId);
+  // Charger les données lorsque le dialogue est ouvert
+  useEffect(() => {
+    if (isOpen && dossierId) {
+      const currentDossier = getDossierById(dossierId);
+      const currentDocuments = getDocumentsByDossierId(dossierId);
+      const currentInspections = getInspectionsByDossierId(dossierId);
+      const currentCertificat = getCertificatByDossierId(dossierId);
 
-  if (!dossier) return null;
+      console.log(`Dialogue ouvert - Chargement des documents pour ${dossierId}:`, currentDocuments);
+      
+      setDossier(currentDossier);
+      setDocuments(currentDocuments);
+      setInspections(currentInspections);
+      setCertificat(currentCertificat);
+    }
+  }, [isOpen, dossierId, getDossierById, getDocumentsByDossierId, getInspectionsByDossierId, getCertificatByDossierId]);
+
+  if (!dossierId) return null;
   
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -44,21 +60,23 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
       <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle className="text-xl">
-            Détails du dossier: {dossier.operateurNom}
+            Détails du dossier: {dossier?.operateurNom}
           </DialogTitle>
           <DialogDescription className="text-gray-500">
-            Informations détaillées sur le dossier {dossier.operateurNom}
+            Informations détaillées sur le dossier {dossier?.operateurNom}
           </DialogDescription>
         </DialogHeader>
         
-        <DossierHeader dossier={dossier} />
+        {dossier && <DossierHeader dossier={dossier} />}
         
-        <DossierDetailsTabs 
-          dossier={dossier}
-          documents={documents}
-          inspections={inspections}
-          certificat={certificat}
-        />
+        {dossier && (
+          <DossierDetailsTabs 
+            dossier={dossier}
+            documents={documents}
+            inspections={inspections}
+            certificat={certificat}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

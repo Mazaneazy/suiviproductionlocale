@@ -21,6 +21,8 @@ const DossierDetailsTabs: React.FC<DossierDetailsTabsProps> = ({
   inspections, 
   certificat 
 }) => {
+  console.log("DossierDetailsTabs reçoit documents:", documents);
+  
   return (
     <Tabs defaultValue="historique">
       <TabsList className="grid grid-cols-3 mb-4">
@@ -34,7 +36,7 @@ const DossierDetailsTabs: React.FC<DossierDetailsTabsProps> = ({
       </TabsContent>
       
       <TabsContent value="documents" className="h-[400px]">
-        <DossierDocumentsTab documents={documents} />
+        <DossierDocumentsTab documents={documents || []} />
       </TabsContent>
       
       <TabsContent value="elements" className="h-[400px]">
