@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -9,7 +10,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Dossier } from '@/types';
 import DossierForm from './DossierForm';
@@ -32,48 +33,20 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
 }) => {
   const { toast } = useToast();
   const { createProducteurAccount } = useAuth();
-  const [createAccount, setCreateAccount] = useState(false);
   const [producteurCredentials, setProducteurCredentials] = useState<{email: string, password: string} | null>(null);
 
   const handleSubmit = () => {
     // Formulaire maintenant validé dans useDossierForm
     onSubmit();
-    
-    // Si l'option est cochée, créer un compte producteur après la soumission du dossier
-    if (createAccount) {
-      // Le dossier est créé par la fonction onSubmit, donc on doit attendre un peu avant de créer le compte
-      setTimeout(() => {
-        const latestDossier = JSON.parse(localStorage.getItem('dossiers') || '[]').pop();
-        if (latestDossier) {
-          const producteur = createProducteurAccount(latestDossier);
-          
-          if (producteur) {
-            setProducteurCredentials({
-              email: producteur.email,
-              password: 'password'
-            });
-          } else {
-            setCreateAccount(false);
-            toast({
-              title: "Erreur",
-              description: "Impossible de créer le compte producteur",
-              variant: "destructive",
-            });
-          }
-        }
-      }, 300);
-    }
-  };
-
-  const handleAccountCreationToggle = () => {
-    setCreateAccount(!createAccount);
   };
 
   const closeDialog = () => {
     onOpenChange(false);
     setProducteurCredentials(null);
-    setCreateAccount(false);
   };
+
+  // Check if required fields are filled
+  const isFormValid = newDossier.operateurNom && newDossier.typeProduit;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -111,6 +84,20 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
               onSubmit={handleSubmit}
               onCancel={closeDialog}
             />
+            
+            <DialogFooter className="mt-4">
+              <Button variant="outline" onClick={closeDialog} className="mr-2">
+                Annuler
+              </Button>
+              <Button 
+                onClick={handleSubmit} 
+                disabled={!isFormValid}
+                className="bg-certif-green hover:bg-certif-green/90"
+              >
+                <Save className="mr-2" size={16} />
+                Enregistrer
+              </Button>
+            </DialogFooter>
           </>
         )}
       </DialogContent>
