@@ -47,15 +47,17 @@ export function useDocumentProcessing() {
         status: 'en_attente' // Using a specific string literal that matches the expected type
       };
       
-      // Ajouter le document au dossier
-      const result = addDocument(newDocData);
-      
-      // Si addDocument nous retourne le document créé, l'utiliser, sinon essayer de le récupérer
-      if (result && result.id) {
-        addedDocuments.push(result);
-      } else {
-        // Obtenir le nouveau document depuis localStorage si addDocument ne retourne pas l'objet
-        try {
+      try {
+        // Ajouter le document au dossier
+        const result = addDocument(newDocData);
+        
+        // Si addDocument retourne le document créé, l'ajouter à notre liste de documents ajoutés
+        if (result && typeof result === 'object' && 'id' in result) {
+          addedDocuments.push(result);
+          console.log(`Document ajouté avec succès: ${file.name} (ID: ${result.id})`);
+        } else {
+          // Si addDocument ne retourne pas le document, essayer de le récupérer depuis localStorage
+          console.log("Le document a été ajouté mais l'objet n'a pas été retourné, tentative de récupération...");
           const storedDocuments = localStorage.getItem('documents');
           if (storedDocuments) {
             const allDocs = JSON.parse(storedDocuments);
@@ -68,14 +70,15 @@ export function useDocumentProcessing() {
             
             if (newDoc) {
               addedDocuments.push(newDoc);
+              console.log(`Document récupéré depuis localStorage: ${newDoc.nom} (ID: ${newDoc.id})`);
             }
           }
-        } catch (error) {
-          console.error("Erreur lors de la récupération du document depuis localStorage:", error);
         }
+      } catch (error) {
+        console.error(`Erreur lors de l'ajout du document ${file.name}:`, error);
       }
       
-      console.log(`Document ajouté: ${file.name} (Type: ${documentType}) pour le dossier ${dossierId}`);
+      console.log(`Document traité: ${file.name} (Type: ${documentType}) pour le dossier ${dossierId}`);
     });
     
     // Notification du succès
