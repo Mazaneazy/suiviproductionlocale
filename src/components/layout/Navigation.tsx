@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FileCheck, FileText, ClipboardCheck, Home, BarChart, UserRound, Shield, Calculator } from 'lucide-react';
+import { FileCheck, FileText, ClipboardCheck, Home, BarChart, UserRound, Shield, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface NavigationProps {
@@ -19,15 +19,19 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onItemClick }) 
     { to: '/accueil', icon: <FileText size={20} />, label: 'Poste d\'Accueil', module: 'acceuil' },
     { to: '/dossiers', icon: <FileText size={20} />, label: 'Dossiers en cours', module: 'dossiers' },
     { to: '/inspections', icon: <ClipboardCheck size={20} />, label: 'Inspections', module: 'inspections' },
-    { to: '/certificats', icon: <FileCheck size={20} />, label: 'Résultats', module: 'resultats' },
-    { to: '/notes-frais', icon: <Calculator size={20} />, label: 'Notes de frais', module: 'notes-frais', excludeRoles: ['inspecteur'] },
+    { to: '/certificats', icon: <FileCheck size={20} />, label: 'Certificats émis', module: 'resultats' },
     { to: '/statistiques', icon: <BarChart size={20} />, label: 'Statistiques', module: 'statistiques' },
     { to: '/responsable-technique', icon: <Shield size={20} />, label: 'Responsable Technique', module: 'responsable-technique' },
-    { to: '/user-management', icon: <UserRound size={20} />, label: 'Gestion des utilisateurs', module: 'user-management' },
+    { to: '/user-management', icon: <Users size={20} />, label: 'Gestion des utilisateurs', module: 'user-management' },
   ];
 
   // Filtrer les liens selon les droits d'accès de l'utilisateur et exclure selon le rôle
   const filteredNavLinks = navLinks.filter(link => {
+    // Pour les producteurs locaux (rôle "producteur"), montrer uniquement leur tableau de bord
+    if (currentUser?.role === 'producteur') {
+      return link.to === '/dashboard';
+    }
+    
     // Vérifier si le lien doit être exclu pour le rôle actuel de l'utilisateur
     const shouldExcludeByRole = link.excludeRoles && 
       currentUser?.role && 
@@ -50,6 +54,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onItemClick }) 
       'directeur': { '/certificats': 'Directeur Evaluation Conformité' },
       'directeur_general': { '/dashboard': 'Direction Générale ANOR' },
       'gestionnaire': { '/dossiers': 'Gestion des dossiers' },
+      'producteur': { '/dashboard': 'Mon dossier de certification' },
     };
 
     if (currentUser?.role && roleTitles[currentUser.role] && roleTitles[currentUser.role][link.to]) {

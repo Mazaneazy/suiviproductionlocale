@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -30,14 +31,16 @@ import {
 } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
 import { useToast } from '../hooks/use-toast';
-import { UserRound, PlusCircle } from 'lucide-react';
+import { UserRound, PlusCircle, Search, FileText } from 'lucide-react';
 import { User, UserRole } from '../types';
 
 const UserManagement = () => {
-  const { getAllUsers, createUser } = useAuth();
+  const { getAllUsers, createUser, getUserActions } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>(getAllUsers());
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   
   const [newUser, setNewUser] = useState({
     name: '',
@@ -58,7 +61,8 @@ const UserManagement = () => {
     'chef_mission': 'Chef de Mission d\'Inspection',
     'certificats': 'Délivrance des Certificats',
     'directeur_general': 'Directeur Général ANOR',
-    'gestionnaire': 'Gestionnaire des Dossiers'
+    'gestionnaire': 'Gestionnaire des Dossiers',
+    'producteur': 'Producteur Local'
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,6 +124,21 @@ const UserManagement = () => {
         description: "Une erreur est survenue lors de la création de l'utilisateur",
       });
     }
+  };
+
+  const handleViewDetails = (userId: string) => {
+    navigate(`/user-details/${userId}`);
+  };
+
+  const filteredUsers = users.filter(user => 
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    roleLabels[user.role]?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Compter le nombre d'actions par utilisateur
+  const getActionCount = (userId: string) => {
+    return getUserActions(userId).length;
   };
 
   return (
@@ -195,6 +214,15 @@ const UserManagement = () => {
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
+        <div className="mb-4 relative">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+          <Input
+            placeholder="Rechercher par nom, email ou rôle..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -202,10 +230,12 @@ const UserManagement = () => {
                 <TableHead>Nom</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Rôle</TableHead>
+                <TableHead>Actions système</TableHead>
+                <TableHead>Détails</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center space-x-2">
@@ -220,6 +250,21 @@ const UserManagement = () => {
                     <Badge variant="outline" className="font-normal">
                       {roleLabels[user.role] || user.role}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">
+                      {getActionCount(user.id)} actions
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleViewDetails(user.id)}
+                    >
+                      <FileText className="mr-1" size={14} />
+                      Détail
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

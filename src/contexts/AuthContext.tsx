@@ -1,158 +1,269 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { User, UserRole } from '../types';
+import { generateId } from './data/utils';
+import { Dossier } from '../types';
 
+// Define the AuthContext type
 interface AuthContextProps {
   currentUser: User | null;
-  isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
-  hasRole: (role: UserRole | UserRole[]) => boolean;
-  hasAccess: (module: string) => boolean;
-  createUser: (userData: Omit<User, "id">) => Promise<boolean>;
   getAllUsers: () => User[];
+  getUserById: (id: string) => User | undefined;
+  createUser: (user: Omit<User, 'id'>) => Promise<boolean>;
+  hasAccess: (moduleName: string) => boolean;
+  getUserActions: (userId: string) => any[];
+  createProducteurAccount: (dossier: Dossier) => User;
 }
 
+// Create the context with default values
 const AuthContext = createContext<AuthContextProps>({
   currentUser: null,
-  isAuthenticated: false,
   login: async () => false,
   logout: () => {},
-  hasRole: () => false,
-  hasAccess: () => false,
-  createUser: async () => false,
   getAllUsers: () => [],
+  getUserById: () => undefined,
+  createUser: async () => false,
+  hasAccess: () => false,
+  getUserActions: () => [],
+  createProducteurAccount: () => ({} as User),
 });
 
-// Mock users for demo purposes
-const INITIAL_MOCK_USERS: User[] = [
-  { id: '1', name: 'Admin', email: 'admin@certif.com', role: 'admin', avatar: '' },
-  { id: '2', name: 'Poste d\'Accueil', email: 'acceuil@certif.com', role: 'acceuil', avatar: '' },
-  { id: '3', name: 'Chef des Inspections', email: 'inspecteur@certif.com', role: 'inspecteur', avatar: '' },
-  { id: '4', name: 'Responsable Notes de Frais', email: 'comptable@certif.com', role: 'comptable', avatar: '' },
-  { id: '5', name: 'Chargé du reporting', email: 'analyste@certif.com', role: 'analyste', avatar: '' },
-  { id: '6', name: 'Chef de Mission d\'Inspection', email: 'chef_mission@certif.com', role: 'chef_mission', avatar: '' },
-  { id: '7', name: 'Directeur Evaluation Conformité', email: 'directeur@certif.com', role: 'directeur', avatar: '' },
-  { id: '8', name: 'Responsable Technique', email: 'technique@certif.com', role: 'responsable_technique', avatar: '' },
-  { id: '9', name: 'Délivrance des Certificats', email: 'certificats@certif.com', role: 'certificats', avatar: '' },
-  { id: '10', name: 'Directeur Général ANOR', email: 'dg@certif.com', role: 'directeur_general', avatar: '' },
-  { id: '11', name: 'Gestionnaire', email: 'gestionnaire@certif.com', role: 'gestionnaire', avatar: '' },
+// Mock user data (replace with a real database or API)
+const MOCK_USERS: User[] = [
+  {
+    id: '1',
+    name: 'Admin User',
+    email: 'admin@example.com',
+    role: 'admin',
+    password: 'password',
+    permissions: ['*'],
+    actions: []
+  },
+  {
+    id: '2',
+    name: 'Accueil User',
+    email: 'accueil@example.com',
+    role: 'acceuil',
+    password: 'password',
+    permissions: ['acceuil'],
+    actions: []
+  },
+  {
+    id: '3',
+    name: 'Inspecteur User',
+    email: 'inspecteur@example.com',
+    role: 'inspecteur',
+    password: 'password',
+    permissions: ['inspections'],
+    actions: []
+  },
+  {
+    id: '4',
+    name: 'Certificats User',
+    email: 'certificats@example.com',
+    role: 'certificats',
+    password: 'password',
+    permissions: ['resultats'],
+    actions: []
+  },
+    {
+    id: '5',
+    name: 'Analyste User',
+    email: 'analyste@example.com',
+    role: 'analyste',
+    password: 'password',
+    permissions: ['statistiques'],
+    actions: []
+  },
+  {
+    id: '6',
+    name: 'Comptable User',
+    email: 'comptable@example.com',
+    role: 'comptable',
+    password: 'password',
+    permissions: ['notes-frais'],
+    actions: []
+  },
+  {
+    id: '7',
+    name: 'Responsable Technique',
+    email: 'rt@example.com',
+    role: 'responsable_technique',
+    password: 'password',
+    permissions: ['responsable-technique'],
+    actions: []
+  },
+  {
+    id: '8',
+    name: 'Chef de Mission',
+    email: 'chef.mission@example.com',
+    role: 'chef_mission',
+    password: 'password',
+    permissions: ['inspections'],
+    actions: []
+  },
+  {
+    id: '9',
+    name: 'Surveillant User',
+    email: 'surveillant@example.com',
+    role: 'surveillant',
+    password: 'password',
+    permissions: ['inspections'],
+    actions: []
+  },
+  {
+    id: '10',
+    name: 'Directeur User',
+    email: 'directeur@example.com',
+    role: 'directeur',
+    password: 'password',
+    permissions: ['resultats'],
+    actions: []
+  },
+  {
+    id: '11',
+    name: 'Directeur General',
+    email: 'dg@example.com',
+    role: 'directeur_general',
+    password: 'password',
+    permissions: ['*'],
+    actions: []
+  },
+  {
+    id: '12',
+    name: 'Gestionnaire Dossiers',
+    email: 'gestionnaire@example.com',
+    role: 'gestionnaire',
+    password: 'password',
+    permissions: ['dossiers'],
+    actions: []
+  },
 ];
 
-// Définir les accès par module pour chaque rôle
-const ROLE_ACCESS_MAP: Record<string, string[]> = {
-  'admin': ['dossiers', 'inspections', 'resultats', 'certificats', 'statistiques', 'acceuil', 'responsable-technique', 'user-management', 'notes-frais'],
-  'acceuil': ['dossiers', 'acceuil'],
-  'inspecteur': ['inspections', 'dossiers', 'notes-frais'],
-  'analyste': ['statistiques', 'dossiers'],
-  'chef_mission': ['inspections', 'dossiers'],
-  'directeur': ['dossiers', 'certificats', 'statistiques', 'resultats', 'inspections'],
-  'responsable_technique': ['dossiers', 'responsable-technique', 'inspections'],
-  'certificats': ['certificats', 'dossiers', 'resultats'],
-  'directeur_general': ['dossiers', 'inspections', 'certificats', 'statistiques', 'acceuil', 'responsable-technique'],
-  'gestionnaire': ['dossiers', 'inspections', 'notes-frais'],
-  'comptable': ['notes-frais', 'dossiers'],
-};
+let mockUsers = [...MOCK_USERS];
 
+// AuthProvider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [users, setUsers] = useState<User[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
   useEffect(() => {
-    // Load users from localStorage if available
-    const storedUsers = localStorage.getItem('certif_users');
-    if (storedUsers) {
-      setUsers(JSON.parse(storedUsers));
-    } else {
-      // Initialize with default users if no users are stored
-      setUsers(INITIAL_MOCK_USERS);
-      localStorage.setItem('certif_users', JSON.stringify(INITIAL_MOCK_USERS));
-    }
+    // Save current user to local storage
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  }, [currentUser]);
 
-    // Check if user is already logged in
-    const storedUser = localStorage.getItem('certif_user');
-    if (storedUser) {
-      setCurrentUser(JSON.parse(storedUser));
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  const login = async (email: string, password: string): Promise<boolean> => {
-    // Get the latest users from localStorage
-    const storedUsers = localStorage.getItem('certif_users');
-    const currentUsers = storedUsers ? JSON.parse(storedUsers) : INITIAL_MOCK_USERS;
-    
-    const user = currentUsers.find((user: User) => user.email === email);
-    
-    // Simulate a delay for the "API call"
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    if (user && password === 'password') { // Simple password for demo
+  // Login function
+  const login = async (email: string, password: string) => {
+    const user = mockUsers.find(user => user.email === email && user.password === password);
+    if (user) {
       setCurrentUser(user);
-      setIsAuthenticated(true);
-      localStorage.setItem('certif_user', JSON.stringify(user));
+
+      // Add login action
+      addUserAction(user.id, 'Connexion', 'Connexion réussie', 'auth');
       return true;
     }
     return false;
   };
 
+  // Logout function
   const logout = () => {
-    setCurrentUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('certif_user');
-  };
-
-  const hasRole = (role: UserRole | UserRole[]): boolean => {
-    if (!currentUser) return false;
-    
-    if (Array.isArray(role)) {
-      return role.includes(currentUser.role as UserRole) || currentUser.role === 'admin' || currentUser.role === 'directeur_general';
+    if (currentUser) {
+      // Add logout action
+      addUserAction(currentUser.id, 'Déconnexion', 'Déconnexion réussie', 'auth');
     }
-    return currentUser.role === role || currentUser.role === 'admin' || currentUser.role === 'directeur_general';
+    setCurrentUser(null);
+    localStorage.removeItem('currentUser');
   };
 
-  const hasAccess = (module: string): boolean => {
-    if (!currentUser) return false;
-    if (currentUser.role === 'admin' || currentUser.role === 'directeur_general') return true;
-    
-    const allowedModules = ROLE_ACCESS_MAP[currentUser.role] || [];
-    return allowedModules.includes(module);
+  // Get all users
+  const getAllUsers = () => {
+    return mockUsers;
   };
 
-  const createUser = async (userData: Omit<User, "id">): Promise<boolean> => {
-    // Simulate a delay for API call
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Get user by ID
+  const getUserById = (id: string) => {
+    return mockUsers.find(user => user.id === id);
+  };
 
-    const newUser = { 
-      ...userData, 
-      id: (users.length + 1).toString(),
+  // Create user
+  const createUser = async (user: Omit<User, 'id'>) => {
+    const newUser: User = {
+      id: generateId(),
+      ...user,
+      password: 'password', // Default password
+      actions: []
     };
+    mockUsers.push(newUser);
 
-    const updatedUsers = [...users, newUser];
-    setUsers(updatedUsers);
-    localStorage.setItem('certif_users', JSON.stringify(updatedUsers));
-    
+    // Add creation action
+    addUserAction(newUser.id, 'Création de compte', `Compte créé avec le rôle ${newUser.role}`, 'user-management');
     return true;
   };
 
-  const getAllUsers = (): User[] => {
-    return users;
+  // Check if user has access to a module
+  const hasAccess = (moduleName: string) => {
+    if (!currentUser) return false;
+    return currentUser.permissions?.includes(moduleName) || currentUser.permissions?.includes('*');
+  };
+
+  // Add user action
+  const addUserAction = (userId: string, action: string, details: string, module: string) => {
+    const user = mockUsers.find(user => user.id === userId);
+    if (user) {
+      const newAction = {
+        id: generateId(),
+        userId: userId,
+        date: new Date().toISOString(),
+        action: action,
+        details: details,
+        module: module
+      };
+      user.actions = [...(user.actions || []), newAction];
+    }
+  };
+
+  // Get user actions
+  const getUserActions = (userId: string) => {
+    const user = mockUsers.find(user => user.id === userId);
+    return user?.actions || [];
+  };
+
+  // Ajouter le contexte pour le compte producteur
+  const createProducteurAccount = (dossier: Dossier) => {
+    const newUser: User = {
+      id: generateId(),
+      name: dossier.operateurNom,
+      email: `${dossier.operateurNom.toLowerCase().replace(/\s+/g, '.')}@producteur.anor.cm`,
+      role: 'producteur',
+      password: 'password',
+      producteurDossierId: dossier.id,
+      permissions: ['dashboard'],
+      actions: []
+    };
+    
+    mockUsers.push(newUser);
+    return newUser;
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      currentUser, 
-      isAuthenticated, 
-      login, 
-      logout, 
-      hasRole, 
-      hasAccess, 
+    <AuthContext.Provider value={{
+      currentUser,
+      login,
+      logout,
+      getAllUsers,
+      getUserById,
       createUser,
-      getAllUsers
+      hasAccess,
+      getUserActions,
+      createProducteurAccount
     }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
+// Custom hook to use the AuthContext
 export const useAuth = () => useContext(AuthContext);

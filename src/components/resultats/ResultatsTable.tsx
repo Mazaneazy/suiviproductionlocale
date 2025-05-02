@@ -13,7 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { AlertCircle, DownloadCloud } from 'lucide-react';
+import { AlertCircle, DownloadCloud, FileText } from 'lucide-react';
+import DossierDetailsDialog from '../dossiers/DossierDetailsDialog';
 
 interface ResultatsTableProps {
   filteredCertificats: Certificat[];
@@ -118,6 +119,8 @@ const ResultatsTable: React.FC<ResultatsTableProps> = ({
                 </TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
+                    <DossierDetailsDialog dossierId={certificat.dossierId} />
+                    
                     {certificat.status === 'actif' && canCreateDocuments && (
                       <Button 
                         variant="outline" 

@@ -28,7 +28,7 @@ const Login = () => {
       if (success) {
         toast({
           title: "Connexion réussie",
-          description: "Bienvenue dans l'application CertifFlow.",
+          description: "Bienvenue dans le système de certification des produits locaux.",
         });
         navigate('/dashboard');
       } else {
@@ -56,17 +56,18 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-certif-lightgray flex items-center justify-center p-4">
+    <div className="min-h-screen bg-cover bg-center flex items-center justify-center p-4" 
+         style={{ backgroundImage: `url('/lovable-uploads/e93b38b9-1b6c-44f8-b92e-16075ea91ea2.png')` }}>
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <FileCheck size={60} className="text-certif-green" />
+            <img src="/lovable-uploads/b3a4f946-cb80-4ff5-9096-718b92e2e94a.png" alt="Logo ANOR" className="h-24" />
           </div>
-          <h1 className="text-3xl font-bold text-certif-blue">CertifFlow</h1>
-          <p className="text-gray-500 mt-2">Système de gestion des certifications</p>
+          <h1 className="text-3xl font-bold text-white">Certification des Produits Locaux</h1>
+          <p className="text-white/80 mt-2">Système de gestion des certifications - ANOR</p>
         </div>
 
-        <Card>
+        <Card className="backdrop-blur-md bg-white/90">
           <CardHeader>
             <CardTitle className="text-xl font-semibold text-center">Connexion</CardTitle>
           </CardHeader>

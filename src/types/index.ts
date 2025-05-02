@@ -1,62 +1,27 @@
-
-export type UserRole = 'admin' | 'acceuil' | 'inspecteur' | 'analyste' | 'surveillant' | 'comptable' | 'directeur' | 'responsable_technique' | 'chef_mission' | 'certificats' | 'directeur_general' | 'gestionnaire';
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: UserRole;
-  avatar?: string;
-}
-
 export interface Dossier {
   id: string;
   operateurNom: string;
   promoteurNom: string;
   telephone: string;
   typeProduit: string;
-  dateTransmission: string;
   responsable: string;
-  status: 'complet' | 'en_attente' | 'rejete' | 'en_cours' | 'certifie' | 'a_corriger';
-  delai: number; // délai en jours
+  dateTransmission: string;
+  status: 'en_attente' | 'en_cours' | 'complet' | 'rejete' | 'certifie' | 'a_corriger';
+  delai: number;
   dateButoir: string;
-  documents?: DocumentDossier[];
-  parametresEvaluation?: string[];
-  commentaires?: string;
   historique?: HistoriqueEvenement[];
-}
-
-export interface DocumentDossier {
-  id: string;
-  dossierId: string;
-  type: 'registre_commerce' | 'carte_contribuable' | 'processus_production' | 'certificats_conformite' | 'liste_personnel' | 'plan_localisation';
-  nom: string;
-  url: string;
-  dateUpload: string;
-  status?: 'valide' | 'rejete' | 'en_attente';
-  commentaire?: string;
+  parametresEvaluation?: string[];
 }
 
 export interface NoteFrais {
   id: string;
   dossierId: string;
   inspecteurId: string;
-  dateCreation: string;
-  deplacement: number;
-  hebergement: number;
-  restauration: number;
-  indemnites: number;
-  status: 'en_attente' | 'validee' | 'rejetee';
-  commentaire?: string;
-  fichierUrl?: string;
-  notificationEnvoyee?: boolean;
-  operateurNotifie?: boolean;
-  fraisGestion?: number;
-  fraisInspection?: number;
-  fraisAnalyses?: number;
-  fraisSurveillance?: number;
+  date: string;
+  description: string;
+  montant: number;
+  status: 'en_attente' | 'valide' | 'rejete';
   total?: number;
-  validePar?: string;
 }
 
 export interface Inspection {
@@ -66,11 +31,7 @@ export interface Inspection {
   lieu: string;
   inspecteurs: string[];
   resultat: 'conforme' | 'non_conforme' | 'en_attente';
-  recommandations?: string;
-  actionsCorrectives?: string;
-  rapportUrl?: string;
-  avisResponsableTechnique?: 'favorable' | 'defavorable' | 'en_attente';
-  commentaireResponsableTechnique?: string;
+  notes?: string;
 }
 
 export interface Certificat {
@@ -82,16 +43,22 @@ export interface Certificat {
   dateDelivrance: string;
   dateExpiration: string;
   status: 'actif' | 'suspendu' | 'retire' | 'expire';
+  resultatConformite?: ResultatConformite;
+}
+
+export interface ResultatConformite {
+  id: string;
+  certificatId: string;
+  dateEvaluation: string;
+  conclusion: string;
+  rapport: string;
 }
 
 export interface Notification {
   id: string;
-  userId: string;
   message: string;
-  type: 'info' | 'warning' | 'alert';
-  lue: boolean;
   date: string;
-  link?: string;
+  lue: boolean;
 }
 
 export interface Statistique {
@@ -99,7 +66,17 @@ export interface Statistique {
   dossiersCertifies: number;
   dossiersEnCours: number;
   dossiersRejetes: number;
-  delaiMoyenTraitement: number; // en jours
+  delaiMoyenTraitement: number;
+}
+
+export interface DocumentDossier {
+  id: string;
+  dossierId: string;
+  nom: string;
+  type: string;
+  dateUpload: string;
+  url: string;
+  status?: 'valide' | 'rejete' | 'en_attente';
 }
 
 export interface HistoriqueEvenement {
@@ -111,15 +88,25 @@ export interface HistoriqueEvenement {
   commentaire?: string;
 }
 
-export interface ResultatConformite {
+export type UserRole = 'admin' | 'acceuil' | 'inspecteur' | 'certificats' | 'analyste' | 'comptable' | 'responsable_technique' | 'chef_mission' | 'surveillant' | 'directeur' | 'directeur_general' | 'gestionnaire' | 'producteur';
+
+export interface User {
   id: string;
-  dossierId: string;
-  type: 'certificat' | 'non_conformite' | 'actions_correctives';
-  dateCreation: string;
-  creePar: string;
-  valide: boolean;
-  validePar?: string;
-  dateValidation?: string;
-  contenu: string;
-  fichierUrl?: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatar?: string;
+  password?: string; // Only used for mock authentication
+  permissions?: string[];
+  actions?: UserAction[];
+  producteurDossierId?: string; // ID du dossier associé au compte producteur
+}
+
+export interface UserAction {
+  id: string;
+  userId: string;
+  date: string;
+  action: string;
+  details: string;
+  module: string;
 }

@@ -32,7 +32,7 @@ const Certificats = () => {
   return (
     <Layout>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-certif-blue">Résultats d'évaluation</h1>
+        <h1 className="text-3xl font-bold text-certif-blue">Certificats émis</h1>
         {canCreateDocuments && (
           <CreateResultDialog 
             dialogOpen={dialogOpen}
