@@ -142,12 +142,15 @@ export const useDossierForm = (
       }));
     
     // Add documents to the dossier
-    setNewDossier((prevDossier) => ({
+    setNewDossier(prevDossier => ({
       ...prevDossier,
       documents: documentObjects
     }));
     
-    onSubmit();
+    // Call onSubmit after updating the state
+    setTimeout(() => {
+      onSubmit();
+    }, 0);
   };
   
   return {
