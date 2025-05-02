@@ -8,6 +8,7 @@ import DossierStatusField from './fields/DossierStatusField';
 import DocumentFields from './fields/DocumentFields';
 import { useDossierForm } from './hooks/useDossierForm';
 import { Separator } from '@/components/ui/separator';
+import { Check } from 'lucide-react';
 
 interface DossierFormProps {
   newDossier: Omit<Dossier, 'id'>;
@@ -66,6 +67,7 @@ const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierF
           Annuler
         </Button>
         <Button onClick={handleAddDossier} className="bg-certif-green hover:bg-certif-green/90">
+          <Check className="mr-1 h-4 w-4" />
           Enregistrer
         </Button>
       </div>
