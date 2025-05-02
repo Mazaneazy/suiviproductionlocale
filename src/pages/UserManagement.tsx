@@ -35,7 +35,7 @@ import { UserRound, PlusCircle, Search, FileText } from 'lucide-react';
 import { User, UserRole } from '../types';
 
 const UserManagement = () => {
-  const { getAllUsers, createUser, getUserActions } = useAuth();
+  const { getAllUsers, createUser } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>(getAllUsers());
@@ -136,11 +136,6 @@ const UserManagement = () => {
     roleLabels[user.role]?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Compter le nombre d'actions par utilisateur
-  const getActionCount = (userId: string) => {
-    return getUserActions(userId).length;
-  };
-
   return (
     <Layout>
       <div className="flex justify-between items-center mb-6">
@@ -179,6 +174,20 @@ const UserManagement = () => {
                   type="email"
                   value={newUser.email}
                   onChange={handleInputChange}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="avatar" className="text-right font-medium text-sm">
+                  URL Photo
+                </label>
+                <Input
+                  id="avatar"
+                  name="avatar"
+                  type="url"
+                  value={newUser.avatar}
+                  onChange={handleInputChange}
+                  placeholder="https://exemple.com/photo.jpg"
                   className="col-span-3"
                 />
               </div>
@@ -230,7 +239,6 @@ const UserManagement = () => {
                 <TableHead>Nom</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Rôle</TableHead>
-                <TableHead>Actions système</TableHead>
                 <TableHead>Détails</TableHead>
               </TableRow>
             </TableHeader>
@@ -239,9 +247,17 @@ const UserManagement = () => {
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center space-x-2">
-                      <div className="bg-gray-100 p-1 rounded-full">
-                        <UserRound size={20} className="text-gray-500" />
-                      </div>
+                      {user.avatar ? (
+                        <img 
+                          src={user.avatar} 
+                          alt={user.name} 
+                          className="h-6 w-6 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="bg-gray-100 p-1 rounded-full">
+                          <UserRound size={20} className="text-gray-500" />
+                        </div>
+                      )}
                       <span>{user.name}</span>
                     </div>
                   </TableCell>
@@ -249,11 +265,6 @@ const UserManagement = () => {
                   <TableCell>
                     <Badge variant="outline" className="font-normal">
                       {roleLabels[user.role] || user.role}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">
-                      {getActionCount(user.id)} actions
                     </Badge>
                   </TableCell>
                   <TableCell>
