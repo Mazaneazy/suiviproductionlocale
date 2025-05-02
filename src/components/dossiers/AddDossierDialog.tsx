@@ -85,7 +85,7 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
               onCancel={closeDialog}
             />
             
-            <DialogFooter className="flex justify-between mt-4">
+            <div className="flex justify-end space-x-2 mt-6 pb-2">
               <Button 
                 onClick={handleSubmit} 
                 disabled={!isFormValid}
@@ -97,7 +97,7 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
               <Button variant="outline" onClick={closeDialog}>
                 Annuler
               </Button>
-            </DialogFooter>
+            </div>
           </>
         )}
       </DialogContent>
