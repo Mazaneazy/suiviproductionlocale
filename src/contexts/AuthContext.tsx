@@ -1,26 +1,13 @@
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { User, UserRole } from '../types';
+import React, { createContext, useState, useEffect } from 'react';
+import { User, UserRole, Dossier } from '@/types';
 import { generateId } from './data/utils';
-import { Dossier } from '../types';
-
-// Define the AuthContext type
-interface AuthContextProps {
-  currentUser: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  getAllUsers: () => User[];
-  getUserById: (id: string) => User | undefined;
-  createUser: (user: Omit<User, 'id'>) => Promise<boolean>;
-  hasAccess: (moduleName: string) => boolean;
-  hasRole: (roles: UserRole | UserRole[]) => boolean; 
-  isAuthenticated: boolean; 
-  getUserActions: (userId: string) => any[];
-  createProducteurAccount: (dossier: Dossier) => User;
-}
+import { MOCK_USERS } from '@/data/mockUsers';
+import { rolePermissionsMap, moduleNames } from '@/constants/authConstants';
+import { AuthContextProps } from './AuthContextTypes';
 
 // Create the context with default values
-const AuthContext = createContext<AuthContextProps>({
+export const AuthContext = createContext<AuthContextProps>({
   currentUser: null,
   login: async () => false,
   logout: () => {},
@@ -34,151 +21,14 @@ const AuthContext = createContext<AuthContextProps>({
   createProducteurAccount: () => ({} as User),
 });
 
-// Define role to permission mapping
-const rolePermissionsMap: Record<UserRole, string[]> = {
-  'admin': ['*'], // Admin access to all modules
-  'acceuil': ['acceuil'],
-  'inspecteur': ['inspections'],
-  'certificats': ['resultats'],
-  'analyste': ['statistiques'],
-  'comptable': ['notes-frais'],
-  'responsable_technique': ['responsable-technique'],
-  'chef_mission': ['inspections'],
-  'surveillant': ['inspections'],
-  'directeur': ['resultats'],
-  'directeur_general': ['*'], // Director general access to all modules
-  'gestionnaire': ['dossiers'],
-  'producteur': ['dashboard'] // Producteurs can only access their dashboard
-};
-
-// Module names for navigation and access control
-export const moduleNames = {
-  'acceuil': 'Poste d\'Accueil',
-  'dossiers': 'Gestion des Dossiers',
-  'inspections': 'Inspections',
-  'resultats': 'Certificats émis',
-  'statistiques': 'Statistiques',
-  'notes-frais': 'Notes de frais',
-  'responsable-technique': 'Responsable Technique',
-  'user-management': 'Gestion des utilisateurs'
-};
-
-// Mock user data (replace with a real database or API)
-const MOCK_USERS: User[] = [
-  {
-    id: '1',
-    name: 'Admin User',
-    email: 'admin@example.com',
-    role: 'admin',
-    password: 'password',
-    permissions: ['*'],
-    actions: []
-  },
-  {
-    id: '2',
-    name: 'Accueil User',
-    email: 'accueil@example.com',
-    role: 'acceuil',
-    password: 'password',
-    permissions: ['acceuil'],
-    actions: []
-  },
-  {
-    id: '3',
-    name: 'Inspecteur User',
-    email: 'inspecteur@example.com',
-    role: 'inspecteur',
-    password: 'password',
-    permissions: ['inspections'],
-    actions: []
-  },
-  {
-    id: '4',
-    name: 'Certificats User',
-    email: 'certificats@example.com',
-    role: 'certificats',
-    password: 'password',
-    permissions: ['resultats'],
-    actions: []
-  },
-    {
-    id: '5',
-    name: 'Analyste User',
-    email: 'analyste@example.com',
-    role: 'analyste',
-    password: 'password',
-    permissions: ['statistiques'],
-    actions: []
-  },
-  {
-    id: '6',
-    name: 'Comptable User',
-    email: 'comptable@example.com',
-    role: 'comptable',
-    password: 'password',
-    permissions: ['notes-frais'],
-    actions: []
-  },
-  {
-    id: '7',
-    name: 'Responsable Technique',
-    email: 'rt@example.com',
-    role: 'responsable_technique',
-    password: 'password',
-    permissions: ['responsable-technique'],
-    actions: []
-  },
-  {
-    id: '8',
-    name: 'Chef de Mission',
-    email: 'chef.mission@example.com',
-    role: 'chef_mission',
-    password: 'password',
-    permissions: ['inspections'],
-    actions: []
-  },
-  {
-    id: '9',
-    name: 'Surveillant User',
-    email: 'surveillant@example.com',
-    role: 'surveillant',
-    password: 'password',
-    permissions: ['inspections'],
-    actions: []
-  },
-  {
-    id: '10',
-    name: 'Directeur User',
-    email: 'directeur@example.com',
-    role: 'directeur',
-    password: 'password',
-    permissions: ['resultats'],
-    actions: []
-  },
-  {
-    id: '11',
-    name: 'Directeur General',
-    email: 'dg@example.com',
-    role: 'directeur_general',
-    password: 'password',
-    permissions: ['*'],
-    actions: []
-  },
-  {
-    id: '12',
-    name: 'Gestionnaire Dossiers',
-    email: 'gestionnaire@example.com',
-    role: 'gestionnaire',
-    password: 'password',
-    permissions: ['dossiers'],
-    actions: []
-  },
-];
-
-let mockUsers = [...MOCK_USERS];
+// Export module names for use in other components
+export { moduleNames } from '@/constants/authConstants';
 
 // AuthProvider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Initialize mockUsers from the imported data
+  let mockUsers = [...MOCK_USERS];
+
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const storedUser = localStorage.getItem('currentUser');
     return storedUser ? JSON.parse(storedUser) : null;
@@ -321,5 +171,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-// Custom hook to use the AuthContext
-export const useAuth = () => useContext(AuthContext);
+// Export the useAuth hook directly from this file
+export { useAuth } from '../hooks/useAuth';

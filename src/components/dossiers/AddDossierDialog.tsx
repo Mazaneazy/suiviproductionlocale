@@ -89,10 +89,6 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
     setCreateAccount(false);
   };
 
-  // Define dummy handlers to satisfy the DossierForm props requirements
-  const handleDummySubmit = () => {};
-  const handleDummyCancel = () => {};
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
@@ -124,10 +120,10 @@ const AddDossierDialog: React.FC<AddDossierDialogProps> = ({
         ) : (
           <>
             <DossierForm
-              dossier={newDossier}
-              setDossier={setNewDossier}
-              onSubmit={handleDummySubmit}
-              onCancel={handleDummyCancel}
+              newDossier={newDossier}
+              setNewDossier={setNewDossier}
+              onSubmit={() => {}}
+              onCancel={() => {}}
             />
             
             <div className="flex items-center space-x-2 my-4">
