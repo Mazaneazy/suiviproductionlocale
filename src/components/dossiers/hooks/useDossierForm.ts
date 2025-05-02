@@ -1,4 +1,3 @@
-
 import { useState, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Dossier, DocumentDossier } from '@/types';
@@ -115,21 +114,9 @@ export const useDossierForm = (
       return;
     }
     
-    // Check required documents
-    const missingDocuments = documents
-      .filter(doc => doc.required && !doc.file)
-      .map(doc => doc.label);
+    // Remove document validation check to make button work without attachments
     
-    if (missingDocuments.length > 0) {
-      toast({
-        variant: "destructive",
-        title: "Documents manquants",
-        description: `Veuillez télécharger les documents requis: ${missingDocuments.join(', ')}`,
-      });
-      return;
-    }
-    
-    // Create document objects from files
+    // Create document objects from files that exist (if any)
     const documentObjects: Omit<DocumentDossier, 'id'>[] = documents
       .filter(doc => doc.file)
       .map(doc => ({

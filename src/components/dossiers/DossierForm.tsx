@@ -32,6 +32,9 @@ const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierF
     onSubmit
   );
 
+  // Check if required fields are filled
+  const isFormValid = newDossier.operateurNom && newDossier.typeProduit;
+
   return (
     <div className="grid gap-4 py-4">
       <DossierBasicFields 
@@ -66,7 +69,11 @@ const DossierForm = ({ newDossier, setNewDossier, onSubmit, onCancel }: DossierF
         <Button variant="outline" onClick={onCancel}>
           Annuler
         </Button>
-        <Button onClick={handleAddDossier} className="bg-certif-green hover:bg-certif-green/90">
+        <Button 
+          onClick={handleAddDossier} 
+          className="bg-certif-green hover:bg-certif-green/90"
+          disabled={!isFormValid}
+        >
           <Check className="mr-1 h-4 w-4" />
           Enregistrer
         </Button>
