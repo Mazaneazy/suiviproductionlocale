@@ -3,9 +3,11 @@ import React, { useState } from 'react';
 import { DocumentDossier } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, MessageSquare, PenLine } from 'lucide-react';
 import { DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import DocumentAnnotationLayer from './DocumentAnnotationLayer';
+import DocumentComments from './DocumentComments';
 
 interface DocumentViewerProps {
   document: DocumentDossier;
@@ -16,6 +18,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document }) => {
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState('preview');
 
   // Dans un environnement réel, nous aurions un vrai lecteur PDF
   // Ici, nous simulons l'affichage d'un PDF
@@ -83,15 +86,23 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document }) => {
         </div>
       </div>
 
-      <Tabs defaultValue="preview" className="flex-1 flex flex-col">
+      <Tabs defaultValue="preview" className="flex-1 flex flex-col" value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-2">
           <TabsTrigger value="preview">Aperçu</TabsTrigger>
           <TabsTrigger value="details">Détails</TabsTrigger>
+          <TabsTrigger value="annotations" className="flex items-center gap-1">
+            <PenLine className="h-4 w-4" />
+            Annotations
+          </TabsTrigger>
+          <TabsTrigger value="comments" className="flex items-center gap-1">
+            <MessageSquare className="h-4 w-4" />
+            Commentaires
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="preview" className="flex-1 overflow-auto bg-gray-100 rounded-md p-4">
           <div 
-            className="mx-auto bg-white shadow-md flex items-center justify-center"
+            className="mx-auto bg-white shadow-md flex items-center justify-center relative"
             style={{ 
               maxWidth: `${Math.min(100, 80 * zoom)}%`, 
               minHeight: '400px',
@@ -134,6 +145,10 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document }) => {
                 </Button>
               </div>
             </div>
+            
+            {activeTab === 'annotations' && (
+              <DocumentAnnotationLayer documentId={document.id} />
+            )}
           </div>
         </TabsContent>
 
@@ -195,6 +210,29 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document }) => {
               </div>
             </div>
           </div>
+        </TabsContent>
+        
+        <TabsContent value="annotations" className="bg-white rounded-md p-4">
+          <div className="flex flex-col h-full">
+            <p className="text-sm text-gray-500 mb-4">
+              Utilisez les outils d'annotation pour marquer des éléments importants sur le document.
+              Pour ajouter une annotation, cliquez sur l'aperçu du document.
+            </p>
+            <div className="flex-1">
+              <Button 
+                variant="default" 
+                size="sm" 
+                onClick={() => setActiveTab('preview')}
+                className="mb-4"
+              >
+                Retour à l'aperçu avec les annotations
+              </Button>
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="comments" className="bg-white rounded-md p-4">
+          <DocumentComments documentId={document.id} />
         </TabsContent>
       </Tabs>
     </div>
