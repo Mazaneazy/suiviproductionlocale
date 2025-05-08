@@ -1,9 +1,9 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useData } from '@/contexts/DataContext';
 import { useNavigate } from 'react-router-dom';
 import { DocumentUpload } from './DocumentsSection';
+import { getDefaultDocumentsList } from '@/utils/documentUtils';
 
 export const useDossierForm = () => {
   const navigate = useNavigate();
@@ -15,14 +15,8 @@ export const useDossierForm = () => {
   const [telephone, setTelephone] = useState('');
   const [produits, setProduits] = useState('');
   
-  const [documents, setDocuments] = useState<DocumentUpload[]>([
-    { type: 'registre_commerce', file: null, label: 'Registre de Commerce', required: true },
-    { type: 'carte_contribuable', file: null, label: 'Carte de Contribuable (NIU)', required: true },
-    { type: 'processus_production', file: null, label: 'Schéma du processus de production', required: true },
-    { type: 'certificats_conformite', file: null, label: 'Certificats de Conformité', required: false },
-    { type: 'liste_personnel', file: null, label: 'Liste du personnel (sur papier entête)', required: true },
-    { type: 'plan_localisation', file: null, label: 'Plan de localisation', required: true },
-  ]);
+  // Now use the utility function to get the default documents list
+  const [documents, setDocuments] = useState<DocumentUpload[]>(getDefaultDocumentsList());
 
   const handleDocumentChange = (type: string, file: File | null) => {
     setDocuments(documents.map(doc => 

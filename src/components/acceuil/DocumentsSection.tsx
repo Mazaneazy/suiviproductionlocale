@@ -1,6 +1,6 @@
 
 import React from 'react';
-import DocumentUploadItem, { DocumentUploadProps } from './DocumentUploadItem';
+import DocumentUploadItem from './DocumentUploadItem';
 
 export interface DocumentUpload {
   type: 'registre_commerce' | 'carte_contribuable' | 'processus_production' | 'certificats_conformite' | 'liste_personnel' | 'plan_localisation';
