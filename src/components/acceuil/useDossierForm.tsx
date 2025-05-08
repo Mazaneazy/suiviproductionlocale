@@ -5,6 +5,7 @@ import { useData } from '@/contexts/DataContext';
 import { useNavigate } from 'react-router-dom';
 import { DocumentUpload } from './DocumentsSection';
 import { getDefaultDocumentsList } from '@/utils/documentUtils';
+import { doesCompanyNameExist, generateDossierReference } from '@/utils/dossierUtils';
 
 export const useDossierForm = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export const useDossierForm = () => {
   const [produits, setProduits] = useState('');
   const [email, setEmail] = useState('');
   const [adresse, setAdresse] = useState('');
+  const [reference, setReference] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Utiliser la fonction utilitaire pour obtenir la liste des documents par défaut
@@ -28,8 +30,25 @@ export const useDossierForm = () => {
     ));
   };
 
+  // Vérifier si le nom d'entreprise existe déjà
+  const validateEntrepriseName = (name: string): boolean => {
+    if (doesCompanyNameExist(name)) {
+      toast({
+        variant: "destructive",
+        title: "Erreur d'enregistrement",
+        description: `Une entreprise avec le nom "${name}" existe déjà dans le système.`,
+      });
+      return false;
+    }
+    return true;
+  };
+
   // Fonction pour créer un nouveau dossier à partir des données du formulaire
   const createDossierObject = () => {
+    // Générer une référence unique pour ce dossier
+    const dossierReference = generateDossierReference();
+    setReference(dossierReference);
+    
     // Créer des objets de document à partir des fichiers
     const documentObjects = documents
       .filter(doc => doc.file)
@@ -40,6 +59,7 @@ export const useDossierForm = () => {
         nom: doc.file!.name,
         url: URL.createObjectURL(doc.file!),  // Dans une vraie application, cela serait téléchargé sur un serveur
         dateUpload: new Date().toISOString(),
+        status: 'en_attente' as const
       }));
     
     // Créer l'objet dossier
@@ -50,6 +70,7 @@ export const useDossierForm = () => {
       email: email || undefined,
       adresse: adresse || undefined,
       typeProduit: produits,
+      reference: dossierReference,
       dateTransmission: new Date().toISOString().split('T')[0],
       responsable: 'Responsable Technique',
       status: 'en_attente' as const,
@@ -71,6 +92,11 @@ export const useDossierForm = () => {
         title: "Champ obligatoire manquant",
         description: "Veuillez au moins saisir le nom de l'entreprise.",
       });
+      return;
+    }
+    
+    // Vérifier que le nom d'entreprise est unique
+    if (!validateEntrepriseName(entreprise)) {
       return;
     }
     
@@ -99,6 +125,13 @@ export const useDossierForm = () => {
           title: "Formulaire incomplet",
           description: "Veuillez remplir tous les champs obligatoires.",
         });
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Vérifier que le nom d'entreprise est unique
+      if (!validateEntrepriseName(entreprise)) {
+        setIsSubmitting(false);
         return;
       }
       
@@ -113,6 +146,7 @@ export const useDossierForm = () => {
           title: "Documents manquants",
           description: `Veuillez télécharger les documents requis: ${missingDocuments.join(', ')}`,
         });
+        setIsSubmitting(false);
         return;
       }
       
@@ -167,6 +201,7 @@ export const useDossierForm = () => {
     adresse,
     setAdresse,
     documents,
+    reference,
     handleDocumentChange,
     handleSave,
     handleSubmit,

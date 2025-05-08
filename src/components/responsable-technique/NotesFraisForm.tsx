@@ -1,13 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
 import { useData } from '@/contexts/DataContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { Dossier } from '@/types';
+import { useParametresEvaluation } from '@/hooks/useParametresEvaluation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Dossier } from '@/types';
+import { FileCog } from 'lucide-react';
+import ParametresEvaluationSection from './parametres/ParametresEvaluationSection';
 
 interface NotesFraisFormProps {
   dossier: Dossier;
@@ -15,177 +18,185 @@ interface NotesFraisFormProps {
 }
 
 const NotesFraisForm: React.FC<NotesFraisFormProps> = ({ dossier, onNoteFraisCreated }) => {
+  const { toast } = useToast();
   const { addNoteFrais } = useData();
-  const { currentUser } = useAuth();
   
-  const [noteFrais, setNoteFrais] = useState({
-    fraisGestion: 50000,
-    fraisInspection: 100000,
-    fraisAnalyses: 75000,
-    fraisSurveillance: 60000,
-    commentaire: '',
-  });
+  const {
+    parametres,
+    selectedParametres,
+    totalPrix,
+    addParametre,
+    removeParametre,
+    toggleParametre
+  } = useParametresEvaluation(dossier.id);
   
+  const [fraisGestion, setFraisGestion] = useState(50000);
+  const [fraisInspection, setFraisInspection] = useState(75000);
+  const [fraisSurveillance, setFraisSurveillance] = useState(40000);
   const [total, setTotal] = useState(0);
+  const [description, setDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Calcul du total
+  // Calculer le total
   useEffect(() => {
-    const calculatedTotal = 
-      (noteFrais.fraisGestion || 0) + 
-      (noteFrais.fraisInspection || 0) + 
-      (noteFrais.fraisAnalyses || 0) + 
-      (noteFrais.fraisSurveillance || 0);
-    
-    setTotal(calculatedTotal);
-  }, [noteFrais]);
+    const newTotal = totalPrix + fraisGestion + fraisInspection + fraisSurveillance;
+    setTotal(newTotal);
+  }, [totalPrix, fraisGestion, fraisInspection, fraisSurveillance]);
   
-  // Mettre à jour les valeurs de la note de frais
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
     
-    if (name === 'commentaire') {
-      setNoteFrais({ ...noteFrais, commentaire: value });
-    } else {
-      const numValue = value === '' ? 0 : parseInt(value);
-      setNoteFrais({ ...noteFrais, [name]: numValue });
+    if (selectedParametres.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Aucun paramètre sélectionné",
+        description: "Veuillez sélectionner au moins un paramètre à évaluer.",
+      });
+      setIsSubmitting(false);
+      return;
+    }
+    
+    try {
+      // Créer la note de frais
+      const newNoteFrais = {
+        dossierId: dossier.id,
+        inspecteurId: 'resp_technique',
+        date: new Date().toISOString().split('T')[0],
+        dateCreation: new Date().toISOString(),
+        description: description || `Note de frais pour le dossier ${dossier.operateurNom}`,
+        montant: total,
+        status: 'en_attente' as const,
+        parametresEvaluation: selectedParametres,
+        fraisGestion,
+        fraisInspection,
+        fraisAnalyses: totalPrix,
+        fraisSurveillance,
+        acquitte: false
+      };
+      
+      addNoteFrais(newNoteFrais);
+      
+      // Mise à jour du dossier avec les paramètres d'évaluation sélectionnés
+      // Cette partie serait normalement gérée par updateDossier, mais pour simplifier
+      
+      toast({
+        title: "Note de frais créée",
+        description: "La note de frais a été créée avec succès. Elle sera transmise au Directeur pour validation.",
+      });
+      
+      onNoteFraisCreated();
+    } catch (error) {
+      console.error("Erreur lors de la création de la note de frais:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la création de la note de frais.",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
-  // Soumettre la note de frais
-  const handleSubmit = () => {
-    if (!currentUser) return;
-    
-    addNoteFrais({
-      dossierId: dossier.id,
-      inspecteurId: currentUser.id,
-      date: new Date().toISOString().split('T')[0],
-      description: `Frais pour certification ${dossier.typeProduit}`,
-      montant: total,
-      status: 'en_attente',
-      deplacement: 0,
-      hebergement: 0,
-      restauration: 0,
-      indemnites: 0,
-      fraisGestion: noteFrais.fraisGestion,
-      fraisInspection: noteFrais.fraisInspection,
-      fraisAnalyses: noteFrais.fraisAnalyses,
-      fraisSurveillance: noteFrais.fraisSurveillance,
-      commentaire: noteFrais.commentaire || undefined,
-    });
-    
-    onNoteFraisCreated();
-  };
-  
-  // Formatter les montants en FCFA
-  const formatMontant = (montant: number) => {
-    return montant.toLocaleString() + ' FCFA';
-  };
-  
   return (
-    <div className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <ParametresEvaluationSection
+        parametres={parametres}
+        selectedParametres={selectedParametres}
+        onAddParametre={addParametre}
+        onRemoveParametre={removeParametre}
+        onToggleParametre={toggleParametre}
+      />
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="font-medium mb-4">Détails du dossier</h3>
-              <div className="space-y-2">
-                <div>
-                  <span className="text-sm text-gray-500">Opérateur:</span>
-                  <p className="font-medium">{dossier.operateurNom}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-500">Produit:</span>
-                  <p>{dossier.typeProduit}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-500">Paramètres à évaluer:</span>
-                  <ul className="list-disc list-inside text-sm pl-2">
-                    {dossier.parametresEvaluation?.map((param, index) => (
-                      <li key={index}>{param}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <h3 className="text-lg font-medium text-certif-blue mb-4">Frais additionnels</h3>
+          <Card className="p-4 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="fraisGestion">Frais de gestion (FCFA)</Label>
               <Input
                 id="fraisGestion"
-                name="fraisGestion"
                 type="number"
-                value={noteFrais.fraisGestion}
-                onChange={handleChange}
+                value={fraisGestion}
+                onChange={(e) => setFraisGestion(Number(e.target.value))}
               />
-              <p className="text-xs text-gray-500">{formatMontant(noteFrais.fraisGestion)}</p>
             </div>
+            
             <div className="space-y-2">
-              <Label htmlFor="fraisInspection">Inspection et échantillonnage (FCFA)</Label>
+              <Label htmlFor="fraisInspection">Frais d'inspection et échantillonage (FCFA)</Label>
               <Input
                 id="fraisInspection"
-                name="fraisInspection"
                 type="number"
-                value={noteFrais.fraisInspection}
-                onChange={handleChange}
+                value={fraisInspection}
+                onChange={(e) => setFraisInspection(Number(e.target.value))}
               />
-              <p className="text-xs text-gray-500">{formatMontant(noteFrais.fraisInspection)}</p>
             </div>
+            
             <div className="space-y-2">
-              <Label htmlFor="fraisAnalyses">Analyses et essais (FCFA)</Label>
-              <Input
-                id="fraisAnalyses"
-                name="fraisAnalyses"
-                type="number"
-                value={noteFrais.fraisAnalyses}
-                onChange={handleChange}
-              />
-              <p className="text-xs text-gray-500">{formatMontant(noteFrais.fraisAnalyses)}</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="fraisSurveillance">Surveillance (FCFA)</Label>
+              <Label htmlFor="fraisSurveillance">Frais de surveillance (FCFA)</Label>
               <Input
                 id="fraisSurveillance"
-                name="fraisSurveillance"
                 type="number"
-                value={noteFrais.fraisSurveillance}
-                onChange={handleChange}
+                value={fraisSurveillance}
+                onChange={(e) => setFraisSurveillance(Number(e.target.value))}
               />
-              <p className="text-xs text-gray-500">{formatMontant(noteFrais.fraisSurveillance)}</p>
             </div>
-          </div>
+          </Card>
+        </div>
+        
+        <div>
+          <h3 className="text-lg font-medium text-certif-blue mb-4">Récapitulatif</h3>
+          <Card className="p-4 space-y-4">
+            <div className="space-y-4">
+              <div className="flex justify-between border-b pb-2">
+                <span>Analyses et essais:</span>
+                <span className="font-medium">{totalPrix.toLocaleString()} FCFA</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span>Frais de gestion:</span>
+                <span>{fraisGestion.toLocaleString()} FCFA</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span>Inspection et échantillonage:</span>
+                <span>{fraisInspection.toLocaleString()} FCFA</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span>Frais de surveillance:</span>
+                <span>{fraisSurveillance.toLocaleString()} FCFA</span>
+              </div>
+              <div className="flex justify-between font-bold text-lg text-certif-blue">
+                <span>Total:</span>
+                <span>{total.toLocaleString()} FCFA</span>
+              </div>
+            </div>
+          </Card>
           
-          <div className="p-4 bg-gray-100 rounded-lg flex justify-between items-center">
-            <span className="font-medium">Total:</span>
-            <span className="font-bold text-lg">{formatMontant(total)}</span>
+          <div className="mt-4 space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Description de la note de frais"
+              className="h-24"
+            />
           </div>
         </div>
       </div>
       
-      <div className="space-y-2">
-        <Label htmlFor="commentaire">Commentaires</Label>
-        <Textarea
-          id="commentaire"
-          name="commentaire"
-          value={noteFrais.commentaire}
-          onChange={handleChange}
-          placeholder="Ajouter des commentaires ou instructions spécifiques"
-          rows={3}
-        />
-      </div>
-      
-      <div className="flex justify-end">
-        <Button 
-          className="bg-certif-blue hover:bg-certif-blue/90"
-          onClick={handleSubmit}
-        >
-          Transmettre la note de frais au Directeur
+      <div className="flex justify-end pt-4 border-t">
+        <Button type="submit" disabled={isSubmitting} className="bg-certif-green hover:bg-certif-green/90">
+          {isSubmitting ? (
+            <>Création en cours...</>
+          ) : (
+            <>
+              <FileCog className="mr-2" size={16} />
+              Créer la note de frais
+            </>
+          )}
         </Button>
       </div>
-    </div>
+    </form>
   );
 };
 

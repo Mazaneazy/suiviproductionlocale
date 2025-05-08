@@ -1,17 +1,15 @@
 
 import { DocumentDossier } from '@/types';
 
-/**
- * Hook providing document validation functionality
- */
 export function useDocumentValidation() {
-  /**
-   * Vérifie si les documents requis sont présents et valides
-   */
+  // Vérifier que les documents requis sont présents
   const checkRequiredDocuments = (
-    dossierId: string,
+    dossierId: string, 
     getDocumentsByDossierId: (id: string) => DocumentDossier[]
-  ): { isComplete: boolean, missingTypes: string[] } => {
+  ) => {
+    const documents = getDocumentsByDossierId(dossierId);
+    
+    // Liste des types de documents requis
     const requiredTypes = [
       'registre_commerce',
       'carte_contribuable',
@@ -20,29 +18,29 @@ export function useDocumentValidation() {
       'plan_localisation'
     ];
     
-    const dossierDocuments = getDocumentsByDossierId(dossierId);
-    const validDocuments = dossierDocuments.filter(doc => doc.status === 'valide');
-    
-    const presentTypes = validDocuments.map(doc => doc.type);
-    const missingTypes = requiredTypes.filter(type => !presentTypes.includes(type));
+    // Vérifier que chaque type de document requis est présent
+    const missingDocuments = requiredTypes.filter(type => 
+      !documents.some(doc => doc.type === type)
+    );
     
     return {
-      isComplete: missingTypes.length === 0,
-      missingTypes
+      isComplete: missingDocuments.length === 0,
+      missingDocuments
     };
   };
 
-  /**
-   * Récupère tous les documents pour un type spécifique dans un dossier
-   */
+  // Obtenir les documents par type
   const getDocumentsByType = (
-    dossierId: string,
+    dossierId: string, 
     documentType: string,
     getDocumentsByDossierId: (id: string) => DocumentDossier[]
-  ): DocumentDossier[] => {
-    const dossierDocuments = getDocumentsByDossierId(dossierId);
-    return dossierDocuments.filter(doc => doc.type === documentType);
+  ) => {
+    const documents = getDocumentsByDossierId(dossierId);
+    return documents.filter(doc => doc.type === documentType);
   };
-  
-  return { checkRequiredDocuments, getDocumentsByType };
+
+  return {
+    checkRequiredDocuments,
+    getDocumentsByType
+  };
 }

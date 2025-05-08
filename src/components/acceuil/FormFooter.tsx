@@ -13,7 +13,7 @@ const FormFooter: React.FC<FormFooterProps> = ({ onSave, isSubmitting = false })
   const navigate = useNavigate();
 
   return (
-    <div className="flex justify-end space-x-2">
+    <div className="flex justify-end space-x-2 w-full">
       <Button type="button" variant="outline" onClick={() => navigate('/dossiers')}>
         Annuler
       </Button>
@@ -24,8 +24,17 @@ const FormFooter: React.FC<FormFooterProps> = ({ onSave, isSubmitting = false })
         disabled={isSubmitting}
         className="bg-blue-500 hover:bg-blue-600 text-white"
       >
-        <Save className="mr-2" size={16} />
-        Enregistrer
+        {isSubmitting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Enregistrement...
+          </>
+        ) : (
+          <>
+            <Save className="mr-2" size={16} />
+            Enregistrer
+          </>
+        )}
       </Button>
       <Button 
         type="submit" 
