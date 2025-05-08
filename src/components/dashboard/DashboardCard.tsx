@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { DragHandleDots2Icon } from '@radix-ui/react-icons';
+import { DotFilledIcon, DragHandleDots2Icon } from '@radix-ui/react-icons';
 
 interface DashboardCardProps {
   type: string;
