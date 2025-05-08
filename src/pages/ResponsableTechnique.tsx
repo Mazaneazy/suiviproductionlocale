@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import { useData } from '../contexts/DataContext';
@@ -31,7 +30,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const ResponsableTechnique = () => {
-  const { dossiers, getDocumentsByDossierId, getNotesFraisByDossierId, updateNoteFrais, updateDossier, inspections, addInspection } = useData();
+  const { dossiers, getDocumentsByDossierId, getNoteFraisByDossierId, updateNoteFrais, updateDossier, inspections, addInspection } = useData();
   const { toast } = useToast();
   const { processAttachments } = useDocumentProcessing();
   
@@ -54,7 +53,7 @@ const ResponsableTechnique = () => {
     : [];
 
   const notesFrais = selectedDossierId
-    ? getNotesFraisByDossierId(selectedDossierId)
+    ? getNoteFraisByDossierId(selectedDossierId)
     : [];
 
   const dossierInspections = selectedDossierId
