@@ -19,7 +19,6 @@ import {
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/use-toast';
 import ResetPasswordDialog from '@/components/auth/ResetPasswordDialog';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 // Définition du schéma de validation
 const loginSchema = z.object({
@@ -40,7 +39,6 @@ const Login = () => {
   const navigate = useNavigate();
   const { login, getAllUsers } = useAuth();
   const { toast } = useToast();
-  const isMobile = useIsMobile();
 
   // Initialisation du formulaire avec React Hook Form et Zod
   const form = useForm<LoginFormValues>({
@@ -96,12 +94,12 @@ const Login = () => {
     <div className="min-h-screen bg-cover bg-center flex items-center justify-center p-4" 
          style={{ backgroundImage: `url('/lovable-uploads/e93b38b9-1b6c-44f8-b92e-16075ea91ea2.png')` }}>
       <div className="max-w-md w-full">
-        <div className="text-center mb-6">
+        <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <img src="/lovable-uploads/b3a4f946-cb80-4ff5-9096-718b92e2e94a.png" alt="Logo ANOR" className="h-16 md:h-24" />
+            <img src="/lovable-uploads/b3a4f946-cb80-4ff5-9096-718b92e2e94a.png" alt="Logo ANOR" className="h-24" />
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white">Certification des Produits Locaux</h1>
-          <p className="text-white/80 mt-2 text-sm md:text-base">Système de gestion des certifications - ANOR</p>
+          <h1 className="text-3xl font-bold text-white">Certification des Produits Locaux</h1>
+          <p className="text-white/80 mt-2">Système de gestion des certifications - ANOR</p>
         </div>
 
         <Card className="backdrop-blur-md bg-white/90">
@@ -128,11 +126,7 @@ const Login = () => {
                         <FormControl>
                           <Input 
                             placeholder="Adresse email"
-                            className="pl-10"
-                            type="email"
-                            inputMode="email"
-                            autoCapitalize="none"
-                            autoComplete="email" 
+                            className="pl-10" 
                             {...field} 
                           />
                         </FormControl>
@@ -154,7 +148,6 @@ const Login = () => {
                             type={showPassword ? "text" : "password"}
                             placeholder="Mot de passe" 
                             className="pl-10 pr-10"
-                            autoComplete="current-password"
                             {...field} 
                           />
                         </FormControl>
@@ -199,7 +192,7 @@ const Login = () => {
           <CardFooter className="flex flex-col">
             <div className="w-full border-t pt-4">
               <p className="text-sm text-gray-500 mb-2">Pour la démonstration, utilisez:</p>
-              <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1'} gap-2 max-h-60 overflow-y-auto`}>
+              <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto">
                 {loginExamples.map((example) => (
                   <Button 
                     key={example.role}
