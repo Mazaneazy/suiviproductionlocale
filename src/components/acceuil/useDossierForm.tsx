@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useData } from '@/contexts/DataContext';
@@ -126,7 +127,7 @@ export const useDossierForm = () => {
     setPromoteur('');
     setTelephone('');
     setProduits('');
-    setDocuments(documents.map(doc => ({ ...doc, file: null })));
+    setDocuments(getDefaultDocumentsList());
   };
 
   return {
