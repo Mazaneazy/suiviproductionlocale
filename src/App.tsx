@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Dossiers from "./pages/Dossiers";
 import Inspections from "./pages/Inspections";
+import Calendar from "./pages/Calendar";
 import Certificats from "./pages/Certificats";
 import Accueil from "./pages/Accueil";
 import ResponsableTechnique from "./pages/ResponsableTechnique";
@@ -64,6 +65,12 @@ const App = () => (
               <Route path="/inspections" element={
                 <ProtectedRoute moduleName="inspections">
                   <Inspections />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/calendar" element={
+                <ProtectedRoute moduleName="inspections">
+                  <Calendar />
                 </ProtectedRoute>
               } />
 
