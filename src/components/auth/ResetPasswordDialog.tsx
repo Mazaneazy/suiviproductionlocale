@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Form,
   FormControl,
@@ -44,6 +45,7 @@ const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
   const { resetPassword } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const isMobile = useIsMobile();
   
   const form = useForm<ResetFormValues>({
     resolver: zodResolver(resetSchema),
@@ -85,7 +87,7 @@ const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className={`${isMobile ? 'w-[95%] p-4' : 'sm:max-w-md'}`}>
         <DialogHeader>
           <DialogTitle>Réinitialisation du mot de passe</DialogTitle>
           <DialogDescription>
@@ -107,6 +109,7 @@ const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
                         placeholder="Adresse email"
                         className="pl-10" 
                         {...field} 
+                        autoComplete="email"
                       />
                     </FormControl>
                     <FormMessage />
@@ -115,18 +118,19 @@ const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
               )}
             />
             
-            <DialogFooter className="pt-4">
+            <DialogFooter className={`pt-4 ${isMobile ? 'flex-col space-y-2' : ''}`}>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isLoading}
+                className={isMobile ? 'w-full' : ''}
               >
                 Annuler
               </Button>
               <Button 
                 type="submit" 
-                className="bg-certif-blue hover:bg-certif-blue/90"
+                className={`bg-certif-blue hover:bg-certif-blue/90 ${isMobile ? 'w-full' : ''}`}
                 disabled={isLoading}
               >
                 {isLoading ? 'Envoi en cours...' : 'Envoyer les instructions'}
