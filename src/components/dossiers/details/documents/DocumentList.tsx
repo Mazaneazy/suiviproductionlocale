@@ -3,32 +3,12 @@ import React from 'react';
 import { DocumentDossier } from '@/types';
 import { File, Download, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { formatDocumentType } from '@/utils/documentTypeUtils';
 
 interface DocumentListProps {
   documents: DocumentDossier[];
   onViewDocument: (doc: DocumentDossier) => void;
 }
-
-// Helper function to format document type
-const formatDocumentType = (type: string): string => {
-  switch (type) {
-    case 'registre_commerce':
-      return 'Registre de Commerce';
-    case 'carte_contribuable':
-      return 'Carte de Contribuable';
-    case 'processus_production':
-      return 'Processus de production';
-    case 'certificats_conformite':
-      return 'Certificats';
-    case 'liste_personnel':
-      return 'Liste du personnel';
-    case 'plan_localisation':
-      return 'Plan de localisation';
-    case 'pdf':
-    default:
-      return 'Autres documents';
-  }
-};
 
 const DocumentList: React.FC<DocumentListProps> = ({ documents, onViewDocument }) => {
   return (
@@ -62,8 +42,5 @@ const DocumentList: React.FC<DocumentListProps> = ({ documents, onViewDocument }
     </div>
   );
 };
-
-// Expose the helper function for other components
-DocumentList.formatDocumentType = formatDocumentType;
 
 export default DocumentList;

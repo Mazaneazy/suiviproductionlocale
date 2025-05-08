@@ -32,3 +32,29 @@ export const determineDocumentType = (fileName: string): string => {
   
   return 'pdf'; // Type par défaut
 };
+
+/**
+ * Format document type to a user-friendly label
+ * 
+ * @param type The document type to format
+ * @returns A user-friendly string representation of the document type
+ */
+export const formatDocumentType = (type: string): string => {
+  switch (type) {
+    case 'registre_commerce':
+      return 'Registre de Commerce';
+    case 'carte_contribuable':
+      return 'Carte de Contribuable';
+    case 'processus_production':
+      return 'Processus de production';
+    case 'certificats_conformite':
+      return 'Certificats';
+    case 'liste_personnel':
+      return 'Liste du personnel';
+    case 'plan_localisation':
+      return 'Plan de localisation';
+    case 'pdf':
+    default:
+      return 'Autres documents';
+  }
+};

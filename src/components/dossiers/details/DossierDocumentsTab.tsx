@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useData } from '@/contexts/DataContext';
+import { formatDocumentType } from '@/utils/documentTypeUtils';
 
 // Import our new component files
 import DocumentViewerDialog from './documents/DocumentViewerDialog';
@@ -96,7 +97,7 @@ const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({
   // Filter documents based on search and type filter
   const filteredDocuments = docsToDisplay.filter(doc => {
     const matchesSearch = doc.nom.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                       DocumentList.formatDocumentType(doc.type).toLowerCase().includes(searchTerm.toLowerCase());
+                       formatDocumentType(doc.type).toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = typeFilter === 'tous' || doc.type === typeFilter;
     
     return matchesSearch && matchesType;
