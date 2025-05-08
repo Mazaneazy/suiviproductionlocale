@@ -1,7 +1,7 @@
 
 import { useData } from '@/contexts/DataContext';
 import { useToast } from '@/hooks/use-toast';
-import { DocumentDossier } from '@/types';
+import { DocumentDossier, RapportInspection } from '@/types';
 
 export function useDocumentProcessing() {
   const { addDocument, getDossierById, updateDocument, getDocumentsByDossierId } = useData();
@@ -173,6 +173,12 @@ export function useDocumentProcessing() {
       return 'plan_localisation';
     } else if (lowerFileName.includes('certificat') || lowerFileName.includes('conform')) {
       return 'certificats_conformite';
+    } else if (lowerFileName.includes('rapport') || lowerFileName.includes('inspect')) {
+      return 'rapport_inspection';
+    } else if (lowerFileName.includes('analyse') || lowerFileName.includes('labo')) {
+      return 'rapport_analyse';
+    } else if (lowerFileName.includes('avis') || lowerFileName.includes('technique')) {
+      return 'avis_technique';
     }
     
     return 'pdf'; // Type par défaut
@@ -205,11 +211,26 @@ export function useDocumentProcessing() {
       missingTypes
     };
   };
+  
+  // Soumettre un rapport d'inspection
+  const submitRapport = (rapport: RapportInspection) => {
+    // Dans un système réel, cette fonction appellerait une API pour sauvegarder le rapport
+    console.log("Rapport soumis:", rapport);
+    
+    // Notification de succès
+    toast({
+      title: "Rapport soumis",
+      description: "Le rapport a été soumis avec succès",
+    });
+    
+    return rapport;
+  };
 
   return { 
     processAttachments,
     updateDocumentWithMetadata,
     getDocumentsByType,
-    checkRequiredDocuments
+    checkRequiredDocuments,
+    submitRapport
   };
 }

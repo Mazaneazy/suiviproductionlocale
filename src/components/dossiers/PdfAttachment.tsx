@@ -68,7 +68,7 @@ const PdfAttachment: React.FC<PdfAttachmentProps> = ({
           <input
             id="pdf-upload"
             type="file"
-            accept="application/pdf"
+            accept="application/pdf,.pdf,.doc,.docx,.xls,.xlsx"
             multiple
             className="hidden"
             onChange={handleAttachment}

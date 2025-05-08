@@ -1,4 +1,3 @@
-
 export interface Dossier {
   id: string;
   operateurNom: string;
@@ -12,7 +11,8 @@ export interface Dossier {
   dateButoir: string;
   historique?: HistoriqueEvenement[];
   parametresEvaluation?: string[];
-  commentaires?: string; // Added property
+  commentaires?: string;
+  comiteTechnique?: ComiteTechnique;
 }
 
 export interface NoteFrais {
@@ -20,23 +20,24 @@ export interface NoteFrais {
   dossierId: string;
   inspecteurId: string;
   date: string;
-  dateCreation?: string; // Added property
+  dateCreation?: string;
   description: string;
   montant: number;
   status: 'en_attente' | 'valide' | 'rejete';
   total?: number;
-  deplacement?: number; // Added property
-  hebergement?: number; // Added property
-  restauration?: number; // Added property
-  indemnites?: number; // Added property
-  commentaire?: string; // Added property
-  fichierUrl?: string; // Added property
-  notificationEnvoyee?: boolean; // Added property
-  operateurNotifie?: boolean; // Added property
-  fraisGestion?: number; // Added property
-  fraisInspection?: number; // Added property
-  fraisAnalyses?: number; // Added property
-  fraisSurveillance?: number; // Added property
+  deplacement?: number;
+  hebergement?: number;
+  restauration?: number;
+  indemnites?: number;
+  commentaire?: string;
+  fichierUrl?: string;
+  notificationEnvoyee?: boolean;
+  operateurNotifie?: boolean;
+  fraisGestion?: number;
+  fraisInspection?: number;
+  fraisAnalyses?: number;
+  fraisSurveillance?: number;
+  acquitte?: boolean;
 }
 
 export interface Inspection {
@@ -130,4 +131,31 @@ export interface UserAction {
   action: string;
   details: string;
   module: string;
+}
+
+export interface RapportInspection {
+  id: string;
+  dossierId: string;
+  inspectionId: string;
+  date: string;
+  contenu: string;
+  fichierUrl?: string;
+  status: 'en_attente' | 'transmis' | 'valide' | 'rejete';
+  avisTechnique?: string;
+  recommandations?: string;
+}
+
+export interface ComiteTechnique {
+  id: string;
+  dossierId: string;
+  dateCreation: string;
+  chefComite: MembreComite;
+  membres: MembreComite[];
+}
+
+export interface MembreComite {
+  id: string;
+  nom: string;
+  role: 'chef' | 'inspecteur' | 'analyste' | 'expert';
+  specialite?: string;
 }
