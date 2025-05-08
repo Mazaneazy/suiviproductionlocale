@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, Upload, X, CheckCircle } from 'lucide-react';
+import { PlusCircle, Upload, X, CheckCircle, Save } from 'lucide-react';
 
 interface DocumentUpload {
   type: 'registre_commerce' | 'carte_contribuable' | 'processus_production' | 'certificats_conformite' | 'liste_personnel' | 'plan_localisation';
@@ -74,6 +74,66 @@ const AccueilForm = () => {
     }
   };
 
+  // Fonction pour créer un nouveau dossier à partir des données du formulaire
+  const createDossierObject = () => {
+    // Create document objects from files
+    const documentObjects = documents
+      .filter(doc => doc.file)
+      .map(doc => ({
+        id: Math.random().toString(36).substring(2, 11),
+        dossierId: '',  // To be filled after dossier creation
+        type: doc.type,
+        nom: doc.file!.name,
+        url: URL.createObjectURL(doc.file!),  // In a real app, this would be uploaded to a server
+        dateUpload: new Date().toISOString(),
+      }));
+    
+    // Create the dossier object
+    return {
+      operateurNom: entreprise,
+      promoteurNom: promoteur,
+      telephone,
+      typeProduit: produits,
+      dateTransmission: new Date().toISOString().split('T')[0],
+      responsable: 'Responsable Technique',
+      status: 'en_attente' as const,
+      delai: 30,
+      dateButoir: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      documents: documentObjects,
+    };
+  };
+  
+  // Nouvelle fonction pour enregistrer le dossier sans le transmettre
+  const handleSave = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // Validation de base (uniquement l'entreprise est obligatoire pour l'enregistrement)
+    if (!entreprise) {
+      toast({
+        variant: "destructive",
+        title: "Champ obligatoire manquant",
+        description: "Veuillez au moins saisir le nom de l'entreprise.",
+      });
+      return;
+    }
+    
+    // Ajouter le dossier
+    const newDossier = createDossierObject();
+    addDossier(newDossier);
+    
+    toast({
+      title: "Dossier enregistré",
+      description: "Le dossier a été enregistré avec succès.",
+    });
+    
+    // Reset form
+    setEntreprise('');
+    setPromoteur('');
+    setTelephone('');
+    setProduits('');
+    setDocuments(documents.map(doc => ({ ...doc, file: null })));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -101,32 +161,8 @@ const AccueilForm = () => {
       return;
     }
     
-    // Create document objects from files
-    const documentObjects = documents
-      .filter(doc => doc.file)
-      .map(doc => ({
-        id: Math.random().toString(36).substring(2, 11),
-        dossierId: '',  // To be filled after dossier creation
-        type: doc.type,
-        nom: doc.file!.name,
-        url: URL.createObjectURL(doc.file!),  // In a real app, this would be uploaded to a server
-        dateUpload: new Date().toISOString(),
-      }));
-    
     // Add the dossier
-    const newDossier = {
-      operateurNom: entreprise,
-      promoteurNom: promoteur,
-      telephone,
-      typeProduit: produits,
-      dateTransmission: new Date().toISOString().split('T')[0],
-      responsable: 'Responsable Technique',
-      status: 'en_attente' as const,
-      delai: 30,
-      dateButoir: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      documents: documentObjects,
-    };
-    
+    const newDossier = createDossierObject();
     addDossier(newDossier);
     
     toast({
@@ -256,6 +292,15 @@ const AccueilForm = () => {
         <CardFooter className="flex justify-end space-x-2">
           <Button type="button" variant="outline" onClick={() => navigate('/dossiers')}>
             Annuler
+          </Button>
+          <Button 
+            type="button" 
+            variant="secondary" 
+            onClick={handleSave}
+            className="bg-blue-500 hover:bg-blue-600 text-white"
+          >
+            <Save className="mr-2" size={16} />
+            Enregistrer
           </Button>
           <Button type="submit" className="bg-certif-green hover:bg-certif-green/90">
             <PlusCircle className="mr-2" size={16} />
