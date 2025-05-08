@@ -12,8 +12,18 @@ import {
   Calendar
 } from 'lucide-react';
 
-const Navigation = () => {
+interface NavigationProps {
+  onItemClick?: () => void;  // Make this prop optional
+}
+
+const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
   const { hasAccess } = useAuth();
+
+  const handleClick = () => {
+    if (onItemClick) {
+      onItemClick();
+    }
+  };
 
   const navItems = [
     {
@@ -75,6 +85,7 @@ const Navigation = () => {
                   : 'text-gray-700 hover:bg-gray-100'
               }`
             }
+            onClick={handleClick}
           >
             {item.icon}
             {item.title}
