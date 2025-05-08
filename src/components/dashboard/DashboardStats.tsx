@@ -24,8 +24,8 @@ export default function DashboardStats() {
     },
     {
       title: "Inspections planifiées",
-      // Fix: Use a more robust check that handles string comparison correctly
-      value: dossiers.filter(d => d.status === "inspection_planifiee" || d.status === "inspection_planifiee").length,
+      // Fix: Only check for valid status values defined in the type
+      value: dossiers.filter(d => d.status === "en_cours").length,
       icon: <ClipboardCheck className="h-6 w-6 text-amber-500" />,
       description: "En attente d'inspection",
     },

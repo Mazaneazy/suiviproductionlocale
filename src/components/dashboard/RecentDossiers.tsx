@@ -20,11 +20,11 @@ export default function RecentDossiers() {
     );
   } else {
     // Pour les autres utilisateurs, afficher les dossiers récents
-    // Fix: Use createdAt or dateCreation as fallback if dateSoumission doesn't exist
+    // Fix: Use dateTransmission instead of the properties that don't exist in the Dossier type
     filteredDossiers = [...dossiers]
       .sort((a, b) => {
-        const dateA = a.dateSoumission || a.createdAt || a.dateCreation || "";
-        const dateB = b.dateSoumission || b.createdAt || b.dateCreation || "";
+        const dateA = a.dateTransmission || "";
+        const dateB = b.dateTransmission || "";
         return new Date(dateB).getTime() - new Date(dateA).getTime();
       })
       .slice(0, 5);
