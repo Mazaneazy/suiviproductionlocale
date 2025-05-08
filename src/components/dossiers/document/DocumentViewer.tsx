@@ -83,29 +83,47 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, darkMode = fa
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="preview" className="flex-1 animate-in fade-in duration-300">
-          <DocumentPreviewTab 
-            document={document}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            zoom={zoom}
-            rotation={rotation}
-            activeTab={activeTab}
-            darkMode={darkMode}
-          />
-        </TabsContent>
+        <div className="flex-1 overflow-hidden relative">
+          <TabsContent 
+            value="preview" 
+            className="flex-1 absolute inset-0 animate-in fade-in duration-200"
+            style={{ display: activeTab === 'preview' ? 'block' : 'none' }}
+          >
+            <DocumentPreviewTab 
+              document={document}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              zoom={zoom}
+              rotation={rotation}
+              activeTab={activeTab}
+              darkMode={darkMode}
+            />
+          </TabsContent>
 
-        <TabsContent value="details" className="animate-in fade-in duration-300">
-          <DocumentDetailsTab document={document} darkMode={darkMode} />
-        </TabsContent>
-        
-        <TabsContent value="annotations" className="animate-in fade-in duration-300">
-          <DocumentAnnotationsTab setActiveTab={setActiveTab} darkMode={darkMode} />
-        </TabsContent>
-        
-        <TabsContent value="comments" className="animate-in fade-in duration-300">
-          <DocumentComments documentId={document.id} />
-        </TabsContent>
+          <TabsContent 
+            value="details" 
+            className="absolute inset-0 animate-in fade-in duration-200"
+            style={{ display: activeTab === 'details' ? 'block' : 'none' }}
+          >
+            <DocumentDetailsTab document={document} darkMode={darkMode} />
+          </TabsContent>
+          
+          <TabsContent 
+            value="annotations" 
+            className="absolute inset-0 animate-in fade-in duration-200"
+            style={{ display: activeTab === 'annotations' ? 'block' : 'none' }}
+          >
+            <DocumentAnnotationsTab setActiveTab={setActiveTab} darkMode={darkMode} />
+          </TabsContent>
+          
+          <TabsContent 
+            value="comments" 
+            className="absolute inset-0 animate-in fade-in duration-200"
+            style={{ display: activeTab === 'comments' ? 'block' : 'none' }}
+          >
+            <DocumentComments documentId={document.id} />
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   );
