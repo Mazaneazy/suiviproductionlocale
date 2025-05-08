@@ -16,8 +16,9 @@ import {
   FormItem,
   FormMessage,
 } from "../components/ui/form";
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/use-toast';
+import ResetPasswordDialog from '@/components/auth/ResetPasswordDialog';
 
 // Définition du schéma de validation
 const loginSchema = z.object({
@@ -34,6 +35,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [resetPasswordOpen, setResetPasswordOpen] = useState(false);
   const navigate = useNavigate();
   const { login, getAllUsers } = useAuth();
   const { toast } = useToast();
@@ -166,6 +168,17 @@ const Login = () => {
                   )}
                 />
 
+                <div className="flex justify-end">
+                  <Button 
+                    type="button" 
+                    variant="link" 
+                    className="p-0 h-auto text-certif-blue"
+                    onClick={() => setResetPasswordOpen(true)}
+                  >
+                    Mot de passe oublié ?
+                  </Button>
+                </div>
+
                 <Button 
                   type="submit" 
                   className="w-full bg-certif-blue hover:bg-certif-blue/90" 
@@ -198,6 +211,11 @@ const Login = () => {
           </CardFooter>
         </Card>
       </div>
+
+      <ResetPasswordDialog 
+        open={resetPasswordOpen}
+        onOpenChange={setResetPasswordOpen}
+      />
     </div>
   );
 };

@@ -1,7 +1,6 @@
 
-import { User, UserRole, Dossier } from '@/types';
+import { User, UserRole, UserAction } from '@/types';
 
-// Define the AuthContext type
 export interface AuthContextProps {
   currentUser: User | null;
   login: (email: string, password: string) => Promise<boolean>;
@@ -12,6 +11,7 @@ export interface AuthContextProps {
   hasAccess: (moduleName: string) => boolean;
   hasRole: (roles: UserRole | UserRole[]) => boolean;
   isAuthenticated: boolean;
-  getUserActions: (userId: string) => any[];
-  createProducteurAccount: (dossier: Dossier) => User;
+  getUserActions: (userId: string) => UserAction[];
+  createProducteurAccount: (dossier: any) => User;
+  resetPassword: (email: string) => Promise<boolean>;
 }

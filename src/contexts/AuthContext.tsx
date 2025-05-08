@@ -19,6 +19,7 @@ export const AuthContext = createContext<AuthContextProps>({
   isAuthenticated: false,
   getUserActions: () => [],
   createProducteurAccount: () => ({} as User),
+  resetPassword: async () => false,
 });
 
 // Export module names for use in other components
@@ -96,6 +97,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
+  // Password reset function
+  const resetPassword = async (email: string): Promise<boolean> => {
+    // Find user with this email
+    const user = mockUsers.find(user => user.email === email);
+    
+    if (user) {
+      // In a real app, we would send an email here
+      // For this mock version, we'll just reset the password to 'newpassword'
+      user.password = 'newpassword';
+      
+      // Add password reset action
+      addUserAction(user.id, 'Réinitialisation mot de passe', 'Mot de passe réinitialisé', 'auth');
+      
+      return true;
+    }
+    return false;
+  };
+
   // Check if user has access to a module
   const hasAccess = (moduleName: string) => {
     if (!currentUser) return false;
@@ -164,7 +183,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       hasRole,
       isAuthenticated,
       getUserActions,
-      createProducteurAccount
+      createProducteurAccount,
+      resetPassword
     }}>
       {children}
     </AuthContext.Provider>
