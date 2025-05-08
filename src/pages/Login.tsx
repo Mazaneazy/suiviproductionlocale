@@ -1,30 +1,58 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileCheck, Mail, Lock, AlertCircle } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FileCheck, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "../components/ui/form";
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
 
+// Définition du schéma de validation
+const loginSchema = z.object({
+  email: z.string()
+    .email('Adresse email invalide')
+    .min(1, 'L\'email est requis'),
+  password: z.string()
+    .min(1, 'Le mot de passe est requis'),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { login, getAllUsers } = useAuth();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Initialisation du formulaire avec React Hook Form et Zod
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const handleSubmit = async (values: LoginFormValues) => {
     setError('');
     setIsLoading(true);
 
     try {
-      const success = await login(email, password);
+      const success = await login(values.email, values.password);
       if (success) {
         toast({
           title: "Connexion réussie",
@@ -41,6 +69,11 @@ const Login = () => {
     }
   };
 
+  // Toggle d'affichage du mot de passe
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   // Get all available users for demo
   const users = getAllUsers();
   
@@ -51,8 +84,8 @@ const Login = () => {
   }));
 
   const handleExampleLogin = (exampleEmail: string) => {
-    setEmail(exampleEmail);
-    setPassword('password');
+    form.setValue('email', exampleEmail);
+    form.setValue('password', 'password');
   };
 
   return (
@@ -79,43 +112,69 @@ const Login = () => {
               </Alert>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <div className="relative">
-                  <Mail className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
-                  <Input 
-                    type="email"
-                    placeholder="Adresse email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="relative">
+                        <Mail className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
+                        <FormControl>
+                          <Input 
+                            placeholder="Adresse email"
+                            className="pl-10" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
 
-              <div className="space-y-2">
-                <div className="relative">
-                  <Lock className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
-                  <Input 
-                    type="password"
-                    placeholder="Mot de passe"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="relative">
+                        <Lock className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
+                        <FormControl>
+                          <Input 
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Mot de passe" 
+                            className="pl-10 pr-10"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <button 
+                          type="button"
+                          onClick={togglePasswordVisibility}
+                          className="absolute inset-y-0 right-0 flex items-center pr-3"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4 text-gray-400" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-gray-400" />
+                          )}
+                        </button>
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
 
-              <Button 
-                type="submit" 
-                className="w-full bg-certif-blue hover:bg-certif-blue/90" 
-                disabled={isLoading}
-              >
-                {isLoading ? 'Connexion en cours...' : 'Se connecter'}
-              </Button>
-            </form>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-certif-blue hover:bg-certif-blue/90" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Connexion en cours...' : 'Se connecter'}
+                </Button>
+              </form>
+            </Form>
           </CardContent>
           <CardFooter className="flex flex-col">
             <div className="w-full border-t pt-4">
