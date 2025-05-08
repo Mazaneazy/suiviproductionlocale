@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './layout/Header';
 import Sidebar from './layout/Sidebar';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -9,6 +10,14 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
+  
+  // Fermer le menu mobile quand on change de page ou quand l'écran devient plus grand
+  useEffect(() => {
+    if (!isMobile) {
+      setMobileMenuOpen(false);
+    }
+  }, [isMobile]);
 
   return (
     <div className="min-h-screen bg-certif-lightgray flex flex-col">
@@ -25,9 +34,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         
         <Sidebar />
 
-        <main className="flex-1 p-6 md:p-8 overflow-auto">
-          <div className="container max-w-7xl mx-auto">
-            <div className="bg-white rounded-lg shadow-sm p-6">
+        <main className={`flex-1 p-4 md:p-8 overflow-auto transition-all duration-300 ${mobileMenuOpen && isMobile ? 'opacity-50' : 'opacity-100'}`}>
+          <div className="container mx-auto">
+            <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
               {children}
             </div>
           </div>
