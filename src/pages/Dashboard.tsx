@@ -5,6 +5,7 @@ import { useAuth } from "../hooks/useAuth";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import RecentDossiers from "@/components/dashboard/RecentDossiers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion } from "framer-motion";
 
 const Dashboard = () => {
   const { currentUser } = useAuth();
@@ -22,18 +23,52 @@ const Dashboard = () => {
     return `${timeMessage}, ${currentUser?.name || 'Utilisateur'}`;
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { 
+      y: 0, 
+      opacity: 1,
+      transition: { type: 'spring', stiffness: 100 }
+    }
+  };
+
   return (
     <Layout>
       <Helmet>
         <title>Tableau de bord | ANOR Certification</title>
       </Helmet>
       
-      <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <h1 className="text-2xl font-bold mb-6 text-certif-blue">{getWelcomeMessage()}</h1>
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="space-y-8"
+      >
+        <motion.h1 
+          variants={itemVariants}
+          className="text-3xl font-bold mb-2 text-certif-blue"
+        >
+          {getWelcomeMessage()}
+        </motion.h1>
         
-        <DashboardStats />
+        <motion.div variants={itemVariants}>
+          <DashboardStats />
+        </motion.div>
         
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
+        <motion.div 
+          variants={itemVariants}
+          className="grid gap-6 md:grid-cols-3"
+        >
           <RecentDossiers />
           
           {currentUser?.role !== 'producteur' && (
@@ -48,8 +83,8 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           )}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </Layout>
   );
 };
