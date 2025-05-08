@@ -15,8 +15,11 @@ export const useDossierForm = () => {
   const [promoteur, setPromoteur] = useState('');
   const [telephone, setTelephone] = useState('');
   const [produits, setProduits] = useState('');
+  const [email, setEmail] = useState('');
+  const [adresse, setAdresse] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Now use the utility function to get the default documents list
+  // Utiliser la fonction utilitaire pour obtenir la liste des documents par défaut
   const [documents, setDocuments] = useState<DocumentUpload[]>(getDefaultDocumentsList());
 
   const handleDocumentChange = (type: string, file: File | null) => {
@@ -27,23 +30,25 @@ export const useDossierForm = () => {
 
   // Fonction pour créer un nouveau dossier à partir des données du formulaire
   const createDossierObject = () => {
-    // Create document objects from files
+    // Créer des objets de document à partir des fichiers
     const documentObjects = documents
       .filter(doc => doc.file)
       .map(doc => ({
         id: Math.random().toString(36).substring(2, 11),
-        dossierId: '',  // To be filled after dossier creation
+        dossierId: '',  // À remplir après la création du dossier
         type: doc.type,
         nom: doc.file!.name,
-        url: URL.createObjectURL(doc.file!),  // In a real app, this would be uploaded to a server
+        url: URL.createObjectURL(doc.file!),  // Dans une vraie application, cela serait téléchargé sur un serveur
         dateUpload: new Date().toISOString(),
       }));
     
-    // Create the dossier object
+    // Créer l'objet dossier
     return {
       operateurNom: entreprise,
       promoteurNom: promoteur,
       telephone,
+      email: email || undefined,
+      adresse: adresse || undefined,
       typeProduit: produits,
       dateTransmission: new Date().toISOString().split('T')[0],
       responsable: 'Responsable Technique',
@@ -51,6 +56,7 @@ export const useDossierForm = () => {
       delai: 30,
       dateButoir: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       documents: documentObjects,
+      commentaires: "", // Champ pour les commentaires ultérieurs
     };
   };
 
@@ -77,49 +83,64 @@ export const useDossierForm = () => {
       description: "Le dossier a été enregistré avec succès.",
     });
     
-    // Reset form
+    // Réinitialiser le formulaire
     resetForm();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
-    // Validation
-    if (!entreprise || !promoteur || !telephone || !produits) {
+    try {
+      // Validation
+      if (!entreprise || !promoteur || !telephone || !produits) {
+        toast({
+          variant: "destructive",
+          title: "Formulaire incomplet",
+          description: "Veuillez remplir tous les champs obligatoires.",
+        });
+        return;
+      }
+      
+      // Vérifier les documents requis
+      const missingDocuments = documents
+        .filter(doc => doc.required && !doc.file)
+        .map(doc => doc.label);
+      
+      if (missingDocuments.length > 0) {
+        toast({
+          variant: "destructive",
+          title: "Documents manquants",
+          description: `Veuillez télécharger les documents requis: ${missingDocuments.join(', ')}`,
+        });
+        return;
+      }
+      
+      // Ajouter le dossier
+      const newDossier = createDossierObject();
+      addDossier(newDossier);
+      
+      // Simuler un délai pour montrer le chargement dans l'interface utilisateur
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Dossier transmis",
+        description: "Le dossier a été transmis au Responsable Technique avec succès.",
+      });
+      
+      // Réinitialiser le formulaire et naviguer
+      resetForm();
+      navigate('/dossiers');
+    } catch (error) {
+      console.error("Erreur lors de la soumission du dossier:", error);
       toast({
         variant: "destructive",
-        title: "Formulaire incomplet",
-        description: "Veuillez remplir tous les champs obligatoires.",
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la soumission du dossier.",
       });
-      return;
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    // Check required documents
-    const missingDocuments = documents
-      .filter(doc => doc.required && !doc.file)
-      .map(doc => doc.label);
-    
-    if (missingDocuments.length > 0) {
-      toast({
-        variant: "destructive",
-        title: "Documents manquants",
-        description: `Veuillez télécharger les documents requis: ${missingDocuments.join(', ')}`,
-      });
-      return;
-    }
-    
-    // Add the dossier
-    const newDossier = createDossierObject();
-    addDossier(newDossier);
-    
-    toast({
-      title: "Dossier transmis",
-      description: "Le dossier a été transmis au Responsable Technique avec succès.",
-    });
-    
-    // Reset form and navigate
-    resetForm();
-    navigate('/dossiers');
   };
 
   const resetForm = () => {
@@ -127,6 +148,8 @@ export const useDossierForm = () => {
     setPromoteur('');
     setTelephone('');
     setProduits('');
+    setEmail('');
+    setAdresse('');
     setDocuments(getDefaultDocumentsList());
   };
 
@@ -139,9 +162,14 @@ export const useDossierForm = () => {
     setTelephone,
     produits,
     setProduits,
+    email,
+    setEmail,
+    adresse,
+    setAdresse,
     documents,
     handleDocumentChange,
     handleSave,
-    handleSubmit
+    handleSubmit,
+    isSubmitting
   };
 };
