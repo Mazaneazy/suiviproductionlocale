@@ -48,12 +48,11 @@ export function useDocumentProcessing() {
       };
       
       try {
-        // Ajouter le document au dossier (sans vérifier la valeur retournée)
+        // Ajouter le document au dossier (sans attendre de retour)
         addDocument(newDocData);
         console.log(`Document ajouté: ${file.name}`);
         
-        // La fonction addDocument ne retourne pas toujours l'objet,
-        // donc on récupère toujours depuis localStorage pour être sûr
+        // Récupérer le document depuis le localStorage pour confirmer l'ajout
         const storedDocuments = localStorage.getItem('documents');
         if (storedDocuments) {
           const allDocs = JSON.parse(storedDocuments);
