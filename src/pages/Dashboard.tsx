@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from 'react';
 import DashboardCustomizer from '@/components/dashboard/DashboardCustomizer';
 import { getUserDashboardLayout, saveDashboardLayout } from '@/utils/dashboardUtils';
-import { Bell, Calendar, Clock } from "lucide-react";
+import { Bell, Calendar, Clock, ArrowRight } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { useData } from '@/contexts/DataContext';
 

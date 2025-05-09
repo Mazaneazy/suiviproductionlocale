@@ -37,7 +37,7 @@ const DashboardChart: React.FC = () => {
       
       // Compter les dossiers créés ce mois
       const dossiersCount = dossiers.filter(d => {
-        const creationDate = new Date(d.dateCreation || d.dateTransmission || '');
+        const creationDate = new Date(d.dateTransmission || '');
         return creationDate.getMonth() === month && creationDate.getFullYear() === year;
       }).length;
       
