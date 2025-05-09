@@ -46,7 +46,7 @@ const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
 
   return (
     <nav className="mt-4 space-y-1 px-2">
-      {/* Accès pour tous les rôles */}
+      {/* Tableau de bord - accessible à tous */}
       <NavItem href="/dashboard" icon={<Home size={18} />} text="Tableau de bord" />
 
       {/* Poste d'accueil */}

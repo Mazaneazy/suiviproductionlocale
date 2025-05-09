@@ -4,20 +4,20 @@ import { UserRole } from '../types';
 // Define role to permission mapping
 export const rolePermissionsMap: Record<UserRole, string[]> = {
   'admin': ['*'], // Admin access to all modules
-  'acceuil': ['acceuil', 'dossiers'], // Added access to dossiers for status viewing
-  'inspecteur': ['inspections', 'notes-frais'], // Renamed to "Responsable des missions" - added notes-frais access
-  'certificats': ['resultats', 'dossiers'],
-  'analyste': ['statistiques', 'dossiers'],
-  'comptable': ['notes-frais', 'dossiers'],
-  'responsable_technique': ['responsable-technique', 'dossiers'],
-  'chef_mission': ['inspections', 'dossiers'],
-  'surveillant': ['inspections', 'dossiers'],
-  'directeur': ['resultats', 'dossiers'],
+  'acceuil': ['acceuil', 'dossiers', 'dashboard'], // Added access to dashboard for "Chargé de clientèle"
+  'inspecteur': ['inspections', 'notes-frais', 'dashboard'], // Added dashboard access
+  'certificats': ['resultats', 'dossiers', 'dashboard'], // Added dashboard access
+  'analyste': ['statistiques', 'dossiers', 'dashboard'], // Added dashboard access
+  'comptable': ['notes-frais', 'dossiers', 'dashboard'], // Added dashboard access
+  'responsable_technique': ['responsable-technique', 'dossiers', 'dashboard'], // Added dashboard access
+  'chef_mission': ['inspections', 'dossiers', 'dashboard'], // Added dashboard access
+  'surveillant': ['inspections', 'dossiers', 'dashboard'], // Added dashboard access
+  'directeur': ['resultats', 'dossiers', 'dashboard'], // Added dashboard access
   'directeur_general': ['*'], // Director general access to all modules
-  'gestionnaire': ['dossiers'],
-  'producteur': ['dashboard', 'dossiers'], // Producteurs can access their dashboard and dossiers
-  'responsable_qualite': ['certificates-creation', 'dossiers'], // Added dossiers access 
-  'comite_validation': ['validation', 'dossiers'] // Added dossiers access
+  'gestionnaire': ['dossiers', 'dashboard'], // Added dashboard access
+  'producteur': ['dashboard', 'dossiers'], // Already had dashboard access
+  'responsable_qualite': ['certificates-creation', 'dossiers', 'dashboard'], // Added dashboard access
+  'comite_validation': ['validation', 'dossiers', 'dashboard'] // Added dashboard access
 };
 
 // Module names for navigation and access control
@@ -31,5 +31,6 @@ export const moduleNames = {
   'responsable-technique': 'Responsable Technique',
   'user-management': 'Gestion des utilisateurs',
   'certificates-creation': 'Montage des Certificats',
-  'validation': 'Comité de Validation'
+  'validation': 'Comité de Validation',
+  'dashboard': 'Tableau de bord'
 };

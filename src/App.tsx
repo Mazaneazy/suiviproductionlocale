@@ -57,6 +57,18 @@ function App() {
                 <Route path="/" element={<Index />} />
                 
                 <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute
+                      redirectPath="/unauthorized"
+                      accessPermissions={['dashboard']}
+                    >
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route
                   path="/accueil"
                   element={
                     <ProtectedRoute
@@ -67,6 +79,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                
                 <Route
                   path="/dossiers"
                   element={
@@ -78,6 +91,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                
                 <Route
                   path="/inspections"
                   element={
@@ -89,6 +103,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                
                 <Route
                   path="/certificats"
                   element={
@@ -100,6 +115,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                
                 <Route
                   path="/statistiques"
                   element={
@@ -111,6 +127,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                
                 <Route
                   path="/notes-frais"
                   element={
@@ -122,6 +139,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                
                 <Route
                   path="/user-management"
                   element={
@@ -130,17 +148,6 @@ function App() {
                       accessPermissions={['user-management', 'admin']}
                     >
                       <UserManagement />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute
-                      redirectPath="/unauthorized"
-                      accessPermissions={['dashboard']}
-                    >
-                      <Dashboard />
                     </ProtectedRoute>
                   }
                 />
