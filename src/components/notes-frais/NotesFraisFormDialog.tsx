@@ -27,6 +27,17 @@ const NotesFraisFormDialog: React.FC<NotesFraisFormDialogProps> = ({
   onFileChange,
   onSave
 }) => {
+  // Assurons-nous que toutes les propriétés requises sont fournies avec des valeurs par défaut si nécessaire
+  const formattedNoteFrais = {
+    dossierId: newNoteFrais.dossierId || '',
+    date: newNoteFrais.date || new Date().toISOString().split('T')[0],
+    fraisGestion: newNoteFrais.fraisGestion || 0,
+    fraisInspection: newNoteFrais.fraisInspection || 0,
+    fraisAnalyses: newNoteFrais.fraisAnalyses || 0,
+    fraisSurveillance: newNoteFrais.fraisSurveillance || 0,
+    commentaire: newNoteFrais.commentaire || ''
+  };
+
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogContent className="sm:max-w-lg">
@@ -34,7 +45,7 @@ const NotesFraisFormDialog: React.FC<NotesFraisFormDialogProps> = ({
           <DialogTitle>Ajouter une nouvelle note de frais</DialogTitle>
         </DialogHeader>
         <NotesFraisForm
-          newNoteFrais={newNoteFrais}
+          newNoteFrais={formattedNoteFrais}
           dossiers={dossiers}
           fileInputRef={fileInputRef}
           onInputChange={onInputChange}
