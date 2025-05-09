@@ -18,6 +18,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import UserDetails from './pages/UserDetails';
 import UserProfile from './pages/UserProfile';
+import Index from './pages/Index';
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ function App() {
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
+                <Route path="/" element={<Index />} />
                 
                 <Route
                   path="/accueil"
