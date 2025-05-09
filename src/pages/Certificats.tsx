@@ -9,7 +9,7 @@ import { useResultats } from '@/hooks/useResultats';
 
 const Certificats = () => {
   const { currentUser } = useAuth();
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedDossier, setSelectedDossier] = useState(null);
   
   const {
     searchTerm,
@@ -33,11 +33,9 @@ const Certificats = () => {
     <Layout>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-certif-blue">Certificats émis</h1>
-        {canCreateDocuments && (
+        {canCreateDocuments && dossiersEligibles.length > 0 && (
           <CreateResultDialog 
-            dialogOpen={dialogOpen}
-            setDialogOpen={setDialogOpen}
-            dossiersEligibles={dossiersEligibles}
+            dossier={dossiersEligibles[0]}
           />
         )}
       </div>

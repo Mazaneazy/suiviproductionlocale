@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -33,7 +34,7 @@ const CreateResultDialog: React.FC<CreateResultDialogProps> = ({ dossier }) => {
   const [produit, setProduit] = useState(dossier.typeProduit);
   const [dateDelivrance, setDateDelivrance] = useState<Date | undefined>(new Date());
   const [dateExpiration, setDateExpiration] = useState<Date | undefined>(new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
-  const [status, setStatus] = useState<'actif' | 'expire' | 'suspendu' | 'retire'>('actif');
+  const [status, setStatus] = useState<'actif' | 'expire' | 'suspendu' | 'revoque'>('actif');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +77,7 @@ const CreateResultDialog: React.FC<CreateResultDialogProps> = ({ dossier }) => {
       produit: dossier.typeProduit,
       dateDelivrance: new Date().toISOString(),
       dateExpiration: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
-      status: 'actif',
+      status: 'actif' as 'actif',
       responsableQualiteId: currentUser?.id || "unknown"
     };
 
@@ -170,11 +171,14 @@ const CreateResultDialog: React.FC<CreateResultDialogProps> = ({ dossier }) => {
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="status">Statut</Label>
-            <select id="status" value={status} onChange={(e) => setStatus(e.target.value as 'actif' | 'expire' | 'suspendu' | 'retire')} className="col-span-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            <select id="status" 
+                    value={status} 
+                    onChange={(e) => setStatus(e.target.value as 'actif' | 'expire' | 'suspendu' | 'revoque')} 
+                    className="col-span-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
               <option value="actif">Actif</option>
               <option value="expire">Expiré</option>
               <option value="suspendu">Suspendu</option>
-              <option value="retire">Retiré</option>
+              <option value="revoque">Révoqué</option>
             </select>
           </div>
           <div className="flex justify-end">
