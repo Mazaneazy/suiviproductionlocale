@@ -15,6 +15,7 @@ import Dossiers from "./pages/Dossiers";
 import Inspections from "./pages/Inspections";
 import Calendar from "./pages/Calendar";
 import Certificats from "./pages/Certificats";
+import NotesFrais from "./pages/NotesFrais";
 import Accueil from "./pages/Accueil";
 import ResponsableTechnique from "./pages/ResponsableTechnique";
 import Unauthorized from "./pages/Unauthorized";
@@ -75,6 +76,18 @@ const App = () => (
               } />
 
               <Route path="/certificats" element={
+                <ProtectedRoute moduleName="resultats">
+                  <Certificats />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/notes-frais" element={
+                <ProtectedRoute moduleName="notes-frais">
+                  <NotesFrais />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/resultats" element={
                 <ProtectedRoute moduleName="resultats">
                   <Certificats />
                 </ProtectedRoute>

@@ -80,7 +80,7 @@ const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
       {/* Résultats et certificats */}
       {(hasAccess('resultats') || hasRole(['admin', 'directeur_general'])) && (
         <NavItem
-          href="/resultats"
+          href="/certificats"
           icon={<FileCheck2 size={18} />}
           text="Certificats émis"
         />
