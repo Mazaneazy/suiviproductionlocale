@@ -4,8 +4,8 @@ import { UserRole } from '../types';
 // Define role to permission mapping
 export const rolePermissionsMap: Record<UserRole, string[]> = {
   'admin': ['*'], // Admin access to all modules
-  'acceuil': ['acceuil', 'dossiers'], // Added access to dossiers for status viewing
-  'inspecteur': ['inspections', 'notes-frais'], // Renamed to "Responsable des missions" - added notes-frais access
+  'acceuil': ['acceuil', 'dossiers'], 
+  'inspecteur': ['inspections', 'notes-frais', 'dossiers'], 
   'certificats': ['resultats', 'dossiers'],
   'analyste': ['statistiques', 'dossiers'],
   'comptable': ['notes-frais', 'dossiers'],
@@ -15,9 +15,9 @@ export const rolePermissionsMap: Record<UserRole, string[]> = {
   'directeur': ['resultats', 'dossiers'],
   'directeur_general': ['*'], // Director general access to all modules
   'gestionnaire': ['dossiers'],
-  'producteur': ['dashboard', 'dossiers'], // Producteurs can access their dashboard and dossiers
-  'responsable_qualite': ['certificates-creation', 'dossiers'], // Added dossiers access 
-  'comite_validation': ['validation', 'dossiers'] // Added dossiers access
+  'producteur': ['dashboard', 'dossiers'], 
+  'responsable_qualite': ['certificates-creation', 'dossiers'], 
+  'comite_validation': ['validation', 'dossiers']
 };
 
 // Module names for navigation and access control

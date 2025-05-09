@@ -49,14 +49,12 @@ const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
       {/* Accès pour tous les rôles */}
       <NavItem href="/dashboard" icon={<Home size={18} />} text="Tableau de bord" />
 
+      {/* Gestion des dossiers - pour tous */}
+      <NavItem href="/dossiers" icon={<FileText size={18} />} text="Dossiers" />
+
       {/* Poste d'accueil */}
       {hasAccess('acceuil') && (
         <NavItem href="/accueil" icon={<FilePlus2 size={18} />} text="Chargé de clientèle" />
-      )}
-
-      {/* Gestion des dossiers - pour tous sauf producteurs */}
-      {(hasAccess('dossiers') || hasRole(['admin', 'directeur_general'])) && (
-        <NavItem href="/dossiers" icon={<FileText size={18} />} text="Dossiers" />
       )}
 
       {/* Responsable technique */}

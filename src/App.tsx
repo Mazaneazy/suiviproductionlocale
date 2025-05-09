@@ -46,7 +46,7 @@ const App = () => (
               } />
 
               <Route path="/dossiers" element={
-                <ProtectedRoute moduleName="dossiers">
+                <ProtectedRoute>
                   <Dossiers />
                 </ProtectedRoute>
               } />
