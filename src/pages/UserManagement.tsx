@@ -31,7 +31,7 @@ import {
 } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
 import { useToast } from '../hooks/use-toast';
-import { UserRound, PlusCircle, Search, FileText } from 'lucide-react';
+import { UserRound, PlusCircle, Search, FileText, Settings } from 'lucide-react';
 import { User, UserRole } from '../types';
 
 const UserManagement = () => {
@@ -257,14 +257,24 @@ const UserManagement = () => {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => handleViewDetails(user.id)}
-                    >
-                      <FileText className="mr-1" size={14} />
-                      Détail
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleViewDetails(user.id)}
+                      >
+                        <FileText className="mr-1" size={14} />
+                        Détail
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(`/user-profile/${user.id}`)}
+                      >
+                        <Settings className="mr-1" size={14} />
+                        Profil complet
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
