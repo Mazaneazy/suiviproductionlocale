@@ -32,7 +32,7 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: '4',
-    name: 'Gestionnaire de Certificats ',
+    name: 'Gestionnaire de Certificats',
     email: 'certificats@example.com',
     role: 'certificats',
     password: 'password',
@@ -41,7 +41,7 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: '5',
-    name: 'Analyste ,
+    name: 'Analyste',
     email: 'analyste@example.com',
     role: 'analyste',
     password: 'password',
