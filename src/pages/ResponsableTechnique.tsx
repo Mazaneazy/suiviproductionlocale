@@ -15,6 +15,8 @@ import FraisTab from '../components/responsable-technique/tabs/FraisTab';
 import InspectionsTab from '../components/responsable-technique/tabs/InspectionsTab';
 import RapportsTab from '../components/responsable-technique/tabs/RapportsTab';
 import NotesFraisTab from '../components/responsable-technique/tabs/NotesFraisTab';
+import ChecklistTab from '../components/responsable-technique/tabs/ChecklistTab';
+import AvisDecisionTab from '../components/responsable-technique/tabs/AvisDecisionTab';
 
 const ResponsableTechnique = () => {
   const { 
@@ -107,6 +109,20 @@ const ResponsableTechnique = () => {
     setSelectedDossierId(null);
   };
 
+  const handleChecklistSubmitted = () => {
+    toast({
+      title: "Checklist d'inspection soumise",
+      description: "Le plan d'inspection et le plan d'échantillonnage ont été enregistrés.",
+    });
+  };
+
+  const handleAvisSubmitted = () => {
+    toast({
+      title: "Avis de décision soumis",
+      description: "L'avis de décision a été transmis au comité de validation.",
+    });
+  };
+
   return (
     <Layout>
       <div className="mb-6">
@@ -120,9 +136,11 @@ const ResponsableTechnique = () => {
         <TabsList className="mb-6">
           <TabsTrigger value="dossiers">Dossiers à traiter</TabsTrigger>
           <TabsTrigger value="comite" disabled={!selectedDossier}>Pilote technique</TabsTrigger>
+          <TabsTrigger value="checklist" disabled={!selectedDossier}>Checklist d'inspection</TabsTrigger>
           <TabsTrigger value="frais" disabled={!selectedDossier}>Validation des frais</TabsTrigger>
           <TabsTrigger value="inspections" disabled={!selectedDossier}>Inspections</TabsTrigger>
           <TabsTrigger value="rapports">Rapports</TabsTrigger>
+          <TabsTrigger value="avis" disabled={!selectedDossier}>Avis de décision</TabsTrigger>
           <TabsTrigger value="notesfrais" disabled={!selectedDossier}>Note de frais</TabsTrigger>
         </TabsList>
         
@@ -143,6 +161,14 @@ const ResponsableTechnique = () => {
           <ComiteTab 
             dossier={selectedDossier} 
             onSaveComite={handleSaveComite} 
+          />
+        </TabsContent>
+        
+        {/* Tab: Checklist d'inspection */}
+        <TabsContent value="checklist">
+          <ChecklistTab
+            dossier={selectedDossier}
+            onChecklistSubmitted={handleChecklistSubmitted}
           />
         </TabsContent>
         
@@ -180,6 +206,15 @@ const ResponsableTechnique = () => {
           <RapportsTab 
             rapports={[]} // Dans un vrai système, nous récupérerions les rapports depuis l'API 
             onViewRapport={handleViewRapport} 
+          />
+        </TabsContent>
+        
+        {/* Tab: Avis de décision */}
+        <TabsContent value="avis">
+          <AvisDecisionTab
+            dossier={selectedDossier}
+            rapports={[]} // In a real system, we would get the reports from the API
+            onAvisSubmitted={handleAvisSubmitted}
           />
         </TabsContent>
         

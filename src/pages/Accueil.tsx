@@ -3,7 +3,9 @@ import React from 'react';
 import Layout from '../components/Layout';
 import AccueilForm from '../components/acceuil/AccueilForm';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Info } from 'lucide-react';
+import PaymentReceiptForm from '../components/acceuil/PaymentReceiptForm';
 
 const Accueil = () => {
   return (
@@ -21,7 +23,19 @@ const Accueil = () => {
           </AlertDescription>
         </Alert>
       </div>
-      <AccueilForm />
+      
+      <Tabs defaultValue="nouvelle-demande">
+        <TabsList>
+          <TabsTrigger value="nouvelle-demande">Nouvelle demande</TabsTrigger>
+          <TabsTrigger value="paiements">Réception des paiements</TabsTrigger>
+        </TabsList>
+        <TabsContent value="nouvelle-demande">
+          <AccueilForm />
+        </TabsContent>
+        <TabsContent value="paiements">
+          <PaymentReceiptForm />
+        </TabsContent>
+      </Tabs>
     </Layout>
   );
 };

@@ -5,12 +5,15 @@ import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
 import { useToast } from '../hooks/use-toast';
 import { PlusCircle } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Import the new components
 import InspectionFilters from '../components/inspections/InspectionFilters';
 import InspectionsTable from '../components/inspections/InspectionsTable';
 import NewInspectionDialog from '../components/inspections/NewInspectionDialog';
 import InspectionDetails from '../components/inspections/InspectionDetails';
+import RapportsList from '../components/inspections/RapportsList';
+import NotesFraisOverview from '../components/inspections/NotesFraisOverview';
 
 const Inspections = () => {
   const { inspections, dossiers, addInspection, updateInspection } = useData();
@@ -78,32 +81,50 @@ const Inspections = () => {
   return (
     <Layout>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-certif-blue">Inspections</h1>
+        <h1 className="text-3xl font-bold text-certif-blue">Responsable des missions</h1>
         <Button 
           onClick={() => setDialogOpen(true)} 
           className="bg-certif-blue hover:bg-certif-blue/90"
         >
           <PlusCircle className="mr-2" size={16} />
-          Nouvelle inspection
+          Nouvelle mission
         </Button>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
-        <InspectionFilters 
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
-        />
+      <Tabs defaultValue="inspections">
+        <TabsList>
+          <TabsTrigger value="inspections">Inspections</TabsTrigger>
+          <TabsTrigger value="rapports">Rapports</TabsTrigger>
+          <TabsTrigger value="frais">Notes de frais</TabsTrigger>
+        </TabsList>
 
-        <InspectionsTable 
-          inspections={filteredInspections}
-          dossiers={dossiers}
-          onViewDetails={handleViewDetails}
-          onMarkAsConforme={handleMarkAsConforme}
-          onMarkAsNonConforme={handleMarkAsNonConforme}
-        />
-      </div>
+        <TabsContent value="inspections">
+          <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
+            <InspectionFilters 
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+            />
+
+            <InspectionsTable 
+              inspections={filteredInspections}
+              dossiers={dossiers}
+              onViewDetails={handleViewDetails}
+              onMarkAsConforme={handleMarkAsConforme}
+              onMarkAsNonConforme={handleMarkAsNonConforme}
+            />
+          </div>
+        </TabsContent>
+      
+        <TabsContent value="rapports">
+          <RapportsList />
+        </TabsContent>
+      
+        <TabsContent value="frais">
+          <NotesFraisOverview />
+        </TabsContent>
+      </Tabs>
       
       <NewInspectionDialog 
         open={dialogOpen}

@@ -48,8 +48,11 @@ export interface Inspection {
   inspecteurs: string[];
   resultat: 'conforme' | 'non_conforme' | 'en_attente';
   notes?: string;
-  recommandations?: string; // Added property
-  actionsCorrectives?: string; // Added property
+  recommandations?: string;
+  actionsCorrectives?: string;
+  planInspection?: string; // URL to the inspection plan document
+  planEchantillonage?: string; // URL to the sampling plan document
+  checklistComplete?: boolean;
 }
 
 export interface Certificat {
@@ -62,6 +65,7 @@ export interface Certificat {
   dateExpiration: string;
   status: 'actif' | 'suspendu' | 'retire' | 'expire';
   resultatConformite?: ResultatConformite;
+  responsableQualiteId?: string;
 }
 
 export interface ResultatConformite {
@@ -77,9 +81,9 @@ export interface Notification {
   message: string;
   date: string;
   lue: boolean;
-  userId?: string; // Added property
-  type?: 'warning' | 'alert' | 'info'; // Added property
-  link?: string; // Added property
+  userId?: string;
+  type?: 'warning' | 'alert' | 'info';
+  link?: string;
 }
 
 export interface Statistique {
@@ -98,7 +102,7 @@ export interface DocumentDossier {
   dateUpload: string;
   url: string;
   status?: 'valide' | 'rejete' | 'en_attente';
-  commentaire?: string; // Added property
+  commentaire?: string;
 }
 
 export interface HistoriqueEvenement {
@@ -110,7 +114,7 @@ export interface HistoriqueEvenement {
   commentaire?: string;
 }
 
-export type UserRole = 'admin' | 'acceuil' | 'inspecteur' | 'certificats' | 'analyste' | 'comptable' | 'responsable_technique' | 'chef_mission' | 'surveillant' | 'directeur' | 'directeur_general' | 'gestionnaire' | 'producteur';
+export type UserRole = 'admin' | 'acceuil' | 'inspecteur' | 'certificats' | 'analyste' | 'comptable' | 'responsable_technique' | 'chef_mission' | 'surveillant' | 'directeur' | 'directeur_general' | 'gestionnaire' | 'producteur' | 'responsable_qualite' | 'comite_validation';
 
 export interface User {
   id: string;
@@ -118,10 +122,10 @@ export interface User {
   email: string;
   role: UserRole;
   avatar?: string;
-  password?: string; // Only used for mock authentication
+  password?: string;
   permissions?: string[];
   actions?: UserAction[];
-  producteurDossierId?: string; // ID du dossier associé au compte producteur
+  producteurDossierId?: string;
 }
 
 export interface UserAction {
@@ -158,4 +162,37 @@ export interface MembreComite {
   nom: string;
   role: 'chef' | 'inspecteur' | 'analyste' | 'expert';
   specialite?: string;
+}
+
+export interface AvisDecision {
+  id: string;
+  dossierId: string;
+  rapportId: string;
+  date: string;
+  contenu: string;
+  resultat: 'favorable' | 'defavorable' | 'avec_reserves';
+  commentaires?: string;
+  status: 'en_attente' | 'transmis' | 'valide';
+}
+
+export interface ProcessVerbal {
+  id: string;
+  dossierId: string;
+  avisId: string;
+  date: string;
+  contenu: string;
+  decision: 'approuve' | 'rejete' | 'ajourne';
+  signatures: string[];
+}
+
+export interface PreuvePaiement {
+  id: string;
+  noteFraisId: string;
+  dossierId: string;
+  date: string;
+  montant: number;
+  referencePaiement: string;
+  fichierUrl: string;
+  status: 'recu' | 'valide' | 'rejete';
+  commentaires?: string;
 }
