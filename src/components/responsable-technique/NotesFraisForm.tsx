@@ -113,7 +113,7 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({ dossier, onNoteFraisCre
           <h3 className="text-lg font-medium text-certif-blue mb-4">Frais additionnels</h3>
           <Card className="p-4 space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="fraisGestion">Frais de gestion (FCFA)</Label>
+              <Label htmlFor="fraisGestion">Frais de gestion du dossier (FCFA)</Label>
               <Input
                 id="fraisGestion"
                 type="number"

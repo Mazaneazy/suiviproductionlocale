@@ -51,10 +51,10 @@ const NotesFrais = () => {
     dossierId: '',
     inspecteurId: currentUser?.id || '',
     date: new Date().toISOString().split('T')[0],
-    deplacement: 0,
-    hebergement: 0,
-    restauration: 0,
-    indemnites: 0,
+    fraisGestion: 50000,
+    fraisInspection: 75000,
+    fraisAnalyses: 60000,
+    fraisSurveillance: 40000,
     status: 'en_attente' as 'en_attente' | 'valide' | 'rejete',
     commentaire: '',
     description: '',
@@ -81,7 +81,7 @@ const NotesFrais = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    if (name === 'deplacement' || name === 'hebergement' || name === 'restauration' || name === 'indemnites') {
+    if (name === 'fraisGestion' || name === 'fraisInspection' || name === 'fraisAnalyses' || name === 'fraisSurveillance') {
       setNewNoteFrais({
         ...newNoteFrais,
         [name]: parseFloat(value) || 0,
@@ -144,10 +144,10 @@ const NotesFrais = () => {
 
     // Calculer le montant total
     const total = 
-      newNoteFrais.deplacement + 
-      newNoteFrais.hebergement + 
-      newNoteFrais.restauration + 
-      newNoteFrais.indemnites;
+      newNoteFrais.fraisGestion + 
+      newNoteFrais.fraisInspection + 
+      newNoteFrais.fraisAnalyses + 
+      newNoteFrais.fraisSurveillance;
     
     // Simuler l'upload du fichier (dans une vraie application, cela serait fait vers un service de stockage)
     let fichierUrl = '';
@@ -164,10 +164,10 @@ const NotesFrais = () => {
       description: `Note de frais - ${new Date(newNoteFrais.date).toLocaleDateString()}`,
       montant: total,
       status: newNoteFrais.status,
-      deplacement: newNoteFrais.deplacement,
-      hebergement: newNoteFrais.hebergement,
-      restauration: newNoteFrais.restauration,
-      indemnites: newNoteFrais.indemnites,
+      fraisGestion: newNoteFrais.fraisGestion,
+      fraisInspection: newNoteFrais.fraisInspection,
+      fraisAnalyses: newNoteFrais.fraisAnalyses,
+      fraisSurveillance: newNoteFrais.fraisSurveillance,
       commentaire: newNoteFrais.commentaire || undefined,
       fichierUrl: fichierUrl || undefined,
       notificationEnvoyee: false,
@@ -184,10 +184,10 @@ const NotesFrais = () => {
       dossierId: '',
       inspecteurId: currentUser?.id || '',
       date: new Date().toISOString().split('T')[0],
-      deplacement: 0,
-      hebergement: 0,
-      restauration: 0,
-      indemnites: 0,
+      fraisGestion: 50000,
+      fraisInspection: 75000,
+      fraisAnalyses: 60000,
+      fraisSurveillance: 40000,
       status: 'en_attente',
       commentaire: '',
       description: '',
@@ -253,10 +253,10 @@ const NotesFrais = () => {
   // Calculer le total d'une note de frais
   const calculerTotal = (note: NoteFrais) => {
     return (
-      (note.deplacement || 0) + 
-      (note.hebergement || 0) + 
-      (note.restauration || 0) + 
-      (note.indemnites || 0)
+      (note.fraisGestion || 0) + 
+      (note.fraisInspection || 0) + 
+      (note.fraisAnalyses || 0) + 
+      (note.fraisSurveillance || 0)
     );
   };
 
@@ -323,63 +323,63 @@ const NotesFrais = () => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="deplacement" className="text-right font-medium text-sm">
-                  Déplacement (€)
+                <label htmlFor="fraisGestion" className="text-right font-medium text-sm">
+                  Gestion du dossier (FCFA)
                 </label>
                 <Input
-                  id="deplacement"
-                  name="deplacement"
+                  id="fraisGestion"
+                  name="fraisGestion"
                   type="number"
-                  value={newNoteFrais.deplacement}
+                  value={newNoteFrais.fraisGestion}
                   onChange={handleInputChange}
                   className="col-span-3"
                   min={0}
-                  step="0.01"
+                  step="1000"
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="hebergement" className="text-right font-medium text-sm">
-                  Hébergement (€)
+                <label htmlFor="fraisInspection" className="text-right font-medium text-sm">
+                  Inspection/Échantillonage (FCFA)
                 </label>
                 <Input
-                  id="hebergement"
-                  name="hebergement"
+                  id="fraisInspection"
+                  name="fraisInspection"
                   type="number"
-                  value={newNoteFrais.hebergement}
+                  value={newNoteFrais.fraisInspection}
                   onChange={handleInputChange}
                   className="col-span-3"
                   min={0}
-                  step="0.01"
+                  step="1000"
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="restauration" className="text-right font-medium text-sm">
-                  Restauration (€)
+                <label htmlFor="fraisAnalyses" className="text-right font-medium text-sm">
+                  Analyses/Essais (FCFA)
                 </label>
                 <Input
-                  id="restauration"
-                  name="restauration"
+                  id="fraisAnalyses"
+                  name="fraisAnalyses"
                   type="number"
-                  value={newNoteFrais.restauration}
+                  value={newNoteFrais.fraisAnalyses}
                   onChange={handleInputChange}
                   className="col-span-3"
                   min={0}
-                  step="0.01"
+                  step="1000"
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="indemnites" className="text-right font-medium text-sm">
-                  Indemnités (€)
+                <label htmlFor="fraisSurveillance" className="text-right font-medium text-sm">
+                  Surveillance (FCFA)
                 </label>
                 <Input
-                  id="indemnites"
-                  name="indemnites"
+                  id="fraisSurveillance"
+                  name="fraisSurveillance"
                   type="number"
-                  value={newNoteFrais.indemnites}
+                  value={newNoteFrais.fraisSurveillance}
                   onChange={handleInputChange}
                   className="col-span-3"
                   min={0}
-                  step="0.01"
+                  step="1000"
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
@@ -455,12 +455,12 @@ const NotesFrais = () => {
               <TableRow>
                 <TableHead>Date</TableHead>
                 <TableHead>Opérateur</TableHead>
-                <TableHead className="text-right">Déplacement</TableHead>
-                <TableHead className="text-right">Hébergement</TableHead>
-                <TableHead className="text-right">Restauration</TableHead>
-                <TableHead className="text-right">Indemnités</TableHead>
+                <TableHead className="text-right">Gestion</TableHead>
+                <TableHead className="text-right">Inspection</TableHead>
+                <TableHead className="text-right">Analyses</TableHead>
+                <TableHead className="text-right">Surveillance</TableHead>
                 <TableHead className="text-right">Total</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Statut</TableHead>
                 <TableHead>Notification</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -475,11 +475,11 @@ const NotesFrais = () => {
                     <TableRow key={note.id}>
                       <TableCell>{new Date(note.date).toLocaleDateString()}</TableCell>
                       <TableCell className="font-medium">{dossier?.operateurNom}</TableCell>
-                      <TableCell className="text-right">{note.deplacement?.toFixed(2) || '0.00'} €</TableCell>
-                      <TableCell className="text-right">{note.hebergement?.toFixed(2) || '0.00'} €</TableCell>
-                      <TableCell className="text-right">{note.restauration?.toFixed(2) || '0.00'} €</TableCell>
-                      <TableCell className="text-right">{note.indemnites?.toFixed(2) || '0.00'} €</TableCell>
-                      <TableCell className="text-right font-medium">{total.toFixed(2)} €</TableCell>
+                      <TableCell className="text-right">{note.fraisGestion?.toLocaleString() || '0'} FCFA</TableCell>
+                      <TableCell className="text-right">{note.fraisInspection?.toLocaleString() || '0'} FCFA</TableCell>
+                      <TableCell className="text-right">{note.fraisAnalyses?.toLocaleString() || '0'} FCFA</TableCell>
+                      <TableCell className="text-right">{note.fraisSurveillance?.toLocaleString() || '0'} FCFA</TableCell>
+                      <TableCell className="text-right font-medium">{total.toLocaleString()} FCFA</TableCell>
                       <TableCell>
                         <Badge className={getStatusColor(note.status)}>
                           {formatStatus(note.status)}
@@ -589,21 +589,21 @@ const NotesFrais = () => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Total</p>
-                  <p className="font-bold">{(selectedNote.montant || calculerTotal(selectedNote)).toFixed(2)} €</p>
+                  <p className="font-bold">{(selectedNote.montant || calculerTotal(selectedNote)).toLocaleString()} FCFA</p>
                 </div>
               </div>
 
               <div className="border-t border-gray-200 pt-4 mb-4">
                 <h3 className="font-medium mb-2">Détails des frais</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  <p className="text-sm">Déplacement:</p>
-                  <p className="text-sm text-right">{selectedNote.deplacement?.toFixed(2) || '0.00'} €</p>
-                  <p className="text-sm">Hébergement:</p>
-                  <p className="text-sm text-right">{selectedNote.hebergement?.toFixed(2) || '0.00'} €</p>
-                  <p className="text-sm">Restauration:</p>
-                  <p className="text-sm text-right">{selectedNote.restauration?.toFixed(2) || '0.00'} €</p>
-                  <p className="text-sm">Indemnités:</p>
-                  <p className="text-sm text-right">{selectedNote.indemnites?.toFixed(2) || '0.00'} €</p>
+                  <p className="text-sm">Gestion du dossier:</p>
+                  <p className="text-sm text-right">{selectedNote.fraisGestion?.toLocaleString() || '0'} FCFA</p>
+                  <p className="text-sm">Inspection/échantillonage:</p>
+                  <p className="text-sm text-right">{selectedNote.fraisInspection?.toLocaleString() || '0'} FCFA</p>
+                  <p className="text-sm">Analyses/essais:</p>
+                  <p className="text-sm text-right">{selectedNote.fraisAnalyses?.toLocaleString() || '0'} FCFA</p>
+                  <p className="text-sm">Surveillance:</p>
+                  <p className="text-sm text-right">{selectedNote.fraisSurveillance?.toLocaleString() || '0'} FCFA</p>
                 </div>
               </div>
 
