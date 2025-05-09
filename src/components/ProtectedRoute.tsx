@@ -19,17 +19,20 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const location = useLocation();
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
-  // Vérifier les rôles si spécifiés
-  if (allowedRoles && !hasRole(allowedRoles)) {
-    return <Navigate to="/unauthorized" />;
+  // Check if admin or director general (they have access to everything)
+  const isAdminOrDirector = hasRole(['admin', 'directeur_general']);
+  
+  // Check roles if specified
+  if (allowedRoles && !hasRole(allowedRoles) && !isAdminOrDirector) {
+    return <Navigate to="/unauthorized" state={{ from: location }} replace />;
   }
 
-  // Vérifier l'accès au module si spécifié
-  if (moduleName && !hasAccess(moduleName)) {
-    return <Navigate to="/unauthorized" />;
+  // Check module access if specified
+  if (moduleName && !hasAccess(moduleName) && !isAdminOrDirector) {
+    return <Navigate to="/unauthorized" state={{ from: location }} replace />;
   }
 
   return <>{children}</>;

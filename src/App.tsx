@@ -29,20 +29,23 @@ const ProtectedRoute = ({ children, redirectPath, accessPermissions }: {
 }) => {
   const { isAuthenticated, hasAccess, hasRole } = useAuth();
 
-  // Vérifie si au moins une permission est validée (OR logic) au lieu de toutes (AND logic)
-  const hasRequiredPermissions = accessPermissions.some(permission => {
-    return hasAccess(permission) || hasRole(['admin', 'directeur_general']);
-  });
-
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
+
+  // Check if user has admin or director general role
+  const isAdminOrDirector = hasRole(['admin', 'directeur_general']);
+  
+  // Check if user has at least one of the required permissions
+  const hasRequiredPermissions = accessPermissions.some(permission => 
+    hasAccess(permission) || isAdminOrDirector
+  );
 
   if (!hasRequiredPermissions) {
     return <Navigate to={redirectPath} replace />;
   }
 
-  return children;
+  return <>{children}</>;
 };
 
 function App() {
@@ -137,6 +140,18 @@ function App() {
                       accessPermissions={['notes-frais']}
                     >
                       <NotesFrais />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/responsable-technique"
+                  element={
+                    <ProtectedRoute
+                      redirectPath="/unauthorized"
+                      accessPermissions={['responsable-technique']}
+                    >
+                      <ResponsableTechnique />
                     </ProtectedRoute>
                   }
                 />

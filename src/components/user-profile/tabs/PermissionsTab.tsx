@@ -24,6 +24,9 @@ const PermissionsTab: React.FC<PermissionsTabProps> = ({ user, getRoleLabel }) =
     'certificates-creation': { name: 'Montage des certificats', icon: <UserCog className="h-4 w-4" /> },
     'user-management': { name: 'Gestion utilisateurs', icon: <UserCog className="h-4 w-4" /> }
   };
+
+  // Check if user has admin or director general role (they have access to everything)
+  const hasAdminAccess = user.role === 'admin' || user.role === 'directeur_general';
   
   return (
     <Card>
@@ -54,7 +57,7 @@ const PermissionsTab: React.FC<PermissionsTabProps> = ({ user, getRoleLabel }) =
             <h3 className="font-medium mb-2 text-certif-blue">Accès aux modules</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {Object.entries(moduleAccessMap).map(([moduleKey, moduleInfo]) => {
-                const hasAccess = user.permissions?.includes(moduleKey) || user.permissions?.includes('*');
+                const hasAccess = user.permissions?.includes(moduleKey) || user.permissions?.includes('*') || hasAdminAccess;
                 
                 return (
                   <div 
