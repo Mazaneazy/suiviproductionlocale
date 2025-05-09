@@ -1,5 +1,5 @@
 
-import { UserRole } from '@/types';
+import { UserRole } from '../types';
 
 // Define role to permission mapping
 export const rolePermissionsMap: Record<UserRole, string[]> = {
