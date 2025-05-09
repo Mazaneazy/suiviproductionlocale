@@ -1,7 +1,12 @@
 
 // Utility functions for user-related operations
 export const getRoleLabel = (role: string): string => {
-  const roleLabels: Record<string, string> = {
+  const roleLabels = getRoleLabels();
+  return roleLabels[role] || role;
+};
+
+export const getRoleLabels = (): Record<string, string> => {
+  return {
     'admin': 'Administrateur',
     'acceuil': 'Poste d\'Accueil',
     'inspecteur': 'Chef des Inspections',
@@ -16,8 +21,6 @@ export const getRoleLabel = (role: string): string => {
     'gestionnaire': 'Gestionnaire des Dossiers',
     'producteur': 'Producteur Local'
   };
-
-  return roleLabels[role] || role;
 };
 
 // Format date to localized string
