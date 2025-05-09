@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +17,7 @@ import MembreComiteCard from './MembreComiteCard';
 interface ComiteTechniqueFormProps {
   dossier: Dossier;
   onSave: (comite: ComiteTechnique) => void;
+  existingComite?: ComiteTechnique | null;
 }
 
 const ROLES_COMITE = [
@@ -27,13 +27,13 @@ const ROLES_COMITE = [
   { value: 'expert', label: 'Expert technique', icon: <User className="h-4 w-4" /> },
 ];
 
-const ComiteTechniqueForm: React.FC<ComiteTechniqueFormProps> = ({ dossier, onSave }) => {
+const ComiteTechniqueForm: React.FC<ComiteTechniqueFormProps> = ({ dossier, onSave, existingComite }) => {
   const { toast } = useToast();
   const [membres, setMembres] = useState<MembreComite[]>(
-    dossier.comiteTechnique?.membres || []
+    existingComite?.membres || dossier.comiteTechnique?.membres || []
   );
   const [chefComite, setChefComite] = useState<MembreComite | null>(
-    dossier.comiteTechnique?.chefComite || null
+    existingComite?.chefComite || dossier.comiteTechnique?.chefComite || null
   );
   const [nouveauMembre, setNouveauMembre] = useState({
     nom: '',
@@ -100,9 +100,9 @@ const ComiteTechniqueForm: React.FC<ComiteTechniqueFormProps> = ({ dossier, onSa
     }
 
     const comite: ComiteTechnique = {
-      id: dossier.comiteTechnique?.id || Math.random().toString(36).substring(2, 9),
+      id: existingComite?.id || dossier.comiteTechnique?.id || Math.random().toString(36).substring(2, 9),
       dossierId: dossier.id,
-      dateCreation: new Date().toISOString(),
+      dateCreation: existingComite?.dateCreation || new Date().toISOString(),
       chefComite,
       membres,
     };

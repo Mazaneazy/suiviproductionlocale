@@ -38,8 +38,8 @@ const ComiteTab: React.FC<ComiteTabProps> = ({ dossier, onSaveComite }) => {
       
       <ComiteTechniqueForm 
         dossier={dossier} 
+        onSave={onSaveComite}
         existingComite={dossier.comiteTechnique}
-        onSaveComite={onSaveComite}
       />
     </div>
   );

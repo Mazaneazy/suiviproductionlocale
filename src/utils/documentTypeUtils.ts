@@ -1,6 +1,4 @@
 
-import { getDocumentLabel } from './documentUtils';
-
 /**
  * Determines the type of document based on the filename
  * 

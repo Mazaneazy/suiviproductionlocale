@@ -21,6 +21,10 @@ interface NavItemProps {
   text: string;
 }
 
+interface NavigationProps {
+  onItemClick?: () => void;
+}
+
 const NavItem: React.FC<NavItemProps> = ({ href, icon, text }) => (
   <NavLink
     to={href}
@@ -37,7 +41,7 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, text }) => (
   </NavLink>
 );
 
-const Navigation = () => {
+const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
   const { hasAccess, hasRole } = useAuth();
 
   return (

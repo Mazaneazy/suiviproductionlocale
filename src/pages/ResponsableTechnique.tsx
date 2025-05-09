@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import { useData } from '../contexts/DataContext';
@@ -122,7 +121,7 @@ const ResponsableTechnique = () => {
           <TabsTrigger value="comite" disabled={!selectedDossier}>Comité technique</TabsTrigger>
           <TabsTrigger value="frais" disabled={!selectedDossier}>Validation des frais</TabsTrigger>
           <TabsTrigger value="inspections" disabled={!selectedDossier}>Inspections</TabsTrigger>
-          <TabsTrigger value="rapports" disabled={!selectedDossier}>Rapports</TabsTrigger>
+          <TabsTrigger value="rapports">Rapports</TabsTrigger>
           <TabsTrigger value="notesfrais" disabled={!selectedDossier}>Note de frais</TabsTrigger>
         </TabsList>
         
