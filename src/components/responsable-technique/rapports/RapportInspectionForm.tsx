@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -50,14 +49,15 @@ const RapportInspectionForm: React.FC<RapportInspectionFormProps> = ({
 
     const rapport: RapportInspection = {
       id: Math.random().toString(36).substring(2, 9),
-      dossierId: dossier.id,
       inspectionId: inspection.id,
-      date: new Date().toISOString(),
+      dateCreation: new Date().toISOString(),
+      auteur: 'Responsable Technique',
+      titre: `Rapport d'inspection pour ${dossier.operateurNom}`,
       contenu,
-      avisTechnique: avisTechnique || undefined,
-      recommandations: recommandations || undefined,
+      recommandations,
+      conclusion: avisTechnique,
       fichierUrl: attachments.length > 0 ? `https://example.com/rapports/${dossier.id}/rapport.pdf` : undefined,
-      status: 'en_attente'
+      statut: 'soumis',
     };
 
     onSubmit(rapport);

@@ -5,6 +5,9 @@ import { useData } from "@/contexts/DataContext";
 import { useAuth } from "@/hooks/useAuth";
 import { Dossier } from "@/types";
 import { Link } from "react-router-dom";
+import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { Clock, ArrowRight } from "lucide-react";
 
 export default function RecentDossiers() {
   const { dossiers } = useData();
@@ -20,7 +23,6 @@ export default function RecentDossiers() {
     );
   } else {
     // Pour les autres utilisateurs, afficher les dossiers récents
-    // Fix: Use dateTransmission instead of the properties that don't exist in the Dossier type
     filteredDossiers = [...dossiers]
       .sort((a, b) => {
         const dateA = a.dateTransmission || "";
@@ -56,21 +58,54 @@ export default function RecentDossiers() {
     }
   };
 
+  // Format date relative (ex: il y a 3 jours)
+  const formatRelativeDate = (dateString: string) => {
+    try {
+      return formatDistanceToNow(new Date(dateString), { addSuffix: true, locale: fr });
+    } catch (error) {
+      return 'Date inconnue';
+    }
+  };
+
   return (
-    <Card className="col-span-1 md:col-span-2">
-      <CardHeader>
+    <Card className="col-span-1 md:col-span-4">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle>Dossiers récents</CardTitle>
+        {hasAccess('dossiers') && (
+          <Link to="/dossiers" className="text-xs text-certif-blue hover:underline flex items-center">
+            Voir tous <ArrowRight className="ml-1 h-3 w-3" />
+          </Link>
+        )}
       </CardHeader>
       <CardContent>
         {filteredDossiers.length === 0 ? (
-          <p className="text-muted-foreground text-sm">Aucun dossier disponible</p>
+          <div className="flex flex-col items-center justify-center p-6 text-center">
+            <p className="text-muted-foreground text-sm mb-2">Aucun dossier disponible</p>
+            {hasAccess('dossiers') && currentUser?.role !== 'producteur' && (
+              <Link 
+                to="/dossiers"
+                className="text-xs text-certif-blue hover:underline"
+              >
+                Créer un nouveau dossier
+              </Link>
+            )}
+          </div>
         ) : (
           <div className="space-y-4">
             {filteredDossiers.map(dossier => (
-              <div key={dossier.id} className="flex items-center justify-between border-b pb-3">
+              <div 
+                key={dossier.id} 
+                className="flex items-center justify-between border-b pb-3 hover:bg-gray-50 -mx-2 px-2 rounded-md transition-colors duration-200"
+              >
                 <div>
                   <h3 className="font-medium">{dossier.operateurNom}</h3>
-                  <p className="text-sm text-muted-foreground">{dossier.typeProduit}</p>
+                  <div className="flex items-center">
+                    <p className="text-sm text-muted-foreground mr-2">{dossier.typeProduit}</p>
+                    <div className="flex items-center text-xs text-gray-500 mt-0.5">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {formatRelativeDate(dossier.dateTransmission || '')}
+                    </div>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge className={getStatusColor(dossier.status || 'en_attente')}>
@@ -79,7 +114,7 @@ export default function RecentDossiers() {
                   {hasAccess('dossiers') && (
                     <Link 
                       to={`/dossiers?id=${dossier.id}`} 
-                      className="text-xs text-certif-blue hover:underline"
+                      className="text-xs text-certif-blue hover:underline whitespace-nowrap"
                     >
                       Voir détails
                     </Link>

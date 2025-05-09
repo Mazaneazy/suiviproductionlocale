@@ -1,23 +1,23 @@
 
-import { UserRole } from '@/types';
+import { UserRole } from '../types';
 
 // Define role to permission mapping
 export const rolePermissionsMap: Record<UserRole, string[]> = {
   'admin': ['*'], // Admin access to all modules
   'acceuil': ['acceuil', 'dossiers'], // Added access to dossiers for status viewing
   'inspecteur': ['inspections', 'notes-frais'], // Renamed to "Responsable des missions" - added notes-frais access
-  'certificats': ['resultats'],
-  'analyste': ['statistiques'],
-  'comptable': ['notes-frais'],
-  'responsable_technique': ['responsable-technique'],
-  'chef_mission': ['inspections'],
-  'surveillant': ['inspections'],
-  'directeur': ['resultats'],
+  'certificats': ['resultats', 'dossiers'],
+  'analyste': ['statistiques', 'dossiers'],
+  'comptable': ['notes-frais', 'dossiers'],
+  'responsable_technique': ['responsable-technique', 'dossiers'],
+  'chef_mission': ['inspections', 'dossiers'],
+  'surveillant': ['inspections', 'dossiers'],
+  'directeur': ['resultats', 'dossiers'],
   'directeur_general': ['*'], // Director general access to all modules
   'gestionnaire': ['dossiers'],
-  'producteur': ['dashboard'], // Producteurs can only access their dashboard
-  'responsable_qualite': ['certificates-creation'], // Added new role for quality manager
-  'comite_validation': ['validation'] // Added new role for validation committee
+  'producteur': ['dashboard', 'dossiers'], // Producteurs can access their dashboard and dossiers
+  'responsable_qualite': ['certificates-creation', 'dossiers'], // Added dossiers access 
+  'comite_validation': ['validation', 'dossiers'] // Added dossiers access
 };
 
 // Module names for navigation and access control
