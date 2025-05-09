@@ -5,7 +5,6 @@ import { useNotesFraisState } from './useNotesFraisState';
 import { useNotesFraisForm } from './useNotesFraisForm';
 import { useNotesFraisActions } from './useNotesFraisActions';
 import { useNotesFraisUtils } from './useNotesFraisUtils';
-import { URL } from 'url';
 
 export const useNotesFraisManagement = () => {
   const {
@@ -77,7 +76,7 @@ export const useNotesFraisManagement = () => {
     if (uploadedFile) {
       // Dans une vraie application, nous téléchargerions le fichier vers un serveur
       // et obtiendrions une URL. Ici, nous simulons simplement cette URL
-      fichierUrl = URL.createObjectURL(uploadedFile);
+      fichierUrl = `document-${Date.now()}-${uploadedFile.name}`;
     }
 
     addNoteFrais({
