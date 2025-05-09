@@ -7,17 +7,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { useDossierDetailsDialog } from './details/hooks/useDossierDetailsDialog';
 import DossierDialogContent from './details/DossierDialogContent';
-import { File } from 'lucide-react';
 
 interface DossierDetailsDialogProps {
   dossierId: string;
-  buttonText?: string;
 }
 
-const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ 
-  dossierId, 
-  buttonText = "Détails" 
-}) => {
+const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }) => {
   const {
     isOpen,
     setIsOpen,
@@ -33,10 +28,7 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <File className="mr-2 h-4 w-4" />
-          {buttonText}
-        </Button>
+        <Button variant="outline" size="sm">Détails</Button>
       </DialogTrigger>
       
       <DossierDialogContent

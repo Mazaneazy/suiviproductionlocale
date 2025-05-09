@@ -13,8 +13,6 @@ export interface Dossier {
   parametresEvaluation?: string[];
   commentaires?: string;
   comiteTechnique?: ComiteTechnique;
-  piloteTechniqueId?: string;
-  piloteTechniqueNom?: string;
 }
 
 export interface NoteFrais {
