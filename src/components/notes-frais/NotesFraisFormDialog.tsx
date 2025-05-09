@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import NotesFraisForm from './NotesFraisForm';
 import { Dossier, NoteFrais } from '@/types';
 
@@ -17,8 +17,6 @@ interface NotesFraisFormDialogProps {
 }
 
 const NotesFraisFormDialog: React.FC<NotesFraisFormDialogProps> = ({
-  dialogOpen,
-  setDialogOpen,
   newNoteFrais,
   dossiers,
   fileInputRef,
@@ -39,22 +37,20 @@ const NotesFraisFormDialog: React.FC<NotesFraisFormDialogProps> = ({
   };
 
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Ajouter une nouvelle note de frais</DialogTitle>
-        </DialogHeader>
-        <NotesFraisForm
-          newNoteFrais={formattedNoteFrais}
-          dossiers={dossiers}
-          fileInputRef={fileInputRef}
-          onInputChange={onInputChange}
-          onDossierChange={onDossierChange}
-          onFileChange={onFileChange}
-          onSave={onSave}
-        />
-      </DialogContent>
-    </Dialog>
+    <DialogContent className="sm:max-w-lg">
+      <DialogHeader>
+        <DialogTitle>Ajouter une nouvelle note de frais</DialogTitle>
+      </DialogHeader>
+      <NotesFraisForm
+        newNoteFrais={formattedNoteFrais}
+        dossiers={dossiers}
+        fileInputRef={fileInputRef}
+        onInputChange={onInputChange}
+        onDossierChange={onDossierChange}
+        onFileChange={onFileChange}
+        onSave={onSave}
+      />
+    </DialogContent>
   );
 };
 

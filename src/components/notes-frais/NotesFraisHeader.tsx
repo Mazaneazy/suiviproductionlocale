@@ -2,7 +2,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
-import { DialogTrigger } from '@/components/ui/dialog';
 
 interface NotesFraisHeaderProps {
   onOpenDialog: () => void;
@@ -19,15 +18,13 @@ const NotesFraisHeader: React.FC<NotesFraisHeaderProps> = ({ onOpenDialog }) => 
         />
         <h1 className="text-3xl font-bold text-certif-blue">Notes de frais</h1>
       </div>
-      <DialogTrigger asChild>
-        <Button 
-          className="bg-certif-blue hover:bg-certif-blue/90"
-          onClick={onOpenDialog}
-        >
-          <PlusCircle className="mr-2" size={16} />
-          Nouvelle note de frais
-        </Button>
-      </DialogTrigger>
+      <Button 
+        className="bg-certif-blue hover:bg-certif-blue/90"
+        onClick={onOpenDialog}
+      >
+        <PlusCircle className="mr-2" size={16} />
+        Nouvelle note de frais
+      </Button>
     </div>
   );
 };

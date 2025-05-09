@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import NotesFraisDetails from './NotesFraisDetails';
 import { NoteFrais, Dossier } from '@/types';
 
@@ -15,8 +15,6 @@ interface NotesFraisDetailsDialogProps {
 }
 
 const NotesFraisDetailsDialog: React.FC<NotesFraisDetailsDialogProps> = ({
-  detailDialogOpen,
-  setDetailDialogOpen,
   selectedNote,
   dossiers,
   getStatusColor,
@@ -24,22 +22,20 @@ const NotesFraisDetailsDialog: React.FC<NotesFraisDetailsDialogProps> = ({
   calculerTotal
 }) => {
   return (
-    <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Détails de la note de frais</DialogTitle>
-        </DialogHeader>
-        {selectedNote && (
-          <NotesFraisDetails
-            note={selectedNote}
-            dossiers={dossiers}
-            getStatusColor={getStatusColor}
-            formatStatus={formatStatus}
-            calculerTotal={calculerTotal}
-          />
-        )}
-      </DialogContent>
-    </Dialog>
+    <DialogContent className="sm:max-w-lg">
+      <DialogHeader>
+        <DialogTitle>Détails de la note de frais</DialogTitle>
+      </DialogHeader>
+      {selectedNote && (
+        <NotesFraisDetails
+          note={selectedNote}
+          dossiers={dossiers}
+          getStatusColor={getStatusColor}
+          formatStatus={formatStatus}
+          calculerTotal={calculerTotal}
+        />
+      )}
+    </DialogContent>
   );
 };
 
