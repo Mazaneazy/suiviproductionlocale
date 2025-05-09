@@ -1,23 +1,23 @@
 
-import { UserRole } from '../types';
+import { UserRole } from '@/types';
 
 // Define role to permission mapping
 export const rolePermissionsMap: Record<UserRole, string[]> = {
   'admin': ['*'], // Admin access to all modules
-  'acceuil': ['acceuil', 'dossiers', 'dashboard'], // Access to accueil, dossiers and dashboard
-  'inspecteur': ['inspections', 'notes-frais', 'dashboard'], // Access to inspections, notes-frais and dashboard
-  'certificats': ['resultats', 'dossiers', 'dashboard'], // Access to resultats, dossiers and dashboard
-  'analyste': ['statistiques', 'dossiers', 'dashboard'], // Access to statistiques, dossiers and dashboard
-  'comptable': ['notes-frais', 'dossiers', 'dashboard'], // Access to notes-frais, dossiers and dashboard
-  'responsable_technique': ['responsable-technique', 'dossiers', 'dashboard'], // Access to responsable-technique, dossiers and dashboard
-  'chef_mission': ['inspections', 'dossiers', 'dashboard'], // Access to inspections, dossiers and dashboard
-  'surveillant': ['inspections', 'dossiers', 'dashboard'], // Access to inspections, dossiers and dashboard
-  'directeur': ['resultats', 'dossiers', 'dashboard'], // Access to resultats, dossiers and dashboard
+  'acceuil': ['acceuil', 'dossiers'], // Added access to dossiers for status viewing
+  'inspecteur': ['inspections', 'notes-frais'], // Renamed to "Responsable des missions" - added notes-frais access
+  'certificats': ['resultats', 'dossiers'],
+  'analyste': ['statistiques', 'dossiers'],
+  'comptable': ['notes-frais', 'dossiers'],
+  'responsable_technique': ['responsable-technique', 'dossiers'],
+  'chef_mission': ['inspections', 'dossiers'],
+  'surveillant': ['inspections', 'dossiers'],
+  'directeur': ['resultats', 'dossiers'],
   'directeur_general': ['*'], // Director general access to all modules
-  'gestionnaire': ['dossiers', 'dashboard'], // Access to dossiers and dashboard
-  'producteur': ['dashboard', 'dossiers'], // Access to dashboard and dossiers
-  'responsable_qualite': ['certificates-creation', 'dossiers', 'dashboard'], // Access to certificates-creation, dossiers and dashboard
-  'comite_validation': ['validation', 'dossiers', 'dashboard'] // Access to validation, dossiers and dashboard
+  'gestionnaire': ['dossiers'],
+  'producteur': ['dashboard', 'dossiers'], // Producteurs can access their dashboard and dossiers
+  'responsable_qualite': ['certificates-creation', 'dossiers'], // Added dossiers access 
+  'comite_validation': ['validation', 'dossiers'] // Added dossiers access
 };
 
 // Module names for navigation and access control
@@ -31,6 +31,5 @@ export const moduleNames = {
   'responsable-technique': 'Responsable Technique',
   'user-management': 'Gestion des utilisateurs',
   'certificates-creation': 'Montage des Certificats',
-  'validation': 'Comité de Validation',
-  'dashboard': 'Tableau de bord'
+  'validation': 'Comité de Validation'
 };

@@ -20,12 +20,7 @@ const DashboardCustomizer: React.FC<DashboardCustomizerProps> = ({
   const { toast } = useToast();
   
   const handleSave = () => {
-    // Suggérer une disposition par défaut si aucun élément n'est sélectionné
-    const layout = currentLayout.length > 0 ? 
-      currentLayout : 
-      ['stats', 'chart', 'dossiers', 'notifications'];
-    
-    onSaveLayout(layout);
+    onSaveLayout(currentLayout);
     toast({
       title: "Tableau de bord mis à jour",
       description: "Vos préférences ont été enregistrées."
@@ -43,7 +38,7 @@ const DashboardCustomizer: React.FC<DashboardCustomizerProps> = ({
   if (isCustomizing) {
     return (
       <div className="flex gap-2">
-        <Button variant="default" onClick={handleSave} className="flex items-center gap-1 bg-certif-blue hover:bg-certif-blue/90">
+        <Button variant="default" onClick={handleSave} className="flex items-center gap-1">
           <Save className="h-4 w-4" />
           Enregistrer
         </Button>

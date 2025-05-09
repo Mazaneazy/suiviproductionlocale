@@ -1,57 +1,75 @@
-import React, { useState } from 'react';
+
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Bell, Check } from 'lucide-react';
+import { Button } from '../ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Bell, Circle } from 'lucide-react';
-import { useData } from '@/contexts/DataContext';
-import { Badge } from '@/components/ui/badge';
-import { Link } from 'react-router-dom';
+} from '../ui/dropdown-menu';
+import { useData } from '../../contexts/DataContext';
 
-const NotificationsDropdown = () => {
+const NotificationsDropdown: React.FC = () => {
   const { notifications, markNotificationAsRead, getUnreadNotificationsCount } = useData();
-  const unreadCount = getUnreadNotificationsCount();
-  const hasUnreadNotifications = unreadCount > 0;
+  const navigate = useNavigate();
 
-  const handleNotificationClick = (id: string) => {
-    markNotificationAsRead(id);
+  const handleNotificationClick = (notif: any) => {
+    markNotificationAsRead(notif.id);
+    if (notif.link) {
+      navigate(notif.link);
+    }
   };
+
+  const unreadCount = getUnreadNotificationsCount();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="relative">
-          <Bell className="h-5 w-5 text-gray-500" />
-          {hasUnreadNotifications && (
-            <Badge className="absolute -top-1 -right-1 rounded-full px-2 py-0.5 text-xs font-bold bg-red-500 text-white">
+        <Button variant="ghost" size="icon" className="relative">
+          <Bell size={20} />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-certif-red rounded-full w-5 h-5 flex items-center justify-center text-white text-xs">
               {unreadCount}
-            </Badge>
+            </span>
           )}
-        </button>
+        </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-80 mr-2">
+      <DropdownMenuContent align="end" className="w-80">
+        <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+        <DropdownMenuSeparator />
         {notifications.length > 0 ? (
-          notifications.map((notification) => (
-            <DropdownMenuItem
-              key={notification.id}
-              onClick={() => handleNotificationClick(notification.id)}
-              className="flex items-start space-x-2"
+          notifications.slice(0, 5).map((notif) => (
+            <DropdownMenuItem 
+              key={notif.id} 
+              className={`flex flex-col items-start p-3 ${!notif.lue ? 'bg-certif-lightblue' : ''}`}
+              onClick={() => handleNotificationClick(notif)}
             >
-              <div>
-                <div className="text-sm font-medium">{notification.message}</div>
-                <div className="text-xs text-gray-500">{new Date(notification.date).toLocaleDateString()}</div>
+              <div className="flex justify-between w-full">
+                <span className={`text-sm font-medium ${notif.type === 'warning' ? 'text-certif-yellow' : notif.type === 'alert' ? 'text-certif-red' : 'text-certif-blue'}`}>
+                  {notif.type === 'warning' ? 'Attention' : notif.type === 'alert' ? 'Alerte' : 'Information'}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {new Date(notif.date).toLocaleDateString()}
+                </span>
               </div>
-              {!notification.lue && (
-                <Circle className="h-2 w-2 ml-auto text-blue-500" fill="blue" />
+              <p className="text-sm mt-1">{notif.message}</p>
+              {!notif.lue && (
+                <div className="flex justify-end w-full mt-1">
+                  <span className="text-xs text-certif-blue flex items-center">
+                    <Check size={12} className="mr-1" /> Cliquer pour marquer comme lu
+                  </span>
+                </div>
               )}
             </DropdownMenuItem>
           ))
         ) : (
-          <DropdownMenuItem className="justify-center">
-            Pas de nouvelles notifications
-          </DropdownMenuItem>
+          <div className="p-3 text-center text-gray-500">
+            Aucune notification
+          </div>
         )}
       </DropdownMenuContent>
     </DropdownMenu>

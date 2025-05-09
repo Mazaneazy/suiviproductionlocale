@@ -4,19 +4,15 @@ import Layout from "../components/Layout";
 import { useAuth } from "../hooks/useAuth";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import RecentDossiers from "@/components/dashboard/RecentDossiers";
-import DashboardChart from "@/components/dashboard/DashboardChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { useState, useEffect } from 'react';
 import DashboardCustomizer from '@/components/dashboard/DashboardCustomizer';
 import { getUserDashboardLayout, saveDashboardLayout } from '@/utils/dashboardUtils';
-import { Bell, Calendar, Clock, ArrowRight } from "lucide-react";
-import { Link } from 'react-router-dom';
-import { useData } from '@/contexts/DataContext';
+import DashboardCard from '@/components/dashboard/DashboardCard';
 
 const Dashboard = () => {
   const { currentUser } = useAuth();
-  const { notifications } = useData();
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [dashboardLayout, setDashboardLayout] = useState<string[]>([]);
   
@@ -28,7 +24,7 @@ const Dashboard = () => {
         setDashboardLayout(userLayout);
       } else {
         // Disposition par défaut
-        setDashboardLayout(['stats', 'chart', 'dossiers', 'notifications']);
+        setDashboardLayout(['stats', 'dossiers', 'notifications']);
       }
     }
   }, [currentUser]);
@@ -74,9 +70,6 @@ const Dashboard = () => {
     }
   };
 
-  // Récupérer les notifications non lues
-  const unreadNotifications = notifications.filter(notif => !notif.lue).slice(0, 5);
-
   // Rendu des cartes en fonction de la disposition
   const renderDashboardCards = () => {
     return dashboardLayout.map(cardType => {
@@ -87,15 +80,9 @@ const Dashboard = () => {
               <DashboardStats />
             </motion.div>
           );
-        case 'chart':
-          return (
-            <motion.div key="chart" variants={itemVariants} className="col-span-12 lg:col-span-8">
-              <DashboardChart />
-            </motion.div>
-          );
         case 'dossiers':
           return (
-            <motion.div key="dossiers" variants={itemVariants} className="col-span-12 lg:col-span-8 md:col-span-8">
+            <motion.div key="dossiers" variants={itemVariants} className="col-span-12 md:col-span-8">
               <RecentDossiers />
             </motion.div>
           );
@@ -103,54 +90,13 @@ const Dashboard = () => {
           return (
             <motion.div key="notifications" variants={itemVariants} className="col-span-12 md:col-span-4">
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardHeader>
                   <CardTitle>Notifications</CardTitle>
-                  <Bell className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  {unreadNotifications.length > 0 ? (
-                    <div className="space-y-3">
-                      {unreadNotifications.map(notif => (
-                        <div key={notif.id} className="bg-gray-50 p-2 rounded-md border-l-2 border-blue-400">
-                          <p className="text-sm font-medium">{notif.message}</p>
-                          <div className="flex items-center mt-1 text-xs text-gray-500">
-                            <Clock className="h-3 w-3 mr-1" />
-                            <span>{new Date(notif.date).toLocaleDateString()}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      Pas de nouvelles notifications
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          );
-        case 'calendar':
-          return (
-            <motion.div key="calendar" variants={itemVariants} className="col-span-12 md:col-span-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle>Calendrier</CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="bg-blue-50 p-2 rounded-md border-l-2 border-blue-400">
-                      <p className="text-sm font-medium">Inspection - Sarl Agro Prod</p>
-                      <p className="text-xs text-gray-600 mt-1">Aujourd'hui, 14:00</p>
-                    </div>
-                    <div className="bg-green-50 p-2 rounded-md border-l-2 border-green-400">
-                      <p className="text-sm font-medium">Comité technique</p>
-                      <p className="text-xs text-gray-600 mt-1">Demain, 10:00</p>
-                    </div>
-                    <Link to="/calendar" className="text-xs text-certif-blue hover:underline flex items-center justify-end mt-2">
-                      Voir tout le calendrier <ArrowRight className="ml-1 h-3 w-3" />
-                    </Link>
-                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Pas de nouvelles notifications
+                  </p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -171,7 +117,7 @@ const Dashboard = () => {
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="space-y-6"
+        className="space-y-8"
       >
         <div className="flex justify-between items-center">
           <motion.h1 
@@ -197,26 +143,24 @@ const Dashboard = () => {
             <p className="text-sm text-gray-500 mb-4">Faites glisser les éléments pour réorganiser votre tableau de bord</p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {['stats', 'chart', 'dossiers', 'notifications', 'calendar'].map(type => {
-                const cardConfig = {
-                  stats: { title: "Statistiques", description: "Aperçu statistique des dossiers" },
-                  chart: { title: "Graphique des tendances", description: "Évolution des dossiers et certifications" },
-                  dossiers: { title: "Dossiers récents", description: "Liste des derniers dossiers" },
-                  notifications: { title: "Notifications", description: "Vos dernières notifications" },
-                  calendar: { title: "Calendrier", description: "Prochains événements" }
-                };
-                const config = cardConfig[type as keyof typeof cardConfig];
-                
-                return (
-                  <div 
-                    key={type}
-                    className="p-4 border-2 border-dashed rounded-lg bg-white shadow-sm cursor-move hover:border-certif-blue transition-colors duration-200"
-                  >
-                    <h3 className="font-medium">{config.title}</h3>
-                    <p className="text-sm text-gray-500">{config.description}</p>
-                  </div>
-                );
-              })}
+              <DashboardCard 
+                type="stats" 
+                title="Statistiques" 
+                description="Aperçu statistique des dossiers" 
+                isCustomizing={true}
+              />
+              <DashboardCard 
+                type="dossiers" 
+                title="Dossiers récents" 
+                description="Liste des derniers dossiers" 
+                isCustomizing={true}
+              />
+              <DashboardCard 
+                type="notifications" 
+                title="Notifications" 
+                description="Vos dernières notifications" 
+                isCustomizing={true}
+              />
             </div>
           </motion.div>
         ) : (

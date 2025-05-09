@@ -1,197 +1,407 @@
 
 import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon } from "lucide-react"
-import { format } from "date-fns"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useData } from '@/contexts/DataContext';
-import { Certificat, Dossier } from '@/types';
-import { useAuth } from '@/hooks/useAuth';
+import { Dossier, Certificat, Inspection } from '@/types';
 
 interface CreateResultDialogProps {
-  dossier: Dossier;
+  dialogOpen: boolean;
+  setDialogOpen: (open: boolean) => void;
+  dossiersEligibles: Dossier[];
 }
 
-const CreateResultDialog: React.FC<CreateResultDialogProps> = ({ dossier }) => {
-  const { addCertificat } = useData();
+const CreateResultDialog: React.FC<CreateResultDialogProps> = ({ 
+  dialogOpen, 
+  setDialogOpen,
+  dossiersEligibles 
+}) => {
+  const { addCertificat, certificats } = useData();
   const { toast } = useToast();
-  const { currentUser } = useAuth();
-  const [open, setOpen] = useState(false);
-  const [numeroCertificat, setNumeroCertificat] = useState('');
-  const [entreprise, setEntreprise] = useState(dossier.operateurNom);
-  const [produit, setProduit] = useState(dossier.typeProduit);
-  const [dateDelivrance, setDateDelivrance] = useState<Date | undefined>(new Date());
-  const [dateExpiration, setDateExpiration] = useState<Date | undefined>(new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
-  const [status, setStatus] = useState<'actif' | 'expire' | 'suspendu' | 'revoque'>('actif');
+  const [currentTab, setCurrentTab] = useState('certificat');
+  
+  // État pour le nouveau résultat (certificat, non-conformité ou actions correctives)
+  const [newResult, setNewResult] = useState({
+    type: 'certificat',
+    dossierId: '',
+    entreprise: '',
+    produit: '',
+    numero: `CERT-${new Date().getFullYear()}-${certificats.length + 1}`.padStart(8, '0'),
+    dateDelivrance: new Date().toISOString().split('T')[0],
+    dateExpiration: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    status: 'actif' as 'actif' | 'suspendu' | 'retire' | 'expire',
+    commentaire: ''
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Fonction pour mettre à jour les champs du nouveau résultat
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setNewResult({
+      ...newResult,
+      [name]: value,
+    });
+  };
 
-    if (!numeroCertificat || !entreprise || !produit || !dateDelivrance || !dateExpiration) {
+  // Fonction pour mettre à jour le type de résultat
+  const handleTypeChange = (type: string) => {
+    setCurrentTab(type);
+    setNewResult({
+      ...newResult,
+      type,
+      numero: type === 'certificat' 
+        ? `CERT-${new Date().getFullYear()}-${certificats.length + 1}`.padStart(8, '0')
+        : type === 'non_conformite'
+          ? `NC-${new Date().getFullYear()}-${certificats.length + 1}`.padStart(8, '0')
+          : `AC-${new Date().getFullYear()}-${certificats.length + 1}`.padStart(8, '0')
+    });
+  };
+
+  // Fonction pour mettre à jour les informations quand on change le dossier
+  const handleDossierChange = (dossierId: string) => {
+    const dossier = dossiersEligibles.find(d => d.id === dossierId);
+    
+    if (dossier) {
+      setNewResult({
+        ...newResult,
+        dossierId,
+        entreprise: dossier.operateurNom,
+        produit: dossier.typeProduit,
+      });
+    }
+  };
+
+  // Fonction pour ajouter un nouveau certificat ou résultat
+  const handleAddResult = () => {
+    // Vérifier que tous les champs obligatoires sont remplis
+    if (!newResult.dossierId) {
       toast({
         variant: "destructive",
-        title: "Champs manquants",
-        description: "Veuillez remplir tous les champs obligatoires.",
+        title: "Erreur",
+        description: "Veuillez sélectionner un dossier.",
       });
       return;
     }
 
-    const certificat = {
-      dossierId: dossier.id,
-      numero: numeroCertificat,
-      entreprise: entreprise,
-      produit: produit,
-      dateDelivrance: dateDelivrance.toISOString(),
-      dateExpiration: dateExpiration.toISOString(),
-      status: status,
-      responsableQualiteId: currentUser?.id || "unknown" // Add the required field
-    };
-
-    addCertificat(certificat);
-
-    toast({
-      title: "Certificat créé",
-      description: "Le certificat a été créé avec succès.",
+    // Pour un certificat
+    if (newResult.type === 'certificat') {
+      const certificat = {
+        dossierId: newResult.dossierId,
+        numero: newResult.numero,
+        entreprise: newResult.entreprise,
+        produit: newResult.produit,
+        dateDelivrance: newResult.dateDelivrance,
+        dateExpiration: newResult.dateExpiration,
+        status: newResult.status
+      };
+      
+      addCertificat(certificat);
+      
+      toast({
+        title: "Certificat de conformité émis",
+        description: `Le certificat pour "${newResult.entreprise}" a été émis et attend validation.`,
+      });
+    } else {
+      // Pour les autres types de résultats (non-conformité ou actions correctives)
+      const certificat = {
+        dossierId: newResult.dossierId,
+        numero: newResult.numero,
+        entreprise: newResult.entreprise,
+        produit: newResult.produit,
+        dateDelivrance: newResult.dateDelivrance,
+        dateExpiration: newResult.dateExpiration,
+        status: 'actif' as 'actif'
+      };
+      
+      addCertificat(certificat);
+      
+      const resultType = newResult.type === 'non_conformite' 
+        ? "Rapport de non-conformité" 
+        : "Lettre d'actions correctives";
+        
+      toast({
+        title: `${resultType} émis`,
+        description: `Le document pour "${newResult.entreprise}" a été émis et attend validation.`,
+      });
+    }
+    
+    // Réinitialiser le formulaire
+    setNewResult({
+      type: 'certificat',
+      dossierId: '',
+      entreprise: '',
+      produit: '',
+      numero: `CERT-${new Date().getFullYear()}-${certificats.length + 2}`.padStart(8, '0'),
+      dateDelivrance: new Date().toISOString().split('T')[0],
+      dateExpiration: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      status: 'actif',
+      commentaire: ''
     });
-
-    setOpen(false);
-  };
-
-  const handleGenerateDemo = () => {
-    const certificat = {
-      dossierId: dossier.id,
-      numero: `CERT-DEMO-${Math.floor(Math.random() * 1000)}`,
-      entreprise: dossier.operateurNom,
-      produit: dossier.typeProduit,
-      dateDelivrance: new Date().toISOString(),
-      dateExpiration: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
-      status: 'actif' as 'actif',
-      responsableQualiteId: currentUser?.id || "unknown"
-    };
-
-    addCertificat(certificat);
-
-    toast({
-      title: "Certificat de démonstration créé",
-      description: "Un certificat de démonstration a été créé avec succès.",
-    });
-
-    setOpen(false);
+    
+    setDialogOpen(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Créer un certificat</Button>
+        <Button className="bg-certif-green hover:bg-certif-green/90">
+          <PlusCircle className="mr-2" size={16} />
+          Nouveau document
+        </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Créer un certificat</DialogTitle>
+          <DialogTitle>Créer un document de résultat</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="numero">Numéro</Label>
-            <Input id="numero" value={numeroCertificat} onChange={(e) => setNumeroCertificat(e.target.value)} className="col-span-3" />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="entreprise">Entreprise</Label>
-            <Input id="entreprise" value={entreprise} onChange={(e) => setEntreprise(e.target.value)} className="col-span-3" />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="produit">Produit</Label>
-            <Input id="produit" value={produit} onChange={(e) => setProduit(e.target.value)} className="col-span-3" />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="delivrance">Date de délivrance</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-[240px] justify-start text-left font-normal",
-                    !dateDelivrance && "text-muted-foreground"
-                  )}
+        
+        <Tabs defaultValue="certificat" value={currentTab} onValueChange={handleTypeChange}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="certificat">Certificat</TabsTrigger>
+            <TabsTrigger value="non_conformite">Non-conformité</TabsTrigger>
+            <TabsTrigger value="actions_correctives">Actions correctives</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="certificat" className="pt-4">
+            <div className="space-y-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="dossierId" className="text-right font-medium text-sm">
+                  Dossier*
+                </label>
+                <Select
+                  value={newResult.dossierId}
+                  onValueChange={handleDossierChange}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateDelivrance ? format(dateDelivrance, "PPP") : <span>Choisir une date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={dateDelivrance}
-                  onSelect={setDateDelivrance}
-                  disabled={(date) =>
-                    date > new Date()
-                  }
-                  initialFocus
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Sélectionner un dossier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {dossiersEligibles.map((dossier) => (
+                      <SelectItem key={dossier.id} value={dossier.id}>
+                        {dossier.operateurNom} - {dossier.typeProduit}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="numero" className="text-right font-medium text-sm">
+                  Numéro
+                </label>
+                <Input
+                  id="numero"
+                  name="numero"
+                  value={newResult.numero}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                  readOnly
                 />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="expiration">Date d'expiration</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-[240px] justify-start text-left font-normal",
-                    !dateExpiration && "text-muted-foreground"
-                  )}
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="dateDelivrance" className="text-right font-medium text-sm">
+                  Date de délivrance
+                </label>
+                <Input
+                  id="dateDelivrance"
+                  name="dateDelivrance"
+                  type="date"
+                  value={newResult.dateDelivrance}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="dateExpiration" className="text-right font-medium text-sm">
+                  Date d'expiration
+                </label>
+                <Input
+                  id="dateExpiration"
+                  name="dateExpiration"
+                  type="date"
+                  value={newResult.dateExpiration}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="non_conformite" className="pt-4">
+            <div className="space-y-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="dossierId" className="text-right font-medium text-sm">
+                  Dossier*
+                </label>
+                <Select
+                  value={newResult.dossierId}
+                  onValueChange={handleDossierChange}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateExpiration ? format(dateExpiration, "PPP") : <span>Choisir une date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={dateExpiration}
-                  onSelect={setDateExpiration}
-                  disabled={(date) =>
-                    date < new Date()
-                  }
-                  initialFocus
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Sélectionner un dossier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {dossiersEligibles.map((dossier) => (
+                      <SelectItem key={dossier.id} value={dossier.id}>
+                        {dossier.operateurNom} - {dossier.typeProduit}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="numero" className="text-right font-medium text-sm">
+                  Numéro
+                </label>
+                <Input
+                  id="numero"
+                  name="numero"
+                  value={newResult.numero}
+                  className="col-span-3"
+                  readOnly
                 />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="status">Statut</Label>
-            <select id="status" 
-                    value={status} 
-                    onChange={(e) => setStatus(e.target.value as 'actif' | 'expire' | 'suspendu' | 'revoque')} 
-                    className="col-span-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-              <option value="actif">Actif</option>
-              <option value="expire">Expiré</option>
-              <option value="suspendu">Suspendu</option>
-              <option value="revoque">Révoqué</option>
-            </select>
-          </div>
-          <div className="flex justify-end">
-            <Button type="submit">
-              Créer
-            </Button>
-          </div>
-        </form>
-        <div className="flex justify-end">
-          <Button type="button" variant="secondary" onClick={handleGenerateDemo}>
-            Générer un certificat de démonstration
+              </div>
+              
+              <div className="grid grid-cols-4 items-start gap-4">
+                <label htmlFor="commentaire" className="text-right font-medium text-sm pt-2">
+                  Raisons de non-conformité
+                </label>
+                <Textarea
+                  id="commentaire"
+                  name="commentaire"
+                  value={newResult.commentaire}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                  rows={4}
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="dateDelivrance" className="text-right font-medium text-sm">
+                  Date du rapport
+                </label>
+                <Input
+                  id="dateDelivrance"
+                  name="dateDelivrance"
+                  type="date"
+                  value={newResult.dateDelivrance}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="actions_correctives" className="pt-4">
+            <div className="space-y-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="dossierId" className="text-right font-medium text-sm">
+                  Dossier*
+                </label>
+                <Select
+                  value={newResult.dossierId}
+                  onValueChange={handleDossierChange}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Sélectionner un dossier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {dossiersEligibles.map((dossier) => (
+                      <SelectItem key={dossier.id} value={dossier.id}>
+                        {dossier.operateurNom} - {dossier.typeProduit}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="numero" className="text-right font-medium text-sm">
+                  Numéro
+                </label>
+                <Input
+                  id="numero"
+                  name="numero"
+                  value={newResult.numero}
+                  className="col-span-3"
+                  readOnly
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-start gap-4">
+                <label htmlFor="commentaire" className="text-right font-medium text-sm pt-2">
+                  Actions correctives requises
+                </label>
+                <Textarea
+                  id="commentaire"
+                  name="commentaire"
+                  value={newResult.commentaire}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                  rows={4}
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="dateDelivrance" className="text-right font-medium text-sm">
+                  Date d'émission
+                </label>
+                <Input
+                  id="dateDelivrance"
+                  name="dateDelivrance"
+                  type="date"
+                  value={newResult.dateDelivrance}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="dateExpiration" className="text-right font-medium text-sm">
+                  Date limite
+                </label>
+                <Input
+                  id="dateExpiration"
+                  name="dateExpiration"
+                  type="date"
+                  value={newResult.dateExpiration}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+        
+        <DialogFooter className="mt-6">
+          <DialogClose asChild>
+            <Button variant="outline">Annuler</Button>
+          </DialogClose>
+          <Button onClick={handleAddResult} className="bg-certif-green hover:bg-certif-green/90">
+            Émettre le document
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

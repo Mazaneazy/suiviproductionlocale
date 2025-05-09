@@ -1,5 +1,5 @@
 
-import { User, UserRole, UserAction } from '../types';
+import { User, UserRole, UserAction } from '@/types';
 
 export interface AuthContextProps {
   currentUser: User | null;

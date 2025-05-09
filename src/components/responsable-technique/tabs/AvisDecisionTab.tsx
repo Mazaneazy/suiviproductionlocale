@@ -43,17 +43,11 @@ const AvisDecisionTab: React.FC<AvisDecisionTabProps> = ({ dossier, rapports, on
       id: generateId(),
       dossierId: dossier.id,
       rapportId: selectedRapport,
-      dateCreation: new Date().toISOString(),
       date: new Date().toISOString(),
-      auteur: "current-user",
       contenu: contenu,
-      decision: resultat === 'favorable' ? 'favorable' : 
-               resultat === 'defavorable' ? 'defavorable' : 'avec_reserve',
       resultat: resultat,
-      justification: commentaires,
       commentaires: commentaires,
-      status: 'transmis',
-      actions: []
+      status: 'transmis'
     };
     
     // In a real app, we would save the avis to the database
@@ -92,7 +86,7 @@ const AvisDecisionTab: React.FC<AvisDecisionTabProps> = ({ dossier, rapports, on
                 {rapports.length > 0 ? (
                   rapports.map((rapport) => (
                     <SelectItem key={rapport.id} value={rapport.id}>
-                      Rapport du {rapport.dateCreation ? new Date(rapport.dateCreation).toLocaleDateString() : 'date inconnue'}
+                      Rapport du {new Date(rapport.date).toLocaleDateString()}
                     </SelectItem>
                   ))
                 ) : (

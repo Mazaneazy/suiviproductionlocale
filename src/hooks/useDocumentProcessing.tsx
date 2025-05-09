@@ -64,10 +64,7 @@ export function useDocumentProcessing() {
         type: documentType,
         dateUpload: new Date().toISOString(),
         url: fileUrl,
-        status: 'en_attente',
-        taille: file.size / 1024, // convert bytes to KB
-        format: file.name.split('.').pop() || 'pdf',
-        uploadedBy: 'current-user'
+        status: 'en_attente' // Using a specific string literal that matches the expected type
       };
       
       try {
