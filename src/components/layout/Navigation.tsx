@@ -51,7 +51,7 @@ const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
 
       {/* Poste d'accueil */}
       {hasAccess('acceuil') && (
-        <NavItem href="/accueil" icon={<FilePlus2 size={18} />} text="Poste d'Accueil" />
+        <NavItem href="/accueil" icon={<FilePlus2 size={18} />} text="Chargé de clientèle" />
       )}
 
       {/* Gestion des dossiers - pour tous sauf producteurs */}

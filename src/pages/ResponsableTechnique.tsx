@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import { useData } from '../contexts/DataContext';
@@ -111,14 +112,14 @@ const ResponsableTechnique = () => {
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-certif-blue">Poste Responsable Technique</h1>
         <p className="text-gray-600 mt-2">
-          Validation des documents, composition du comité technique et gestion des inspections
+          Validation des documents, composition du pilote technique et gestion des inspections
         </p>
       </div>
       
       <Tabs defaultValue="dossiers" value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
           <TabsTrigger value="dossiers">Dossiers à traiter</TabsTrigger>
-          <TabsTrigger value="comite" disabled={!selectedDossier}>Comité technique</TabsTrigger>
+          <TabsTrigger value="comite" disabled={!selectedDossier}>Pilote technique</TabsTrigger>
           <TabsTrigger value="frais" disabled={!selectedDossier}>Validation des frais</TabsTrigger>
           <TabsTrigger value="inspections" disabled={!selectedDossier}>Inspections</TabsTrigger>
           <TabsTrigger value="rapports">Rapports</TabsTrigger>
@@ -137,7 +138,7 @@ const ResponsableTechnique = () => {
           />
         </TabsContent>
         
-        {/* Tab: Comité technique */}
+        {/* Tab: Pilote technique */}
         <TabsContent value="comite">
           <ComiteTab 
             dossier={selectedDossier} 

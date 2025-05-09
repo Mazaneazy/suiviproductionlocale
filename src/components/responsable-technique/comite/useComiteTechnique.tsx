@@ -62,7 +62,7 @@ export const useComiteTechnique = ({ dossier, existingComite, onSave }: UseComit
 
     toast({
       title: "Membre ajouté",
-      description: `${membreToAdd.nom} a été ajouté au comité technique`,
+      description: `${membreToAdd.nom} a été ajouté au pilote technique`,
     });
   };
 
@@ -71,7 +71,7 @@ export const useComiteTechnique = ({ dossier, existingComite, onSave }: UseComit
     
     toast({
       title: "Membre retiré",
-      description: "Le membre a été retiré du comité technique",
+      description: "Le membre a été retiré du pilote technique",
     });
   };
 
@@ -79,7 +79,7 @@ export const useComiteTechnique = ({ dossier, existingComite, onSave }: UseComit
     if (!chefComite) {
       toast({
         title: "Erreur",
-        description: "Veuillez désigner un chef de comité",
+        description: "Veuillez désigner un chef de pilote",
         variant: "destructive",
       });
       return;
@@ -96,8 +96,8 @@ export const useComiteTechnique = ({ dossier, existingComite, onSave }: UseComit
     onSave(comite);
     
     toast({
-      title: "Comité enregistré",
-      description: "Le comité technique a été enregistré avec succès",
+      title: "Pilote technique enregistré",
+      description: "Le pilote technique a été enregistré avec succès",
     });
   };
 

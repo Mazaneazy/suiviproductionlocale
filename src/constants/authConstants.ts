@@ -20,7 +20,7 @@ export const rolePermissionsMap: Record<UserRole, string[]> = {
 
 // Module names for navigation and access control
 export const moduleNames = {
-  'acceuil': 'Poste d\'Accueil',
+  'acceuil': 'Chargé de clientèle',
   'dossiers': 'Gestion des Dossiers',
   'inspections': 'Inspections',
   'resultats': 'Certificats émis',

@@ -10,7 +10,7 @@ export const getRoleBadge = (role: 'chef' | 'inspecteur' | 'analyste' | 'expert'
       return (
         <Badge className="bg-amber-500 text-white">
           <Award className="h-3 w-3 mr-1" />
-          Chef du comité
+          Chef du pilote technique
         </Badge>
       );
     case 'inspecteur':

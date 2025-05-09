@@ -48,7 +48,7 @@ const ComiteTechniqueForm: React.FC<ComiteTechniqueFormProps> = ({
           onClick={handleSaveComite} 
           className="bg-certif-blue hover:bg-certif-blue/90"
         >
-          Enregistrer le comité technique
+          Enregistrer le pilote technique
         </Button>
       </div>
     </div>

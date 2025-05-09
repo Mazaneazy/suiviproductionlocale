@@ -19,7 +19,7 @@ const ComiteTab: React.FC<ComiteTabProps> = ({ dossier, onSaveComite }) => {
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Information</AlertTitle>
           <AlertDescription>
-            Veuillez sélectionner un dossier pour composer un comité technique.
+            Veuillez sélectionner un dossier pour composer un pilote technique.
           </AlertDescription>
         </Alert>
       </div>
@@ -30,10 +30,10 @@ const ComiteTab: React.FC<ComiteTabProps> = ({ dossier, onSaveComite }) => {
     <div className="bg-white rounded-lg shadow-sm p-6">
       <h2 className="text-xl font-semibold mb-4 flex items-center">
         <Users className="h-5 w-5 mr-2 text-certif-blue" />
-        Composition du comité technique
+        Composition du pilote technique
       </h2>
       <p className="text-gray-600 mb-6">
-        Constituer le comité technique chargé de l'évaluation du dossier de {dossier.operateurNom} et de la définition des paramètres à évaluer.
+        Constituer le pilote technique chargé de l'évaluation du dossier de {dossier.operateurNom} et de la définition des paramètres à évaluer.
       </p>
       
       <ComiteTechniqueForm 

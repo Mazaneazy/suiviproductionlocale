@@ -32,7 +32,7 @@ const AddMembreForm: React.FC<AddMembreFormProps> = ({
     <div className="bg-white p-4 rounded-lg border shadow-sm">
       <h3 className="text-lg font-medium mb-4 flex items-center">
         <UserPlus className="h-5 w-5 mr-2 text-certif-blue" />
-        Ajouter un membre au comité
+        Ajouter un membre au pilote technique
       </h3>
       
       <div className="space-y-4">
