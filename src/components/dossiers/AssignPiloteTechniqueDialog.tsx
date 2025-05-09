@@ -35,11 +35,14 @@ const AssignPiloteTechniqueDialog: React.FC<AssignPiloteTechniqueDialogProps> = 
   const [open, setOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const { getDossierById, updateDossier } = useData();
-  const { getAllUsers } = useAuth();
+  const { getAllUsers, currentUser } = useAuth();
   const { toast } = useToast();
   
   const dossier = getDossierById(dossierId);
   const allUsers = getAllUsers();
+  
+  // Vérifier si l'utilisateur actuel a le rôle 'acceuil'
+  const isAccueilRole = currentUser?.role === 'acceuil';
   
   // Filter users with responsable_technique role
   const techniciens = allUsers.filter(user => 
@@ -47,6 +50,16 @@ const AssignPiloteTechniqueDialog: React.FC<AssignPiloteTechniqueDialogProps> = 
   );
 
   const handleAssign = () => {
+    // Bloquer l'action si l'utilisateur est un chargé de clientèle
+    if (isAccueilRole) {
+      toast({
+        title: "Action non autorisée",
+        description: "Vous n'avez pas les droits pour assigner un pilote technique",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!selectedUserId) {
       toast({
         title: "Erreur",
@@ -91,6 +104,11 @@ const AssignPiloteTechniqueDialog: React.FC<AssignPiloteTechniqueDialogProps> = 
       setSelectedUserId(dossier?.piloteTechniqueId || '');
     }
   }, [open, dossier]);
+
+  // Si l'utilisateur est un chargé de clientèle, ne pas afficher le bouton
+  if (isAccueilRole) {
+    return null;
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
