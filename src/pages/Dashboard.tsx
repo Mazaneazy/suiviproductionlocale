@@ -1,4 +1,3 @@
-
 import { Helmet } from 'react-helmet';
 import Layout from "../components/Layout";
 import { useAuth } from "../hooks/useAuth";
@@ -52,6 +51,7 @@ const Dashboard = () => {
       timeMessage = "Bonsoir";
     }
     
+    // Personnaliser le message avec le nom de l'utilisateur
     return `${timeMessage}, ${currentUser?.name || 'Utilisateur'}`;
   };
 
