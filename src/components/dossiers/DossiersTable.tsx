@@ -15,6 +15,7 @@ import { Dossier } from '@/types';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import DossierDetailsDialog from './DossierDetailsDialog';
+import AssignPiloteTechniqueDialog from './AssignPiloteTechniqueDialog';
 
 interface DossiersTableProps {
   dossiers: Dossier[];
@@ -75,6 +76,7 @@ const DossiersTable: React.FC<DossiersTableProps> = ({ dossiers }) => {
             <TableHead>Opérateur/Promoteur</TableHead>
             <TableHead>Type de produit</TableHead>
             <TableHead>Responsable</TableHead>
+            <TableHead>Pilote technique</TableHead>
             <TableHead>Statut</TableHead>
             <TableHead>Échéance</TableHead>
             <TableHead>Actions</TableHead>
@@ -103,6 +105,7 @@ const DossiersTable: React.FC<DossiersTableProps> = ({ dossiers }) => {
                   </TableCell>
                   <TableCell>{dossier.typeProduit}</TableCell>
                   <TableCell>{dossier.responsable}</TableCell>
+                  <TableCell>{dossier.piloteTechniqueNom || "-"}</TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(dossier.status)}>
                       {formatStatus(dossier.status)}
@@ -128,6 +131,7 @@ const DossiersTable: React.FC<DossiersTableProps> = ({ dossiers }) => {
                   <TableCell>
                     <div className="flex space-x-2">
                       <DossierDetailsDialog dossierId={dossier.id} />
+                      <AssignPiloteTechniqueDialog dossierId={dossier.id} />
                     </div>
                   </TableCell>
                 </TableRow>
@@ -135,7 +139,7 @@ const DossiersTable: React.FC<DossiersTableProps> = ({ dossiers }) => {
             })
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="h-24 text-center">
+              <TableCell colSpan={8} className="h-24 text-center">
                 Aucun dossier trouvé
               </TableCell>
             </TableRow>

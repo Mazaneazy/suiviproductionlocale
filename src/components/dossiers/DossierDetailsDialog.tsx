@@ -10,9 +10,13 @@ import DossierDialogContent from './details/DossierDialogContent';
 
 interface DossierDetailsDialogProps {
   dossierId: string;
+  buttonText?: string;
 }
 
-const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }) => {
+const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ 
+  dossierId, 
+  buttonText = "Détails" 
+}) => {
   const {
     isOpen,
     setIsOpen,
@@ -28,7 +32,7 @@ const DossierDetailsDialog: React.FC<DossierDetailsDialogProps> = ({ dossierId }
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">Détails</Button>
+        <Button variant="outline" size="sm">{buttonText}</Button>
       </DialogTrigger>
       
       <DossierDialogContent
