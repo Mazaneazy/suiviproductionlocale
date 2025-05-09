@@ -5,7 +5,7 @@ import { User } from '@/types';
 export const MOCK_USERS: User[] = [
   {
     id: '1',
-    name: 'Admin User',
+    name: 'Administrateur',
     email: 'admin@example.com',
     role: 'admin',
     password: 'password',
@@ -14,7 +14,7 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: '2',
-    name: 'Accueil User',
+    name: 'Chargé de la clientèle',
     email: 'accueil@example.com',
     role: 'acceuil',
     password: 'password',
@@ -23,7 +23,7 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: '3',
-    name: 'Inspecteur User',
+    name: 'Responsable des missions',
     email: 'inspecteur@example.com',
     role: 'inspecteur',
     password: 'password',
@@ -32,7 +32,7 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: '4',
-    name: 'Certificats User',
+    name: 'Gestionnaire de Certificats ',
     email: 'certificats@example.com',
     role: 'certificats',
     password: 'password',
@@ -41,7 +41,7 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: '5',
-    name: 'Analyste User',
+    name: 'Analyste ,
     email: 'analyste@example.com',
     role: 'analyste',
     password: 'password',
@@ -50,7 +50,7 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: '6',
-    name: 'Comptable User',
+    name: 'Chargé des notes de frais',
     email: 'comptable@example.com',
     role: 'comptable',
     password: 'password',
@@ -77,7 +77,7 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: '9',
-    name: 'Surveillant User',
+    name: 'Surveillant ',
     email: 'surveillant@example.com',
     role: 'surveillant',
     password: 'password',
@@ -86,7 +86,7 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: '10',
-    name: 'Directeur User',
+    name: 'Directeur',
     email: 'directeur@example.com',
     role: 'directeur',
     password: 'password',
