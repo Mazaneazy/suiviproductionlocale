@@ -29,7 +29,8 @@ const ProtectedRoute = ({ children, redirectPath, accessPermissions }: {
 }) => {
   const { isAuthenticated, hasAccess, hasRole } = useAuth();
 
-  const hasRequiredPermissions = accessPermissions.every(permission => {
+  // Vérifie si au moins une permission est validée (OR logic) au lieu de toutes (AND logic)
+  const hasRequiredPermissions = accessPermissions.some(permission => {
     return hasAccess(permission) || hasRole(['admin', 'directeur_general']);
   });
 
@@ -145,7 +146,7 @@ function App() {
                   element={
                     <ProtectedRoute
                       redirectPath="/unauthorized"
-                      accessPermissions={['user-management', 'admin']}
+                      accessPermissions={['user-management']}
                     >
                       <UserManagement />
                     </ProtectedRoute>
@@ -157,7 +158,7 @@ function App() {
                   element={
                     <ProtectedRoute
                       redirectPath="/unauthorized"
-                      accessPermissions={['user-management', 'admin']}
+                      accessPermissions={['user-management']}
                     >
                       <UserDetails />
                     </ProtectedRoute>
@@ -169,7 +170,7 @@ function App() {
                   element={
                     <ProtectedRoute
                       redirectPath="/unauthorized"
-                      accessPermissions={['user-management', 'admin']}
+                      accessPermissions={['user-management']}
                     >
                       <UserProfile />
                     </ProtectedRoute>

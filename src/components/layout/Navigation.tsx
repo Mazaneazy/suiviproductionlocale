@@ -19,13 +19,14 @@ interface NavItemProps {
   href: string;
   icon: React.ReactNode;
   text: string;
+  onClick?: () => void;
 }
 
 interface NavigationProps {
   onItemClick?: () => void;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ href, icon, text }) => (
+const NavItem: React.FC<NavItemProps> = ({ href, icon, text, onClick }) => (
   <NavLink
     to={href}
     className={({ isActive }) =>
@@ -35,6 +36,7 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, text }) => (
         isActive ? 'bg-certif-blue/10 text-certif-blue font-medium' : ''
       )
     }
+    onClick={onClick}
   >
     <span className="mr-3">{icon}</span>
     <span>{text}</span>
@@ -47,16 +49,31 @@ const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
   return (
     <nav className="mt-4 space-y-1 px-2">
       {/* Tableau de bord - accessible à tous */}
-      <NavItem href="/dashboard" icon={<Home size={18} />} text="Tableau de bord" />
+      <NavItem 
+        href="/dashboard" 
+        icon={<Home size={18} />} 
+        text="Tableau de bord" 
+        onClick={onItemClick} 
+      />
 
       {/* Poste d'accueil */}
       {hasAccess('acceuil') && (
-        <NavItem href="/accueil" icon={<FilePlus2 size={18} />} text="Chargé de clientèle" />
+        <NavItem 
+          href="/accueil" 
+          icon={<FilePlus2 size={18} />} 
+          text="Chargé de clientèle" 
+          onClick={onItemClick}
+        />
       )}
 
-      {/* Gestion des dossiers - pour tous sauf producteurs */}
-      {(hasAccess('dossiers') || hasRole(['admin', 'directeur_general'])) && (
-        <NavItem href="/dossiers" icon={<FileText size={18} />} text="Dossiers" />
+      {/* Gestion des dossiers */}
+      {hasAccess('dossiers') && (
+        <NavItem 
+          href="/dossiers" 
+          icon={<FileText size={18} />} 
+          text="Dossiers" 
+          onClick={onItemClick}
+        />
       )}
 
       {/* Responsable technique */}
@@ -65,39 +82,48 @@ const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
           href="/responsable-technique"
           icon={<Settings size={18} />}
           text="Responsable Technique"
+          onClick={onItemClick}
         />
       )}
 
       {/* Inspections */}
-      {(hasAccess('inspections') || hasRole(['admin', 'directeur_general'])) && (
+      {hasAccess('inspections') && (
         <NavItem
           href="/inspections"
           icon={<ClipboardCheck size={18} />}
           text="Inspections"
+          onClick={onItemClick}
         />
       )}
 
       {/* Résultats et certificats */}
-      {(hasAccess('resultats') || hasRole(['admin', 'directeur_general'])) && (
+      {hasAccess('resultats') && (
         <NavItem
           href="/certificats"
           icon={<FileCheck2 size={18} />}
           text="Certificats émis"
+          onClick={onItemClick}
         />
       )}
 
       {/* Statistiques et analyses */}
-      {(hasAccess('statistiques') || hasRole(['admin', 'directeur_general'])) && (
+      {hasAccess('statistiques') && (
         <NavItem
           href="/statistiques"
           icon={<BarChart2 size={18} />}
           text="Statistiques"
+          onClick={onItemClick}
         />
       )}
 
       {/* Notes de frais */}
-      {(hasAccess('notes-frais') || hasRole(['admin', 'directeur_general'])) && (
-        <NavItem href="/notes-frais" icon={<Receipt size={18} />} text="Notes de frais" />
+      {hasAccess('notes-frais') && (
+        <NavItem 
+          href="/notes-frais" 
+          icon={<Receipt size={18} />} 
+          text="Notes de frais" 
+          onClick={onItemClick}
+        />
       )}
 
       {/* Gestion des utilisateurs - pour admin uniquement */}
@@ -106,6 +132,7 @@ const Navigation: React.FC<NavigationProps> = ({ onItemClick }) => {
           href="/user-management"
           icon={<UserCog size={18} />}
           text="Gestion utilisateurs"
+          onClick={onItemClick}
         />
       )}
     </nav>

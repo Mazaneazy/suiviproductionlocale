@@ -19,6 +19,9 @@ const PermissionsTab: React.FC<PermissionsTabProps> = ({ user, getRoleLabel }) =
     'resultats': { name: 'Certificats émis', icon: <BookOpen className="h-4 w-4" /> },
     'statistiques': { name: 'Statistiques', icon: <ChartPie className="h-4 w-4" /> },
     'notes-frais': { name: 'Notes de frais', icon: <FileText className="h-4 w-4" /> },
+    'responsable-technique': { name: 'Responsable technique', icon: <UserCog className="h-4 w-4" /> },
+    'validation': { name: 'Comité de validation', icon: <UserCog className="h-4 w-4" /> },
+    'certificates-creation': { name: 'Montage des certificats', icon: <UserCog className="h-4 w-4" /> },
     'user-management': { name: 'Gestion utilisateurs', icon: <UserCog className="h-4 w-4" /> }
   };
   
