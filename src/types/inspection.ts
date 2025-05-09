@@ -25,6 +25,11 @@ export interface RapportInspection {
   recommandations: string;
   statut: 'brouillon' | 'soumis' | 'valide' | 'rejete';
   fichierUrl?: string;
+  // Add missing properties used in components
+  dossierId?: string;
+  date?: string;
+  status?: string;
+  avisTechnique?: string;
 }
 
 export interface AvisDecision {
@@ -35,4 +40,11 @@ export interface AvisDecision {
   decision: 'favorable' | 'defavorable' | 'avec_reserve';
   justification: string;
   actions: string[];
+  // Add missing properties used in components
+  dossierId?: string;
+  date?: string;
+  contenu?: string;
+  resultat?: 'favorable' | 'defavorable' | 'avec_reserves';
+  commentaires?: string;
+  status?: string;
 }

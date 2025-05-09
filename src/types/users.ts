@@ -7,6 +7,11 @@ export interface User {
   dateCreation?: string;
   phone?: string;
   modules?: string[];
+  // Added missing properties used in the application
+  password?: string;
+  permissions?: string[];
+  actions?: UserAction[];
+  producteurDossierId?: string;
 }
 
 export type UserRole = 
@@ -32,4 +37,5 @@ export interface UserAction {
   action: string;
   date: string;
   details?: string;
+  module?: string;
 }

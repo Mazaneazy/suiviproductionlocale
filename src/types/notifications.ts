@@ -22,4 +22,8 @@ export interface Statistique {
   certificationsParMois: Record<string, number>;
   dossiersParStatut: Record<string, number>;
   dossiersParProduit: Record<string, number>;
+  // Add the properties being used elsewhere in the codebase
+  dossiersEnCours?: number;
+  dossiersCertifies?: number;
+  dossiersRejetes?: number;
 }
