@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -14,7 +15,7 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Unauthorized from './pages/Unauthorized';
 import { Toaster } from '@/components/ui/toaster';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import UserDetails from './pages/UserDetails';
 import UserProfile from './pages/UserProfile';
 
