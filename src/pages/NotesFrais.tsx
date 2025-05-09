@@ -1,7 +1,7 @@
 
 import React from 'react';
 import Layout from '../components/Layout';
-import { useNotesFraisManagement } from '../hooks/useNotesFraisManagement';
+import { useNotesFraisManagement } from '../hooks/notes-frais';
 import NotesFraisHeader from '../components/notes-frais/NotesFraisHeader';
 import NotesFraisFilters from '../components/notes-frais/NotesFraisFilters';
 import NotesFraisTable from '../components/notes-frais/NotesFraisTable';
