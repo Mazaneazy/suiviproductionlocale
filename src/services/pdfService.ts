@@ -50,20 +50,24 @@ export const generateNoteFraisPDF = (noteFrais: NoteFrais, dossier?: Dossier | n
     columnStyles: { 1: { halign: 'right' } }
   });
   
+  let finalY = 150;
+  
   // Add parameters if available
   if (noteFrais.parametresAnalyse && noteFrais.parametresAnalyse.length > 0) {
     doc.setFontSize(12);
-    doc.text("Paramètres à analyser au laboratoire:", 20, doc.autoTable.previous.finalY + 15);
+    doc.text("Paramètres à analyser au laboratoire:", 20, finalY);
     
     const parametersData = noteFrais.parametresAnalyse.map(param => [param]);
     
     doc.autoTable({
-      startY: doc.autoTable.previous.finalY + 20,
+      startY: finalY + 5,
       head: [['Paramètre']],
       body: parametersData,
       theme: 'grid',
       headStyles: { fillColor: [0, 51, 102], textColor: [255, 255, 255] }
     });
+    
+    finalY = finalY + 50; // Adjust as needed based on the number of parameters
   }
   
   // Add footer
