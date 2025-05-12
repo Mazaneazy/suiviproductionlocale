@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { z } from 'zod';
-import { NotesFrais, NoteFraisType, ParametresAnalyse } from '@/types';
+import { NoteFrais } from '@/types';
 import { Json } from '@/integrations/supabase/types';
 
 // This function directly replaces the iteration over Json values with our safe version
@@ -16,6 +16,15 @@ function makeJsonIterable<T = any>(value: Json): T[] {
   if (typeof value === 'object') return Object.values(value as object) as T[];
   if (typeof value === 'string') return [value] as unknown as T[];
   return [value] as unknown as T[]; // For number, boolean, etc.
+}
+
+// Define enum locally since it's not exported from types
+enum NoteFraisType {
+  DEPLACEMENT = 'deplacement',
+  HEBERGEMENT = 'hebergement',
+  RESTAURATION = 'restauration',
+  FOURNITURE = 'fourniture',
+  AUTRE = 'autre'
 }
 
 // Define your schemas and validation logic here
@@ -48,7 +57,8 @@ interface UseNotesFraisFormStateProps {
   onSubmit: (values: NotesFraisValues) => void;
 }
 
-const useNotesFraisFormState = ({ initialValues, onSubmit }: UseNotesFraisFormStateProps) => {
+// Change from default export to named export
+export const useNotesFraisFormState = ({ initialValues, onSubmit }: UseNotesFraisFormStateProps) => {
   const [values, setValues] = useState<NotesFraisValues>({
     date: initialValues?.date || '',
     type: initialValues?.type || NoteFraisType.DEPLACEMENT,
@@ -108,4 +118,5 @@ const useNotesFraisFormState = ({ initialValues, onSubmit }: UseNotesFraisFormSt
   };
 };
 
+// Keep the default export for backward compatibility
 export default useNotesFraisFormState;
