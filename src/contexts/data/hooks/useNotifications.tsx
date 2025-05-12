@@ -4,7 +4,14 @@ import { Notification } from '../../../types';
 import { MOCK_NOTIFICATIONS } from '../mockData';
 
 export function useNotifications() {
-  const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
+  // Map the notifications to the correct interface
+  const mappedNotifications: Notification[] = MOCK_NOTIFICATIONS.map(notif => ({
+    ...notif,
+    date: notif.dateCreation || new Date().toISOString(),
+    lue: notif.lu !== undefined ? notif.lu : false
+  }));
+  
+  const [notifications, setNotifications] = useState<Notification[]>(mappedNotifications);
 
   const markNotificationAsRead = (id: string) => {
     setNotifications(notifications.map(notif => 

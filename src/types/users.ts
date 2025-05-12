@@ -12,6 +12,11 @@ export interface User {
   permissions?: string[];
   actions?: UserAction[];
   producteurDossierId?: string;
+  // Add properties that are used in mockData.ts
+  nom?: string;
+  prenom?: string;
+  telephone?: string;
+  avatar?: any;
 }
 
 export type UserRole = 
@@ -29,7 +34,8 @@ export type UserRole =
   | 'gestionnaire'
   | 'producteur'
   | 'responsable_qualite'
-  | 'comite_validation';
+  | 'comite_validation'
+  | 'directeur_evaluation'; // Add missing role
 
 export interface UserAction {
   id: string;

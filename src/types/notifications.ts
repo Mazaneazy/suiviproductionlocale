@@ -7,6 +7,12 @@ export interface Notification {
   type: 'info' | 'warning' | 'error' | 'success';
   lienDossier?: string;
   destinataireId?: string;
+  // Add properties used in mock notifications
+  userId?: string;
+  titre?: string;
+  lien?: string;
+  dateCreation?: string;
+  lu?: boolean;
 }
 
 export interface Statistique {

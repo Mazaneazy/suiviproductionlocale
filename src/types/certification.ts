@@ -13,6 +13,9 @@ export interface Certificat {
   numeroCertificat?: string;
   normeReference?: string;
   dateEmission?: string;
+  // Add missing properties used in the mock data
+  operateur?: string;
+  logo?: string;
 }
 
 export interface ResultatConformite {

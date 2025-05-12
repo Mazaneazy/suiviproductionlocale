@@ -1,4 +1,3 @@
-
 import { User } from '@/types';
 import { MOCK_USERS } from '../data/mockData';
 
@@ -95,8 +94,23 @@ export const loginUser = async (email: string, password: string): Promise<User> 
     // Utiliser le compte de démonstration
     const { password, ...userWithoutPassword } = demoUser;
     
-    localStorage.setItem('authUser', JSON.stringify(userWithoutPassword));
-    return userWithoutPassword as User;
+    // Map the demoUser properties to User interface properties
+    const mappedUser: User = {
+      id: demoUser.id,
+      name: demoUser.prenom + ' ' + demoUser.nom,
+      email: demoUser.email,
+      role: demoUser.role as any, // Using any to bypass strict typing temporarily
+      phone: demoUser.telephone,
+      dateCreation: demoUser.dateCreation,
+      // Keep original properties for compatibility
+      nom: demoUser.nom,
+      prenom: demoUser.prenom,
+      telephone: demoUser.telephone,
+      avatar: demoUser.avatar
+    };
+    
+    localStorage.setItem('authUser', JSON.stringify(mappedUser));
+    return mappedUser;
   }
   
   // Sinon, utiliser la méthode existante
