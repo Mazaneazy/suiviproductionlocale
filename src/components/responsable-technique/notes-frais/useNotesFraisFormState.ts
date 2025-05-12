@@ -94,7 +94,10 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
       commentaire: '',
       dateCreation: new Date().toISOString(),
     });
-  }, [dossier, currentUser]);
+
+    // Réinitialiser aussi les paramètres d'analyse
+    setSelectedParametres([]);
+  }, [dossier, currentUser, setSelectedParametres]);
 
   // Soumettre le formulaire
   const handleSubmit = useCallback(async (e: FormEvent<HTMLFormElement>) => {
@@ -186,7 +189,7 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
     } finally {
       setIsLoading(false);
     }
-  }, [newNoteFrais, total, toast, handleReset, onNoteFraisCreated, selectedParametres, description, fraisGestion, fraisInspection, totalPrix, fraisSurveillance, dossier, currentUser]);
+  }, [newNoteFrais, total, toast, handleReset, onNoteFraisCreated, selectedParametres, description, fraisGestion, fraisInspection, totalPrix, fraisSurveillance, dossier, currentUser, setSelectedParametres]);
 
   return {
     newNoteFrais,

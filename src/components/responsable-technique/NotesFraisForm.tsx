@@ -47,6 +47,7 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({
   // Handler for description input change
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(e.target.value);
+    handleInputChange(e); // Call the original handler too to update newNoteFrais
   };
   
   // This adapter function will convert the signature from string[] to what the form expects
@@ -61,6 +62,21 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({
         onInputChange={handleInputChange}
         dossierNom={dossier?.operateurNom || "Non spécifié"}
       />
+      
+      <div className="form-group">
+        <label htmlFor="description" className="block text-gray-700 font-medium mb-1">
+          Description
+        </label>
+        <input
+          id="description"
+          name="description"
+          type="text"
+          value={description}
+          onChange={handleDescriptionChange}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Description de la note de frais"
+        />
+      </div>
       
       <FraisAdditionnels
         newNoteFrais={newNoteFrais}

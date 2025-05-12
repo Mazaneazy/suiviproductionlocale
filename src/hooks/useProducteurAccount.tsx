@@ -14,34 +14,36 @@ export function useProducteurAccount() {
     setCreateAccount(!createAccount);
   };
 
-  const createProducteurAccountFromDossier = () => {
-    if (!createAccount) return false;
+  const createProducteurAccountFromDossier = (dossier?: Dossier) => {
+    if (!createAccount || !dossier) return false;
     
-    // Le dossier est créé par la fonction onSubmit, donc on doit attendre un peu avant de créer le compte
-    setTimeout(() => {
-      const latestDossiers = JSON.parse(localStorage.getItem('dossiers') || '[]');
-      const latestDossier = latestDossiers.length > 0 ? latestDossiers[latestDossiers.length - 1] : null;
+    try {
+      const producteur = createProducteurAccount(dossier);
       
-      if (latestDossier) {
-        const producteur = createProducteurAccount(latestDossier);
+      if (producteur) {
+        setProducteurCredentials({
+          email: producteur.email,
+          password: 'password' // Default password
+        });
         
-        if (producteur) {
-          setProducteurCredentials({
-            email: producteur.email,
-            password: 'password'
-          });
-        } else {
-          setCreateAccount(false);
-          toast({
-            title: "Erreur",
-            description: "Impossible de créer le compte producteur",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Compte créé",
+          description: `Un compte producteur a été créé pour ${dossier.operateurNom}`,
+        });
+        
+        return true;
       }
-    }, 300);
-
-    return true;
+    } catch (error) {
+      console.error("Erreur lors de la création du compte producteur:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer le compte producteur",
+        variant: "destructive",
+      });
+    }
+    
+    setCreateAccount(false);
+    return false;
   };
 
   const resetState = () => {
