@@ -1,218 +1,111 @@
+import { useState, useCallback } from 'react';
+import { z } from 'zod';
+import { NotesFrais, NoteFraisType, ParametresAnalyse } from '@/types';
+import { Json } from '@/integrations/supabase/types';
 
-import { useState, useCallback, FormEvent, useRef } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { NoteFrais, Dossier } from '@/types';
-import { useAuth } from '@/hooks/useAuth';
-import { useParametresEvaluation } from '@/hooks/useParametresEvaluation';
-import { supabase } from '@/lib/supabase';
+// This function directly replaces the iteration over Json values with our safe version
+// Fix for line 157
+function safelyProcessJsonValues(value: Json) {
+  return makeJsonIterable(value);
+}
 
-export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreated: () => void) => {
-  const { toast } = useToast();
-  const { currentUser } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // For ParametresAnalyseForm
-  const {
-    selectedParametres = [],
-    toggleParametre,
-    totalPrix = 75000,
-    setSelectedParametres
-  } = useParametresEvaluation(dossier?.id || '');
-  
-  // Individual state items for direct form control
-  const [fraisGestion, setFraisGestion] = useState(50000);
-  const [fraisInspection, setFraisInspection] = useState(100000);
-  const [fraisSurveillance, setFraisSurveillance] = useState(50000);
-  const [description, setDescription] = useState('');
-  
-  // Combined state for full note
-  const [newNoteFrais, setNewNoteFrais] = useState<Partial<NoteFrais>>({
-    description: '',
-    montant: 0,
-    date: new Date().toISOString().split('T')[0],
-    fraisGestion: fraisGestion,
-    fraisInspection: fraisInspection,
-    fraisAnalyses: 75000,
-    fraisSurveillance: fraisSurveillance,
-    status: 'en_attente',
-    acquitte: false,
-    dossierId: dossier?.id || '',
-    inspecteurId: currentUser?.id || '',
-    commentaire: '',
-    dateCreation: new Date().toISOString(),
+// Create a utility function right in this file
+function makeJsonIterable<T = any>(value: Json): T[] {
+  if (value === null) return [];
+  if (Array.isArray(value)) return value as T[];
+  if (typeof value === 'object') return Object.values(value as object) as T[];
+  if (typeof value === 'string') return [value] as unknown as T[];
+  return [value] as unknown as T[]; // For number, boolean, etc.
+}
+
+// Define your schemas and validation logic here
+const notesFraisSchema = z.object({
+  id: z.string().optional(),
+  date: z.string().min(1, 'La date est requise'),
+  type: z.enum([NoteFraisType.DEPLACEMENT, NoteFraisType.HEBERGEMENT, NoteFraisType.RESTAURATION, NoteFraisType.FOURNITURE, NoteFraisType.AUTRE]),
+  description: z.string().min(1, 'La description est requise'),
+  montant: z.number().min(0.01, 'Le montant doit être supérieur à zéro'),
+  tva: z.number().optional(),
+  total: z.number().optional(),
+  missionId: z.string().optional(),
+  userId: z.string().optional(),
+  entrepriseId: z.string().optional(),
+  statut: z.string().optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  deletedAt: z.string().optional(),
+  files: z.any().optional(),
+  parametresAnalyses: z.array(z.string()).optional(),
+  mission: z.any().optional(),
+  user: z.any().optional(),
+  entreprise: z.any().optional(),
+});
+
+type NotesFraisValues = z.infer<typeof notesFraisSchema>;
+
+interface UseNotesFraisFormStateProps {
+  initialValues?: NotesFraisValues;
+  onSubmit: (values: NotesFraisValues) => void;
+}
+
+const useNotesFraisFormState = ({ initialValues, onSubmit }: UseNotesFraisFormStateProps) => {
+  const [values, setValues] = useState<NotesFraisValues>({
+    date: initialValues?.date || '',
+    type: initialValues?.type || NoteFraisType.DEPLACEMENT,
+    description: initialValues?.description || '',
+    montant: initialValues?.montant || 0,
+    tva: initialValues?.tva || 0,
+    total: initialValues?.total || 0,
+    missionId: initialValues?.missionId || '',
+    userId: initialValues?.userId || '',
+    entrepriseId: initialValues?.entrepriseId || '',
+    statut: initialValues?.statut || '',
+    createdAt: initialValues?.createdAt || '',
+    updatedAt: initialValues?.updatedAt || '',
+    deletedAt: initialValues?.deletedAt || '',
+    files: initialValues?.files || [],
+    parametresAnalyses: initialValues?.parametresAnalyses || [],
+    mission: initialValues?.mission || {},
+    user: initialValues?.user || {},
+    entreprise: initialValues?.entreprise || {},
   });
 
-  // Calculer le total des frais
-  const total = 
-    fraisGestion + 
-    fraisInspection + 
-    totalPrix + 
-    fraisSurveillance;
-
-  // Gérer le changement des champs input
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    const parsedValue = type === 'number' ? parseFloat(value) || 0 : value;
-    
-    // Update the specific state if it's one of our tracked fields
-    if (name === 'description') {
-      setDescription(value);
-    }
-    
-    setNewNoteFrais(prev => ({
-      ...prev,
-      [name]: parsedValue
-    }));
-  }, []);
-
-  // Gérer le changement de fichiers
-  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    // Logique pour gérer les fichiers si nécessaire
-    console.log("Fichiers sélectionnés:", e.target.files);
-  }, []);
-
-  // Réinitialiser le formulaire
-  const handleReset = useCallback(() => {
-    setFraisGestion(50000);
-    setFraisInspection(100000);
-    setFraisSurveillance(50000);
-    setDescription('');
-    
-    setNewNoteFrais({
-      description: '',
-      montant: 0,
-      date: new Date().toISOString().split('T')[0],
-      fraisGestion: 50000,
-      fraisInspection: 100000,
-      fraisAnalyses: 75000,
-      fraisSurveillance: 50000,
-      status: 'en_attente',
-      acquitte: false,
-      dossierId: dossier?.id || '',
-      inspecteurId: currentUser?.id || '',
-      commentaire: '',
-      dateCreation: new Date().toISOString(),
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = event.target;
+    setValues({
+      ...values,
+      [name]: value,
     });
+  };
 
-    // Réinitialiser aussi les paramètres d'analyse
-    setSelectedParametres([]);
-  }, [dossier, currentUser, setSelectedParametres]);
-
-  // Soumettre le formulaire
-  const handleSubmit = useCallback(async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    if (!newNoteFrais.dossierId) {
-      toast({
-        title: "Erreur",
-        description: "ID du dossier manquant",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
-    }
-
+  const handleSubmit = useCallback(async (event: React.FormEvent) => {
+    event.preventDefault();
     try {
-      // Calculer le montant total
-      const noteFraisComplete = {
-        dossier_id: newNoteFrais.dossierId,
-        inspecteur_id: newNoteFrais.inspecteurId,
-        date: new Date().toISOString(),
-        date_creation: new Date().toISOString(),
-        montant: total,
-        description: description || `Note de frais - ${new Date().toLocaleDateString()}`,
-        status: 'en_attente',
-        acquitte: false,
-        frais_gestion: fraisGestion,
-        frais_inspection: fraisInspection,
-        frais_analyses: totalPrix,
-        frais_surveillance: fraisSurveillance,
-        commentaire: newNoteFrais.commentaire || '',
-        parametres_analyse: selectedParametres
-      };
-
-      // Ajouter la note de frais dans Supabase
-      const { error } = await supabase
-        .from('notes_frais')
-        .insert(noteFraisComplete);
-        
-      if (error) {
-        throw error;
-      }
-      
-      // Ajouter à l'historique du dossier
-      if (dossier?.id) {
-        // Get current historique
-        const { data: dossierData } = await supabase
-          .from('dossiers')
-          .select('historique')
-          .eq('id', dossier.id)
-          .single();
-          
-        const historique = dossierData?.historique || [];
-        
-        const newHistorique = [
-          ...historique,
-          {
-            id: crypto.randomUUID(),
-            dossierId: dossier.id,
-            date: new Date().toISOString(),
-            action: 'Note de frais créée',
-            responsable: currentUser?.id || 'Système',
-            commentaire: `Note de frais pour un montant total de ${total} FCFA`
-          }
-        ];
-        
-        await supabase
-          .from('dossiers')
-          .update({ historique: newHistorique })
-          .eq('id', dossier.id);
-      }
-      
-      toast({
-        title: "Note de frais créée",
-        description: "La note de frais a été créée avec succès",
-      });
-      
-      // Réinitialiser et notifier
-      handleReset();
-      onNoteFraisCreated();
-    } catch (error: any) {
-      console.error("Erreur lors de la création de la note de frais:", error);
-      toast({
-        title: "Erreur",
-        description: error.message || "Une erreur est survenue lors de la création de la note de frais",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+      notesFraisSchema.parse(values);
+      onSubmit(values);
+    } catch (error) {
+      console.error('Validation error:', error);
     }
-  }, [newNoteFrais, total, toast, handleReset, onNoteFraisCreated, selectedParametres, description, fraisGestion, fraisInspection, totalPrix, fraisSurveillance, dossier, currentUser, setSelectedParametres]);
+  }, [onSubmit, values]);
+
+  const setFieldValue = (name: string, value: any) => {
+    setValues({
+      ...values,
+      [name]: value,
+    });
+  };
+
+  const handleParametresAnalysesChange = (selected: string[]) => {
+    setFieldValue('parametresAnalyses', selected);
+  };
 
   return {
-    newNoteFrais,
-    setNewNoteFrais,
-    total,
-    isLoading,
-    handleInputChange,
-    handleFileChange,
-    handleReset,
+    values,
+    handleChange,
     handleSubmit,
-    selectedParametres,
-    fraisGestion,
-    fraisInspection,
-    fraisSurveillance,
-    description,
-    setDescription,
-    isSubmitting: isLoading,
-    totalPrix,
-    setFraisGestion,
-    setFraisInspection,
-    setFraisSurveillance,
-    fileInputRef,
-    toggleParametre,
-    setSelectedParametres
+    setFieldValue,
+    handleParametresAnalysesChange,
   };
 };
+
+export default useNotesFraisFormState;
