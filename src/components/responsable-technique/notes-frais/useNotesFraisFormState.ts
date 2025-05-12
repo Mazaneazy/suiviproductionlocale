@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { z } from 'zod';
 import { NoteFrais } from '@/types/finances';
-import { Dossier } from '@/types/dossier';  // Direct import from dossier.ts
+import { Dossier } from '@/types'; // Changed this import to use the index file
 
 // This function directly replaces the iteration over Json values with our safe version
 function safelyProcessJsonValues(value: Json) {
@@ -29,7 +29,6 @@ export enum NoteFraisType {
   AUTRE = 'autre'
 }
 
-// Define your schemas and validation logic here
 const notesFraisSchema = z.object({
   id: z.string().optional(),
   date: z.string().min(1, 'La date est requise'),
