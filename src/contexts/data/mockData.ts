@@ -678,7 +678,4 @@ export const MOCK_DOSSIERS: Dossier[] = [
     ressourcesHumainesTracabilite: 'RAS',
     ressourcesFinancieresTracabilite: 'RAS',
     ressourcesTechnologiquesTracabilite: 'RAS',
-    ressourcesInformatiquesTracabilite: 'RAS',
-    ressourcesMateriellesTracabilite: 'RAS',
-    ressourcesHumainesRetraitRappel: 'RAS',
-    ressourcesFinancieresRetraitRappel
+    ressources
