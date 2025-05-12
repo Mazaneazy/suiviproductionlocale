@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { InfoIcon } from 'lucide-react';
 import { DEMO_USERS } from '@/contexts/data/mockData';
+import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -17,6 +19,32 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [showDemoUsers, setShowDemoUsers] = useState(false);
+  const [supabaseUsers, setSupabaseUsers] = useState<{email: string; role: string}[]>([]);
+
+  useEffect(() => {
+    // Charger les comptes depuis Supabase
+    const loadSupabaseUsers = async () => {
+      try {
+        // Tenter de récupérer les comptes de démo de la base de données
+        const { data, error } = await supabase
+          .from('demo_accounts')
+          .select('email, role');
+        
+        if (error) {
+          console.error('Erreur lors de la récupération des comptes:', error);
+          return;
+        }
+        
+        if (data && data.length > 0) {
+          setSupabaseUsers(data);
+        }
+      } catch (err) {
+        console.error('Erreur lors du chargement des comptes:', err);
+      }
+    };
+
+    loadSupabaseUsers();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,9 +52,16 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      await login(email, password);
-      navigate('/dashboard');
+      // Utilise la fonction login de useAuth qui fait appel à supabase.auth
+      const success = await login(email, password);
+      if (success) {
+        toast.success('Connexion réussie');
+        navigate('/dashboard');
+      } else {
+        throw new Error('Échec de la connexion');
+      }
     } catch (err) {
+      console.error('Erreur de connexion:', err);
       setError('Identifiants incorrects. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
@@ -40,13 +75,25 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      await login(demoEmail, demoPassword);
-      navigate('/dashboard');
+      // Utilise la fonction login de useAuth qui fait appel à supabase.auth
+      const success = await login(demoEmail, demoPassword);
+      if (success) {
+        toast.success('Connexion réussie avec compte démo');
+        navigate('/dashboard');
+      } else {
+        throw new Error('Échec de la connexion avec compte démo');
+      }
     } catch (err) {
+      console.error('Erreur de connexion démo:', err);
       setError('Échec de connexion avec le compte démo. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSupabaseUserLogin = (userEmail: string) => {
+    // Pour les comptes Supabase, on utilise le mot de passe par défaut
+    handleDemoUserLogin(userEmail, 'password');
   };
 
   return (
@@ -111,7 +158,7 @@ const Login = () => {
                 {isLoading ? 'Connexion...' : 'Se connecter'}
               </Button>
               
-              <div className="text-center mt-4">
+              <div className="text-center mt-4 space-y-2">
                 <Button 
                   type="button" 
                   variant="link" 
@@ -125,6 +172,37 @@ const Login = () => {
               {showDemoUsers && (
                 <div className="mt-4 border rounded p-3 bg-gray-50">
                   <h3 className="font-medium mb-2 text-sm">Comptes de démonstration:</h3>
+                  
+                  {supabaseUsers.length > 0 && (
+                    <>
+                      <div className="mb-3">
+                        <h4 className="text-xs font-semibold text-gray-600 mb-1">Comptes Supabase:</h4>
+                        <ul className="space-y-2">
+                          {supabaseUsers.map((user, index) => (
+                            <li key={index} className="text-xs">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="w-full justify-between text-left py-1 px-2 h-auto"
+                                onClick={() => handleSupabaseUserLogin(user.email)}
+                              >
+                                <span className="flex flex-col items-start">
+                                  <span className="font-medium">{user.email}</span>
+                                  <span className="text-gray-500 text-xs">({user.role})</span>
+                                </span>
+                                <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">
+                                  Compte Supabase
+                                </span>
+                              </Button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="border-t my-3"></div>
+                    </>
+                  )}
+                  
+                  <h4 className="text-xs font-semibold text-gray-600 mb-1">Comptes intégrés à l'application:</h4>
                   <ul className="space-y-2">
                     {DEMO_USERS.map(user => (
                       <li key={user.id} className="text-xs">
@@ -138,13 +216,21 @@ const Login = () => {
                             <span className="font-medium">{user.email}</span>
                             <span className="text-gray-500 text-xs">({user.role})</span>
                           </span>
-                          <span className="bg-gray-200 px-2 py-0.5 rounded text-gray-700">
+                          <span className="bg-gray-200 px-2 py-0.5 rounded text-gray-700 text-xs">
                             Connexion rapide
                           </span>
                         </Button>
                       </li>
                     ))}
                   </ul>
+
+                  <div className="mt-3 p-2 bg-blue-50 rounded border border-blue-100 text-xs">
+                    <p className="text-blue-800 font-medium">Utilisateurs Supabase disponibles:</p>
+                    <p className="text-blue-700 mt-1">• <strong>admin@anor.cm</strong> - mot de passe: password</p>
+                    <p className="text-blue-700">• <strong>directeur@anor.cm</strong> - mot de passe: password</p>
+                    <p className="text-blue-700">• <strong>inspecteur@anor.cm</strong> - mot de passe: password</p>
+                  </div>
+                  
                   <p className="text-xs text-gray-500 mt-3">
                     Cliquez sur un compte pour vous connecter automatiquement.
                   </p>
@@ -178,9 +264,17 @@ const Login = () => {
                 </ul>
               </div>
               
-              <p className="text-sm text-gray-500 mt-4">
-                Pour vous connecter, utilisez l'un des comptes de démonstration disponibles dans l'onglet "Connexion".
-              </p>
+              <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-md">
+                <h3 className="font-medium text-amber-800 mb-1">Comptes d'accès:</h3>
+                <p className="text-amber-700 mb-2">
+                  Vous pouvez vous connecter avec les comptes listés dans l'onglet "Connexion".
+                </p>
+                <ul className="list-disc pl-5 space-y-1 text-amber-700">
+                  <li><strong>Admin:</strong> admin@anor.cm / password</li>
+                  <li><strong>Directeur:</strong> directeur@anor.cm / password</li>
+                  <li><strong>Inspecteur:</strong> inspecteur@anor.cm / password</li>
+                </ul>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
