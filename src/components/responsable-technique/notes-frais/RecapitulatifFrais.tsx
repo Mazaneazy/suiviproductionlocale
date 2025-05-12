@@ -9,6 +9,9 @@ export interface RecapitulatifFraisProps {
   fraisAnalyses: number;
   fraisSurveillance: number;
   total: number;
+  totalPrix?: number; // Added missing property
+  description?: string; // Added missing property
+  setDescription?: (value: string) => void; // Added missing property
 }
 
 const RecapitulatifFrais: React.FC<RecapitulatifFraisProps> = ({

@@ -10,6 +10,10 @@ export interface InformationsGeneralesProps {
   newNoteFrais: Partial<NoteFrais>;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   dossierNom?: string;
+  description?: string; // Added missing property
+  onDescriptionChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; // Added missing property
+  onFileChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; // Added missing property
+  fileInputRef?: React.RefObject<HTMLInputElement>; // Added missing property
 }
 
 const InformationsGenerales: React.FC<InformationsGeneralesProps> = ({ 
@@ -44,11 +48,11 @@ const InformationsGenerales: React.FC<InformationsGeneralesProps> = ({
           </FormControl>
           
           <FormControl>
-            <FormLabel htmlFor="inspecteurNom">Responsable technique</FormLabel>
+            <FormLabel htmlFor="inspecteurId">Responsable technique</FormLabel>
             <Input
-              id="inspecteurNom"
-              name="inspecteurNom"
-              value={newNoteFrais.inspecteurNom || ''}
+              id="inspecteurId"
+              name="inspecteurId"
+              value={newNoteFrais.inspecteurId || ''}
               onChange={onInputChange}
               className="w-full bg-gray-50"
               readOnly

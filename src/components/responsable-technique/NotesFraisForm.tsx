@@ -21,21 +21,26 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({
   const { currentUser } = useAuth();
   
   const {
+    newNoteFrais,
+    setNewNoteFrais,
+    total,
+    handleInputChange,
+    handleFileChange,
+    handleReset,
+    handleSubmit,
     selectedParametres,
     fraisGestion,
     fraisInspection,
     fraisSurveillance,
-    total,
+    totalPrix,
     description,
     setDescription,
     isSubmitting,
-    handleSubmit,
-    totalPrix,
     setFraisGestion,
     setFraisInspection,
     setFraisSurveillance,
     fileInputRef,
-    handleReset
+    toggleParametre
   } = useNotesFraisFormState(dossier, onNoteFraisCreated);
 
   // Handler for description input change
@@ -43,43 +48,30 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({
     setDescription(e.target.value);
   };
   
-  // Handler for file input change
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // The actual file change handling is done in useNotesFraisForm
-    // This is just a pass-through method
-  };
-  
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <InformationsGenerales
-        description={description}
-        onDescriptionChange={handleDescriptionChange}
-        onFileChange={handleFileChange}
-        fileInputRef={fileInputRef}
+        newNoteFrais={newNoteFrais}
+        onInputChange={handleInputChange}
+        dossierNom={dossier?.operateurNom || "Non spécifié"}
       />
       
       <FraisAdditionnels
-        fraisGestion={fraisGestion}
-        fraisInspection={fraisInspection}
-        fraisSurveillance={fraisSurveillance}
-        setFraisGestion={setFraisGestion}
-        setFraisInspection={setFraisInspection}
-        setFraisSurveillance={setFraisSurveillance}
+        newNoteFrais={newNoteFrais}
+        onInputChange={handleInputChange}
       />
       
       <ParametresAnalyseForm
         selectedParametres={selectedParametres}
-        onChange={() => {}} // This is handled by the hook now
+        onChange={toggleParametre}
       />
       
       <RecapitulatifFrais 
         fraisGestion={fraisGestion}
         fraisInspection={fraisInspection}
+        fraisAnalyses={totalPrix}
         fraisSurveillance={fraisSurveillance}
         total={total}
-        totalPrix={totalPrix}
-        description={description}
-        setDescription={setDescription}
       />
       
       <FormActions 

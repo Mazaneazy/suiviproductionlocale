@@ -6,19 +6,24 @@ import { SaveIcon, RotateCcw } from 'lucide-react';
 export interface FormActionsProps {
   onReset: () => void;
   isLoading?: boolean;
+  isSubmitting?: boolean; // Adding the missing property
 }
 
 const FormActions: React.FC<FormActionsProps> = ({ 
   onReset,
-  isLoading = false 
+  isLoading = false,
+  isSubmitting = false
 }) => {
+  // Use either isLoading or isSubmitting
+  const isDisabled = isLoading || isSubmitting;
+  
   return (
     <div className="flex justify-between space-x-4 mt-6">
       <Button
         type="button"
         variant="outline"
         onClick={onReset}
-        disabled={isLoading}
+        disabled={isDisabled}
       >
         <RotateCcw className="h-4 w-4 mr-2" />
         Réinitialiser
@@ -26,9 +31,9 @@ const FormActions: React.FC<FormActionsProps> = ({
       
       <Button
         type="submit"
-        disabled={isLoading}
+        disabled={isDisabled}
       >
-        {isLoading ? (
+        {isDisabled ? (
           <>
             <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

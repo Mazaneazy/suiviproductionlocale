@@ -20,6 +20,7 @@ export interface NoteFrais {
   total?: number;
   parametresAnalyse?: string[]; // Liste des paramètres à analyser au laboratoire
   pdfUrl?: string; // URL du PDF généré
+  inspecteurNom?: string; // Adding the missing property
 }
 
 export interface PreuvePaiement {

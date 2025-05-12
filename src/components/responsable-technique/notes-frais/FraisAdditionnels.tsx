@@ -9,6 +9,12 @@ import { Separator } from '@/components/ui/separator';
 export interface FraisAdditionnelsProps {
   newNoteFrais: Partial<NoteFrais>;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  fraisGestion?: number; // Added missing property
+  fraisInspection?: number; // Added missing property
+  fraisSurveillance?: number; // Added missing property
+  setFraisGestion?: (value: number) => void; // Added missing property
+  setFraisInspection?: (value: number) => void; // Added missing property
+  setFraisSurveillance?: (value: number) => void; // Added missing property
 }
 
 const FraisAdditionnels: React.FC<FraisAdditionnelsProps> = ({ 

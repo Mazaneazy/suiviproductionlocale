@@ -1,24 +1,40 @@
 
-import { useState, useCallback, FormEvent } from 'react';
+import { useState, useCallback, FormEvent, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { NoteFrais, Dossier } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useData } from '@/contexts/DataContext';
+import { useParametresEvaluation } from '@/hooks/useParametresEvaluation';
 
 export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreated: () => void) => {
   const { toast } = useToast();
   const { currentUser } = useAuth();
   const { addNoteFrais } = useData();
   const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
+  // For ParametresAnalyseForm
+  const {
+    selectedParametres = [],
+    toggleParametre,
+    totalPrix = 75000
+  } = useParametresEvaluation(dossier?.id || '');
+  
+  // Individual state items for direct form control
+  const [fraisGestion, setFraisGestion] = useState(50000);
+  const [fraisInspection, setFraisInspection] = useState(100000);
+  const [fraisSurveillance, setFraisSurveillance] = useState(50000);
+  const [description, setDescription] = useState('');
+  
+  // Combined state for full note
   const [newNoteFrais, setNewNoteFrais] = useState<Partial<NoteFrais>>({
     description: '',
     montant: 0,
     date: new Date().toISOString().split('T')[0],
-    fraisGestion: 50000,
-    fraisInspection: 100000,
+    fraisGestion: fraisGestion,
+    fraisInspection: fraisInspection,
     fraisAnalyses: 75000,
-    fraisSurveillance: 50000,
+    fraisSurveillance: fraisSurveillance,
     status: 'en_attente',
     acquitte: false,
     dossierId: dossier?.id || '',
@@ -30,15 +46,20 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
 
   // Calculer le total des frais
   const total = 
-    (newNoteFrais.fraisGestion || 0) + 
-    (newNoteFrais.fraisInspection || 0) + 
-    (newNoteFrais.fraisAnalyses || 0) + 
-    (newNoteFrais.fraisSurveillance || 0);
+    fraisGestion + 
+    fraisInspection + 
+    totalPrix + 
+    fraisSurveillance;
 
   // Gérer le changement des champs input
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     const parsedValue = type === 'number' ? parseFloat(value) || 0 : value;
+    
+    // Update the specific state if it's one of our tracked fields
+    if (name === 'description') {
+      setDescription(value);
+    }
     
     setNewNoteFrais(prev => ({
       ...prev,
@@ -54,6 +75,11 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
 
   // Réinitialiser le formulaire
   const handleReset = useCallback(() => {
+    setFraisGestion(50000);
+    setFraisInspection(100000);
+    setFraisSurveillance(50000);
+    setDescription('');
+    
     setNewNoteFrais({
       description: '',
       montant: 0,
@@ -94,6 +120,7 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
         id: `frais-${Date.now()}`,
         montant: total,
         date: new Date().toISOString(),
+        parametresAnalyse: selectedParametres,
       };
 
       // Ajouter la note de frais
@@ -117,7 +144,7 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
     } finally {
       setIsLoading(false);
     }
-  }, [newNoteFrais, total, addNoteFrais, toast, handleReset, onNoteFraisCreated]);
+  }, [newNoteFrais, total, addNoteFrais, toast, handleReset, onNoteFraisCreated, selectedParametres]);
 
   return {
     newNoteFrais,
@@ -127,6 +154,20 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
     handleInputChange,
     handleFileChange,
     handleReset,
-    handleSubmit
+    handleSubmit,
+    // Add missing properties that were causing errors
+    selectedParametres,
+    fraisGestion,
+    fraisInspection,
+    fraisSurveillance,
+    description,
+    setDescription,
+    isSubmitting: isLoading,
+    totalPrix,
+    setFraisGestion,
+    setFraisInspection,
+    setFraisSurveillance,
+    fileInputRef,
+    toggleParametre
   };
 };
