@@ -33,6 +33,22 @@ const Login = () => {
     }
   };
 
+  const handleDemoUserLogin = async (demoEmail: string, demoPassword: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPassword);
+    setError('');
+    setIsLoading(true);
+    
+    try {
+      await login(demoEmail, demoPassword);
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Échec de connexion avec le compte démo. Veuillez réessayer.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-md rounded-lg shadow-md bg-white p-8">
@@ -107,16 +123,31 @@ const Login = () => {
               </div>
               
               {showDemoUsers && (
-                <div className="mt-4 border rounded p-3 bg-gray-50 text-xs">
-                  <h3 className="font-medium mb-2">Comptes de démonstration:</h3>
+                <div className="mt-4 border rounded p-3 bg-gray-50">
+                  <h3 className="font-medium mb-2 text-sm">Comptes de démonstration:</h3>
                   <ul className="space-y-2">
                     {DEMO_USERS.map(user => (
-                      <li key={user.id} className="flex justify-between">
-                        <span><b>{user.email}</b> ({user.role})</span>
-                        <span className="text-gray-500">{user.password}</span>
+                      <li key={user.id} className="text-xs">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="w-full justify-between text-left py-1 px-2 h-auto"
+                          onClick={() => handleDemoUserLogin(user.email, user.password)}
+                        >
+                          <span className="flex flex-col items-start">
+                            <span className="font-medium">{user.email}</span>
+                            <span className="text-gray-500 text-xs">({user.role})</span>
+                          </span>
+                          <span className="bg-gray-200 px-2 py-0.5 rounded text-gray-700">
+                            Connexion rapide
+                          </span>
+                        </Button>
                       </li>
                     ))}
                   </ul>
+                  <p className="text-xs text-gray-500 mt-3">
+                    Cliquez sur un compte pour vous connecter automatiquement.
+                  </p>
                 </div>
               )}
             </form>
