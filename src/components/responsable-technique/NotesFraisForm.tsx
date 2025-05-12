@@ -50,11 +50,6 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({
     handleInputChange(e); // Call the original handler too to update newNoteFrais
   };
   
-  // This adapter function will convert the signature from string[] to what the form expects
-  const handleParametresChange = (parametres: string[]) => {
-    setSelectedParametres(parametres);
-  };
-  
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <InformationsGenerales
@@ -85,7 +80,7 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({
       
       <ParametresAnalyseForm
         selectedParametres={selectedParametres}
-        onChange={handleParametresChange}
+        onChange={setSelectedParametres}
       />
       
       <RecapitulatifFrais 

@@ -1,5 +1,5 @@
 
-export { useNotesFraisFormState } from './useNotesFraisFormState';
+export { useNotesFraisFormState, NoteFraisType } from './useNotesFraisFormState';
 export { default as InformationsGenerales } from './InformationsGenerales';
 export { default as FraisAdditionnels } from './FraisAdditionnels';
 export { default as RecapitulatifFrais } from './RecapitulatifFrais';
