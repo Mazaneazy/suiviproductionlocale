@@ -1,5 +1,5 @@
 
-import { UserRole } from '@/types';
+import { UserRole, UserAction, User } from '@/types';
 import { rolePermissionsMap } from '@/constants/authConstants';
 import { generateId } from '../data/utils';
 import { supabase } from '@/lib/supabase';

@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect } from 'react';
 import { User, UserRole, UserAction, Dossier } from '@/types';
 import { supabase } from '@/lib/supabase';
@@ -88,11 +87,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               role: 'acceuil' as UserRole,
               permissions: getPermissionsForRole('acceuil'),
               date_creation: new Date().toISOString(),
-              actions: []
+              actions: [],
+              // Add these missing properties to fix TypeScript error
+              modules: [],
+              phone: '',
+              producteur_dossier_id: null
             };
             
-            await supabase.from('users').insert(newProfile);
-            setCurrentUser(transformSupabaseUser(newProfile));
+            await supabase.from('users').insert(adaptUserForSupabase(newProfile));
+            setCurrentUser(transformSupabaseUser(newProfile as any));
           }
         } else if (event === 'SIGNED_OUT') {
           setCurrentUser(null);
