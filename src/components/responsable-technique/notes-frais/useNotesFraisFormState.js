@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { makeJsonIterable } from '@/utils/jsonUtils';
-import { Dossier } from '@/types';
+import { Dossier } from '@/types/dossier';  // Updated import path to directly import from dossier.ts
 
 export const useNotesFraisFormState = (dossier, onNoteFraisCreated) => {
   const { toast } = useToast();

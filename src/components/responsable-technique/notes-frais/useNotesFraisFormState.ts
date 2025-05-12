@@ -1,7 +1,7 @@
-
 import { useState, useCallback, useRef } from 'react';
 import { z } from 'zod';
-import { NoteFrais } from '@/types';
+import { NoteFrais } from '@/types/finances';
+import { Dossier } from '@/types/dossier';  // Updated import path
 import { Json } from '@/integrations/supabase/types';
 
 // This function directly replaces the iteration over Json values with our safe version
@@ -58,7 +58,7 @@ interface UseNotesFraisFormStateProps {
 }
 
 // Create an adapter hook that bridges the useNotesFraisFormState with the API expected by NotesFraisForm
-export const useNotesFraisFormState = (dossier: any, onNoteFraisCreated: () => void) => {
+export const useNotesFraisFormState = (dossier: Dossier, onNoteFraisCreated: () => void) => {
   const [values, setValues] = useState<NotesFraisValues>({
     date: new Date().toISOString().split('T')[0],
     type: NoteFraisType.DEPLACEMENT,
