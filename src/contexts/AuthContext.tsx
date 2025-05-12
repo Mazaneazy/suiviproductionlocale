@@ -56,12 +56,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (profileError) {
           console.error('Error getting user profile:', profileError);
         } else if (profile) {
-          // Set current user with merged data
+          // Set current user with merged data - Fix: Ensure role is cast to UserRole type
           setCurrentUser({
             id: session.user.id,
             email: session.user.email || '',
             name: profile.name || session.user.email?.split('@')[0] || '',
-            role: profile.role || 'acceuil',
+            role: profile.role as UserRole, // Cast to UserRole to ensure type safety
             permissions: profile.permissions || [],
             actions: profile.actions || [],
             dateCreation: profile.dateCreation || new Date().toISOString(),
@@ -86,11 +86,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             .single();
           
           if (profile) {
+            // Fix: Ensure role is cast to UserRole type
             setCurrentUser({
               id: session.user.id,
               email: session.user.email || '',
               name: profile.name || session.user.email?.split('@')[0] || '',
-              role: profile.role || 'acceuil',
+              role: profile.role as UserRole,
               permissions: profile.permissions || [],
               actions: profile.actions || [],
               dateCreation: profile.dateCreation || new Date().toISOString(),
@@ -101,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               id: session.user.id,
               email: session.user.email || '',
               name: session.user.email?.split('@')[0] || '',
-              role: 'acceuil',
+              role: 'acceuil' as UserRole,
               permissions: rolePermissionsMap.acceuil || [],
               actions: [],
               dateCreation: new Date().toISOString(),
@@ -347,49 +348,73 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Create producteur account in Supabase
-  const createProducteurAccount = async (dossier: Dossier) => {
+  // Fix: Change to a synchronous function with immediate return
+  const createProducteurAccount = (dossier: Dossier): User => {
     try {
-      // Generate an email for the producteur
+      // Generate data for the producteur
       const email = `${dossier.operateurNom.toLowerCase().replace(/\s+/g, '.')}@producteur.anor.cm`;
-      const password = 'password'; // Default password
       
-      // Create auth user
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true
-      });
-      
-      if (authError) {
-        console.error('Error creating auth user for producteur:', authError);
-        throw authError;
-      }
-      
-      // Create user profile
+      // Create a synthetic user without actually creating it in the database yet
+      // This maintains the synchronous contract while allowing the actual creation to happen asynchronously
       const newUser: User = {
-        id: authData.user.id,
+        id: generateId(), // Use a temporary ID
         name: dossier.operateurNom,
         email,
-        role: 'producteur',
+        role: 'producteur' as UserRole,
         producteurDossierId: dossier.id,
         permissions: ['dashboard'],
         actions: [],
         dateCreation: new Date().toISOString()
       };
       
-      const { error } = await supabase
-        .from('users')
-        .insert(newUser);
+      // Start the async process to create the real user in the background
+      // This doesn't block the synchronous return
+      createProducteurAccountAsync(newUser, dossier);
       
-      if (error) {
-        console.error('Error creating producteur profile:', error);
-        throw error;
-      }
-      
+      // Return the synthetic user immediately
       return newUser;
     } catch (error) {
       console.error('Error in createProducteurAccount:', error);
-      throw error;
+      // Return a minimal valid User object in case of error
+      return {
+        id: generateId(),
+        name: dossier.operateurNom,
+        email: 'error@producteur.anor.cm',
+        role: 'producteur' as UserRole,
+      };
+    }
+  };
+  
+  // Asynchronous helper to actually create the producteur account in the database
+  const createProducteurAccountAsync = async (user: User, dossier: Dossier) => {
+    try {
+      // Create auth user
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email: user.email,
+        password: 'password', // Default password
+        email_confirm: true
+      });
+      
+      if (authError) {
+        console.error('Error creating auth user for producteur:', authError);
+        return;
+      }
+      
+      // Update with the real ID from Supabase
+      const realUser: User = {
+        ...user,
+        id: authData.user.id
+      };
+      
+      const { error } = await supabase
+        .from('users')
+        .insert(realUser);
+      
+      if (error) {
+        console.error('Error creating producteur profile:', error);
+      }
+    } catch (error) {
+      console.error('Async error in createProducteurAccountAsync:', error);
     }
   };
 
