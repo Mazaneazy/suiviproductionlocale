@@ -1,7 +1,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Dossier } from '@/types';
+import { Dossier, NoteFrais } from '@/types';
 
 export const useNotesFraisFormState = (dossier, onNoteFraisCreated) => {
   const { toast } = useToast();
