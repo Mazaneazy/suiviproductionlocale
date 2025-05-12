@@ -1,238 +1,159 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { FileCheck, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
-import { Alert, AlertDescription } from '../components/ui/alert';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "../components/ui/form";
 import { useAuth } from '../hooks/useAuth';
-import { useToast } from '../hooks/use-toast';
-import ResetPasswordDialog from '@/components/auth/ResetPasswordDialog';
-import { supabase } from '@/lib/supabase';
-
-// Définition du schéma de validation
-const loginSchema = z.object({
-  email: z.string()
-    .email('Adresse email invalide')
-    .min(1, 'L\'email est requis'),
-  password: z.string()
-    .min(1, 'Le mot de passe est requis'),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { InfoIcon } from 'lucide-react';
+import { DEMO_USERS } from '@/contexts/data/mockData';
 
 const Login = () => {
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [resetPasswordOpen, setResetPasswordOpen] = useState(false);
+  const [error, setError] = useState('');
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const { login, getAllUsers } = useAuth();
-  const { toast } = useToast();
+  const [showDemoUsers, setShowDemoUsers] = useState(false);
 
-  // Initialisation du formulaire avec React Hook Form et Zod
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
-
-  const handleSubmit = async (values: LoginFormValues) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError('');
     setIsLoading(true);
-
+    
     try {
-      const success = await login(values.email, values.password);
-      if (success) {
-        toast({
-          title: "Connexion réussie",
-          description: "Bienvenue dans le système de certification des produits locaux.",
-        });
-        navigate('/dashboard');
-      } else {
-        setError('Email ou mot de passe incorrect');
-      }
+      await login(email, password);
+      navigate('/dashboard');
     } catch (err) {
-      setError('Une erreur est survenue lors de la connexion');
+      setError('Identifiants incorrects. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Toggle d'affichage du mot de passe
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  // Get demo accounts from Supabase for demonstration
-  const [demoAccounts, setDemoAccounts] = React.useState<{role: string, email: string}[]>([]);
-
-  React.useEffect(() => {
-    const fetchDemoAccounts = async () => {
-      const { data, error } = await supabase
-        .from('demo_accounts')
-        .select('role, email');
-      
-      if (error) {
-        console.error('Error fetching demo accounts:', error);
-      } else if (data) {
-        setDemoAccounts(data);
-      }
-    };
-    
-    fetchDemoAccounts();
-  }, []);
-
-  const handleExampleLogin = (exampleEmail: string) => {
-    form.setValue('email', exampleEmail);
-    form.setValue('password', 'password');
-  };
-
   return (
-    <div className="min-h-screen bg-cover bg-center flex items-center justify-center p-4" 
-         style={{ backgroundImage: `url('/lovable-uploads/e93b38b9-1b6c-44f8-b92e-16075ea91ea2.png')` }}>
-      <div className="max-w-md w-full">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md rounded-lg shadow-md bg-white p-8">
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <img src="/lovable-uploads/b3a4f946-cb80-4ff5-9096-718b92e2e94a.png" alt="Logo ANOR" className="h-24" />
-          </div>
-          <h1 className="text-3xl font-bold text-white">Certification des Produits Locaux</h1>
-          <p className="text-white/80 mt-2">Système de gestion des certifications - ANOR</p>
+          <img 
+            src="/lovable-uploads/e1bf7151-3abe-4c2a-8037-71e791d77bf9.png" 
+            alt="ANOR Logo" 
+            className="h-16 mx-auto mb-4" 
+          />
+          <h1 className="text-2xl font-bold text-gray-800">
+            ANOR Certification
+          </h1>
+          <p className="text-gray-500 mt-2">
+            Système de gestion des certifications
+          </p>
         </div>
-
-        <Card className="backdrop-blur-md bg-white/90">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold text-center">Connexion</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {error && (
-              <Alert variant="destructive" className="mb-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="relative">
-                        <Mail className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
-                        <FormControl>
-                          <Input 
-                            placeholder="Adresse email"
-                            className="pl-10" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="relative">
-                        <Lock className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
-                        <FormControl>
-                          <Input 
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Mot de passe" 
-                            className="pl-10 pr-10"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <button 
-                          type="button"
-                          onClick={togglePasswordVisibility}
-                          className="absolute inset-y-0 right-0 flex items-center pr-3"
-                        >
-                          {showPassword ? (
-                            <EyeOff className="h-4 w-4 text-gray-400" />
-                          ) : (
-                            <Eye className="h-4 w-4 text-gray-400" />
-                          )}
-                        </button>
-                        <FormMessage />
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
-                <div className="flex justify-end">
-                  <Button 
-                    type="button" 
-                    variant="link" 
-                    className="p-0 h-auto text-certif-blue"
-                    onClick={() => setResetPasswordOpen(true)}
-                  >
-                    Mot de passe oublié ?
-                  </Button>
+        
+        <Tabs defaultValue="login" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsTrigger value="login">Connexion</TabsTrigger>
+            <TabsTrigger value="info">Informations</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="login">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <div className="p-3 bg-red-100 text-red-700 rounded-md text-sm">
+                  {error}
                 </div>
-
-                <Button 
-                  type="submit" 
-                  className="w-full bg-certif-blue hover:bg-certif-blue/90" 
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Connexion en cours...' : 'Se connecter'}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-          <CardFooter className="flex flex-col">
-            <div className="w-full border-t pt-4">
-              <p className="text-sm text-gray-500 mb-2">Pour la démonstration, utilisez:</p>
-              <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto">
-                {demoAccounts.length > 0 ? (
-                  demoAccounts.map((account) => (
-                    <Button 
-                      key={account.role}
-                      variant="outline" 
-                      onClick={() => handleExampleLogin(account.email)}
-                      className="text-xs justify-between"
-                      size="sm"
-                    >
-                      <span className="font-semibold">{account.role}</span>
-                      <span className="text-gray-500 truncate max-w-[150px]">{account.email}</span>
-                    </Button>
-                  ))
-                ) : (
-                  <p className="text-sm text-gray-500 text-center py-2">
-                    Chargement des comptes de démonstration...
-                  </p>
-                )}
+              )}
+              <div>
+                <label className="text-sm font-medium text-gray-700 block mb-2">
+                  Email
+                </label>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="votre@email.com"
+                  required
+                />
               </div>
-              <p className="text-xs text-gray-400 mt-2 text-center">Mot de passe: "password"</p>
+              <div>
+                <label className="text-sm font-medium text-gray-700 block mb-2">
+                  Mot de passe
+                </label>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full bg-certif-blue hover:bg-certif-blue/90"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Connexion...' : 'Se connecter'}
+              </Button>
+              
+              <div className="text-center mt-4">
+                <Button 
+                  type="button" 
+                  variant="link" 
+                  onClick={() => setShowDemoUsers(!showDemoUsers)}
+                  size="sm"
+                >
+                  {showDemoUsers ? 'Masquer les comptes démo' : 'Afficher les comptes démo'}
+                </Button>
+              </div>
+              
+              {showDemoUsers && (
+                <div className="mt-4 border rounded p-3 bg-gray-50 text-xs">
+                  <h3 className="font-medium mb-2">Comptes de démonstration:</h3>
+                  <ul className="space-y-2">
+                    {DEMO_USERS.map(user => (
+                      <li key={user.id} className="flex justify-between">
+                        <span><b>{user.email}</b> ({user.role})</span>
+                        <span className="text-gray-500">{user.password}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </form>
+          </TabsContent>
+          
+          <TabsContent value="info">
+            <Alert className="bg-blue-50 mb-4">
+              <InfoIcon className="h-4 w-4 text-blue-700" />
+              <AlertTitle className="text-blue-700">Information</AlertTitle>
+              <AlertDescription className="text-blue-600">
+                Cette application est une démonstration du système de gestion des certifications ANOR.
+              </AlertDescription>
+            </Alert>
+            
+            <div className="space-y-4 text-sm">
+              <p className="mb-2">
+                Ce système permet la gestion des dossiers de certification, des inspections, des notes de frais et la génération des certificats de conformité.
+              </p>
+              
+              <div>
+                <h3 className="font-medium text-gray-800 mb-1">Fonctionnalités principales:</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Gestion des dossiers de demande</li>
+                  <li>Planification et suivi des inspections</li>
+                  <li>Gestion des notes de frais</li>
+                  <li>Génération des certificats</li>
+                  <li>Statistiques et tableaux de bord</li>
+                </ul>
+              </div>
+              
+              <p className="text-sm text-gray-500 mt-4">
+                Pour vous connecter, utilisez l'un des comptes de démonstration disponibles dans l'onglet "Connexion".
+              </p>
             </div>
-          </CardFooter>
-        </Card>
+          </TabsContent>
+        </Tabs>
       </div>
-
-      <ResetPasswordDialog 
-        open={resetPasswordOpen}
-        onOpenChange={setResetPasswordOpen}
-      />
     </div>
   );
 };

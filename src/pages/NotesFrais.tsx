@@ -5,7 +5,6 @@ import { useNotesFraisManagement } from '../hooks/notes-frais';
 import NotesFraisHeader from '../components/notes-frais/NotesFraisHeader';
 import NotesFraisFilters from '../components/notes-frais/NotesFraisFilters';
 import NotesFraisTable from '../components/notes-frais/NotesFraisTable';
-import NotesFraisFormDialog from '../components/notes-frais/NotesFraisFormDialog';
 import NotesFraisDetailsDialog from '../components/notes-frais/NotesFraisDetailsDialog';
 import { Dialog } from '@/components/ui/dialog';
 import { Helmet } from 'react-helmet';
@@ -21,20 +20,13 @@ const NotesFrais = () => {
     setSearchTerm,
     statusFilter,
     setStatusFilter,
-    dialogOpen,
-    setDialogOpen,
     detailDialogOpen,
     setDetailDialogOpen,
     selectedNote,
-    newNoteFrais,
     filteredNotesFrais,
     dossiers,
-    fileInputRef,
-    handleInputChange,
-    handleFileChange,
     handleSendNotification,
     handleMarkAsNotified,
-    handleAddNoteFrais,
     handleValidateNoteFrais,
     handleRejectNoteFrais,
     calculerTotal,
@@ -73,26 +65,7 @@ const NotesFrais = () => {
         <title>Notes de Frais | ANOR Certification</title>
       </Helmet>
       
-      {/* Dialog for adding new note */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <NotesFraisFormDialog
-          dialogOpen={dialogOpen}
-          setDialogOpen={setDialogOpen}
-          newNoteFrais={newNoteFrais}
-          dossiers={dossiers}
-          fileInputRef={fileInputRef}
-          onInputChange={handleInputChange}
-          onDossierChange={(value) => {
-            const updatedNote = { ...newNoteFrais, dossierId: value };
-            newNoteFrais.dossierId = value; // Direct update for compatibility
-            return updatedNote;
-          }}
-          onFileChange={handleFileChange}
-          onSave={handleAddNoteFrais}
-        />
-      </Dialog>
-
-      <NotesFraisHeader onOpenDialog={() => setDialogOpen(true)} />
+      <NotesFraisHeader />
       
       <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
         <div className="flex justify-between items-center mb-4">

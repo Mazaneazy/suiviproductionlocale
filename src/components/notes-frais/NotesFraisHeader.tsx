@@ -2,12 +2,13 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface NotesFraisHeaderProps {
-  onOpenDialog: () => void;
+  onOpenDialog?: () => void; // On garde ce prop pour la compatibilité, mais nous ne l'utiliserons plus
 }
 
-const NotesFraisHeader: React.FC<NotesFraisHeaderProps> = ({ onOpenDialog }) => {
+const NotesFraisHeader: React.FC<NotesFraisHeaderProps> = () => {
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex items-center">
@@ -18,13 +19,14 @@ const NotesFraisHeader: React.FC<NotesFraisHeaderProps> = ({ onOpenDialog }) => 
         />
         <h1 className="text-3xl font-bold text-certif-blue">Notes de frais</h1>
       </div>
-      <Button 
-        className="bg-certif-blue hover:bg-certif-blue/90"
-        onClick={onOpenDialog}
-      >
-        <PlusCircle className="mr-2" size={16} />
-        Nouvelle note de frais
-      </Button>
+      <Link to="/notes-frais/nouveau">
+        <Button 
+          className="bg-certif-blue hover:bg-certif-blue/90"
+        >
+          <PlusCircle className="mr-2" size={16} />
+          Nouvelle note de frais
+        </Button>
+      </Link>
     </div>
   );
 };
