@@ -20,6 +20,7 @@ export const AuthContext = createContext<AuthContextProps>({
   getUserActions: () => [],
   createProducteurAccount: () => ({} as User),
   resetPassword: async () => false,
+  changePassword: async () => false,
 });
 
 // Export module names for use in other components
@@ -94,6 +95,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Add creation action
     addUserAction(newUser.id, 'Création de compte', `Compte créé avec le rôle ${newUser.role}`, 'user-management');
+    return true;
+  };
+  
+  // Change password function
+  const changePassword = async (userId: string, currentPassword: string, newPassword: string): Promise<boolean> => {
+    // Find user with this ID
+    const userIndex = mockUsers.findIndex(user => user.id === userId);
+    
+    if (userIndex < 0) return false;
+    
+    // Check if current password is correct
+    if (mockUsers[userIndex].password !== currentPassword) {
+      return false;
+    }
+    
+    // Update password
+    mockUsers[userIndex].password = newPassword;
+    
+    // If this is the current user, update the current user state
+    if (currentUser && currentUser.id === userId) {
+      const updatedUser = {...currentUser, password: newPassword};
+      setCurrentUser(updatedUser);
+    }
+    
+    // Add password change action
+    addUserAction(userId, 'Modification mot de passe', 'Mot de passe modifié', 'auth');
+    
     return true;
   };
 
@@ -184,7 +212,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isAuthenticated,
       getUserActions,
       createProducteurAccount,
-      resetPassword
+      resetPassword,
+      changePassword
     }}>
       {children}
     </AuthContext.Provider>

@@ -18,6 +18,8 @@ export interface NoteFrais {
   operateurNotifie?: boolean;
   notificationEnvoyee?: boolean;
   total?: number;
+  parametresAnalyse?: string[]; // Liste des paramètres à analyser au laboratoire
+  pdfUrl?: string; // URL du PDF généré
 }
 
 export interface PreuvePaiement {

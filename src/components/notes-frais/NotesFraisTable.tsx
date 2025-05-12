@@ -1,27 +1,40 @@
 
 import React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Check, X, Mail } from 'lucide-react';
-import { NoteFrais } from '@/types';
-import { Dossier } from '@/types';
-import { useAuth } from '@/contexts/AuthContext';
+import { MoreHorizontal, CheckCircle, AlertTriangle, Bell, Eye } from 'lucide-react';
+import { NoteFrais, Dossier } from '@/types';
+import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/hooks/useAuth';
+import NotesFraisDownloadButton from './NotesFraisDownloadButton';
 
-interface NotesFraisTableProps {
+interface NoteFraisTableProps {
   notesFrais: NoteFrais[];
   dossiers: Dossier[];
   onValidate: (id: string) => void;
   onReject: (id: string) => void;
   onSendNotification: (id: string) => void;
   onMarkAsNotified: (id: string) => void;
-  onShowDetails: (note: NoteFrais) => void;
+  onShowDetails: (noteFrais: NoteFrais) => void;
   getStatusColor: (status: string) => string;
   formatStatus: (status: string) => string;
-  calculerTotal: (note: NoteFrais) => number;
+  calculerTotal: (noteFrais: NoteFrais) => number;
 }
 
-const NotesFraisTable: React.FC<NotesFraisTableProps> = ({
+const NotesFraisTable: React.FC<NoteFraisTableProps> = ({ 
   notesFrais,
   dossiers,
   onValidate,
@@ -33,118 +46,111 @@ const NotesFraisTable: React.FC<NotesFraisTableProps> = ({
   formatStatus,
   calculerTotal
 }) => {
-  const { currentUser } = useAuth();
-
+  const { hasRole } = useAuth();
+  
+  // Vérifier les rôles pour les différentes actions
+  const canValidate = hasRole(['comptable', 'admin', 'directeur_general']);
+  const canNotify = hasRole(['comptable', 'acceuil', 'admin', 'directeur_general']);
+  
+  // Trouver le nom de l'opérateur pour un dossier donné
+  const getOperatorName = (dossierId: string): string => {
+    const dossier = dossiers.find(d => d.id === dossierId);
+    return dossier ? dossier.operateurNom : 'Inconnu';
+  };
+  
   return (
-    <div className="overflow-x-auto">
+    <div className="border rounded-md">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
             <TableHead>Opérateur</TableHead>
-            <TableHead className="text-right">Gestion</TableHead>
-            <TableHead className="text-right">Inspection</TableHead>
-            <TableHead className="text-right">Analyses</TableHead>
-            <TableHead className="text-right">Surveillance</TableHead>
-            <TableHead className="text-right">Total</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Montant</TableHead>
             <TableHead>Statut</TableHead>
-            <TableHead>Notification</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>Paiement</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {notesFrais.length > 0 ? (
-            notesFrais.map((note) => {
-              const dossier = dossiers.find(d => d.id === note.dossierId);
-              const total = note.montant || calculerTotal(note);
-              
-              return (
-                <TableRow key={note.id}>
-                  <TableCell>{new Date(note.date).toLocaleDateString()}</TableCell>
-                  <TableCell className="font-medium">{dossier?.operateurNom}</TableCell>
-                  <TableCell className="text-right">{note.fraisGestion?.toLocaleString() || '0'} FCFA</TableCell>
-                  <TableCell className="text-right">{note.fraisInspection?.toLocaleString() || '0'} FCFA</TableCell>
-                  <TableCell className="text-right">{note.fraisAnalyses?.toLocaleString() || '0'} FCFA</TableCell>
-                  <TableCell className="text-right">{note.fraisSurveillance?.toLocaleString() || '0'} FCFA</TableCell>
-                  <TableCell className="text-right font-medium">{total.toLocaleString()} FCFA</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(note.status)}>
-                      {formatStatus(note.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {note.notificationEnvoyee ? (
-                      note.operateurNotifie ? (
-                        <Badge className="bg-green-500 text-white">Reçue</Badge>
-                      ) : (
-                        <Badge className="bg-yellow-500 text-white">Envoyée</Badge>
-                      )
-                    ) : (
-                      <Badge className="bg-gray-400 text-white">Non envoyée</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      {note.status === 'en_attente' && currentUser?.role === 'comptable' && (
-                        <>
-                          <Button 
-                            variant="outline" 
-                            size="icon" 
-                            className="h-8 w-8 text-green-500 hover:text-green-700"
-                            onClick={() => onValidate(note.id)}
-                          >
-                            <Check size={16} />
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="icon" 
-                            className="h-8 w-8 text-red-500 hover:text-red-700"
-                            onClick={() => onReject(note.id)}
-                          >
-                            <X size={16} />
-                          </Button>
-                        </>
-                      )}
-                      {note.status === 'valide' && note.notificationEnvoyee === false && (
-                        <Button 
-                          variant="outline" 
-                          size="icon"
-                          className="h-8 w-8 text-blue-500 hover:text-blue-700"
-                          onClick={() => onSendNotification(note.id)}
-                          title="Envoyer une notification"
-                        >
-                          <Mail size={16} />
-                        </Button>
-                      )}
-                      {note.notificationEnvoyee && !note.operateurNotifie && (
-                        <Button 
-                          variant="outline" 
-                          size="icon"
-                          className="h-8 w-8 text-green-500 hover:text-green-700"
-                          onClick={() => onMarkAsNotified(note.id)}
-                          title="Marquer comme notifié"
-                        >
-                          <Check size={16} />
-                        </Button>
-                      )}
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => onShowDetails(note)}
-                      >
-                        Détails
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })
-          ) : (
+          {notesFrais.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={10} className="h-24 text-center">
+              <TableCell colSpan={6} className="text-center py-10">
                 Aucune note de frais trouvée
               </TableCell>
             </TableRow>
+          ) : (
+            notesFrais.map((noteFrais) => (
+              <TableRow key={noteFrais.id}>
+                <TableCell className="font-medium">
+                  {getOperatorName(noteFrais.dossierId)}
+                </TableCell>
+                <TableCell>
+                  {new Date(noteFrais.date).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  {calculerTotal(noteFrais).toLocaleString()} FCFA
+                </TableCell>
+                <TableCell>
+                  <Badge className={getStatusColor(noteFrais.status)}>
+                    {formatStatus(noteFrais.status)}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {noteFrais.acquitte ? (
+                    <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
+                      Acquitté
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="bg-yellow-50 text-yellow-600 border-yellow-200">
+                      En attente
+                    </Badge>
+                  )}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end items-center space-x-2">
+                    <NotesFraisDownloadButton noteFraisId={noteFrais.id} />
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => onShowDetails(noteFrais)}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          Détails
+                        </DropdownMenuItem>
+                        {canValidate && noteFrais.status === 'en_attente' && (
+                          <>
+                            <DropdownMenuItem onClick={() => onValidate(noteFrais.id)}>
+                              <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                              Valider
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onReject(noteFrais.id)}>
+                              <AlertTriangle className="h-4 w-4 mr-2 text-amber-600" />
+                              Rejeter
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        {canNotify && noteFrais.status === 'valide' && !noteFrais.notificationEnvoyee && (
+                          <DropdownMenuItem onClick={() => onSendNotification(noteFrais.id)}>
+                            <Bell className="h-4 w-4 mr-2 text-blue-600" />
+                            Notifier l'opérateur
+                          </DropdownMenuItem>
+                        )}
+                        {canNotify && noteFrais.notificationEnvoyee && !noteFrais.operateurNotifie && (
+                          <DropdownMenuItem onClick={() => onMarkAsNotified(noteFrais.id)}>
+                            <CheckCircle className="h-4 w-4 mr-2 text-blue-600" />
+                            Marquer comme notifié
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
           )}
         </TableBody>
       </Table>
