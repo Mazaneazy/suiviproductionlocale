@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Certificat, HistoriqueEvenement } from '../../../types';
 import { MOCK_CERTIFICATS } from '../mockData';
@@ -6,9 +7,18 @@ import { generateId } from '../utils';
 export function useCertificats(updateDossier: (id: string, data: any) => void) {
   // Map the mock data to match the Certificat interface
   const mappedCertificats: Certificat[] = MOCK_CERTIFICATS.map(cert => ({
-    ...cert,
-    entreprise: cert.operateur || cert.entreprise, // Make sure entreprise is set
-    responsableQualiteId: cert.responsableQualiteId || `resp-${generateId().substring(0, 8)}` // Set a default if missing
+    id: cert.id,
+    dossierId: cert.dossierId,
+    numero: cert.numero,
+    dateDelivrance: cert.dateDelivrance,
+    dateExpiration: cert.dateExpiration,
+    entreprise: cert.operateur || '',
+    produit: cert.produit,
+    status: (cert.status as 'actif' | 'expire' | 'suspendu' | 'revoque'),
+    responsableQualiteId: cert.responsableQualiteId || `resp-${generateId().substring(0, 8)}`,
+    normeReference: cert.normeReference,
+    operateur: cert.operateur,
+    logo: cert.logo
   }));
   
   const [certificats, setCertificats] = useState<Certificat[]>(mappedCertificats);

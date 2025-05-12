@@ -1,3 +1,4 @@
+
 import { Dossier, DocumentDossier, Inspection, NoteFrais, User } from '../../types';
 import { generateId } from './utils';
 import { PRODUITS_CAMEROUNAIS, OPERATEURS_CAMEROUNAIS, NOMS_CAMEROUNAIS } from './mockConstants';
@@ -10,6 +11,7 @@ export const DEMO_USERS = [
     id: 'demo-admin',
     nom: 'Admin',
     prenom: 'Demo',
+    name: 'Demo Admin',
     email: 'admin@demo.com',
     password: 'demo123',
     role: 'admin',
@@ -21,6 +23,7 @@ export const DEMO_USERS = [
     id: 'demo-tech',
     nom: 'Responsable',
     prenom: 'Technique',
+    name: 'Technique Responsable',
     email: 'tech@demo.com',
     password: 'demo123',
     role: 'responsable_technique',
@@ -32,6 +35,7 @@ export const DEMO_USERS = [
     id: 'demo-dir',
     nom: 'Directeur',
     prenom: 'Evaluation',
+    name: 'Evaluation Directeur',
     email: 'dir@demo.com',
     password: 'demo123',
     role: 'directeur_evaluation',
@@ -43,6 +47,7 @@ export const DEMO_USERS = [
     id: 'demo-insp',
     nom: 'Inspecteur',
     prenom: 'Demo',
+    name: 'Demo Inspecteur',
     email: 'inspecteur@demo.com',
     password: 'demo123',
     role: 'inspecteur',
@@ -54,6 +59,7 @@ export const DEMO_USERS = [
     id: 'demo-prod',
     nom: 'Producteur',
     prenom: 'Demo',
+    name: 'Demo Producteur',
     email: 'producteur@demo.com',
     password: 'demo123',
     role: 'producteur',
@@ -69,6 +75,7 @@ export const MOCK_USERS: User[] = [
     id: 'user1',
     nom: 'Kamga',
     prenom: 'Jean',
+    name: 'Jean Kamga',
     email: 'jean.kamga@anor.cm',
     password: 'password',
     role: 'admin',
@@ -80,6 +87,7 @@ export const MOCK_USERS: User[] = [
     id: 'user2',
     nom: 'Nkeng',
     prenom: 'Marie',
+    name: 'Marie Nkeng',
     email: 'marie.nkeng@anor.cm',
     password: 'password',
     role: 'responsable_technique',
@@ -91,6 +99,7 @@ export const MOCK_USERS: User[] = [
     id: 'user3',
     nom: 'Mbarga',
     prenom: 'Paul',
+    name: 'Paul Mbarga',
     email: 'paul.mbarga@anor.cm',
     password: 'password',
     role: 'directeur_evaluation',
@@ -102,6 +111,7 @@ export const MOCK_USERS: User[] = [
     id: 'user4',
     nom: 'Atangana',
     prenom: 'Sophie',
+    name: 'Sophie Atangana',
     email: 'sophie.atangana@anor.cm',
     password: 'password',
     role: 'inspecteur',
@@ -113,6 +123,7 @@ export const MOCK_USERS: User[] = [
     id: 'user5',
     nom: 'Essomba',
     prenom: 'Pierre',
+    name: 'Pierre Essomba',
     email: 'pierre.essomba@anor.cm',
     password: 'password',
     role: 'inspecteur',
@@ -134,7 +145,10 @@ export const MOCK_DOCUMENTS: DocumentDossier[] = [
     type: 'demande',
     url: '/documents/demande.pdf',
     dateUpload: '2023-01-05T00:00:00.000Z',
-    status: 'valide'
+    status: 'valide',
+    taille: 524288,
+    format: 'pdf',
+    uploadedBy: 'user2'
   },
   {
     id: 'doc2',
@@ -143,7 +157,10 @@ export const MOCK_DOCUMENTS: DocumentDossier[] = [
     type: 'fiche_technique',
     url: '/documents/fiche_technique.pdf',
     dateUpload: '2023-01-05T00:00:00.000Z',
-    status: 'valide'
+    status: 'valide',
+    taille: 1048576,
+    format: 'pdf',
+    uploadedBy: 'user2'
   },
   {
     id: 'doc3',
@@ -152,7 +169,10 @@ export const MOCK_DOCUMENTS: DocumentDossier[] = [
     type: 'rapport',
     url: '/documents/rapport_test.pdf',
     dateUpload: '2023-01-05T00:00:00.000Z',
-    status: 'en_attente'
+    status: 'en_attente',
+    taille: 2097152,
+    format: 'pdf',
+    uploadedBy: 'user2'
   },
   {
     id: 'doc4',
@@ -161,7 +181,10 @@ export const MOCK_DOCUMENTS: DocumentDossier[] = [
     type: 'demande',
     url: '/documents/demande2.pdf',
     dateUpload: '2023-02-20T00:00:00.000Z',
-    status: 'valide'
+    status: 'valide',
+    taille: 524288,
+    format: 'pdf',
+    uploadedBy: 'user2'
   },
   {
     id: 'doc5',
@@ -170,7 +193,10 @@ export const MOCK_DOCUMENTS: DocumentDossier[] = [
     type: 'fiche_technique',
     url: '/documents/fiche_technique2.pdf',
     dateUpload: '2023-02-20T00:00:00.000Z',
-    status: 'valide'
+    status: 'valide',
+    taille: 1048576,
+    format: 'pdf',
+    uploadedBy: 'user2'
   }
 ];
 
@@ -187,10 +213,13 @@ export const MOCK_INSPECTIONS: Inspection[] = [
       id: 'rap1',
       inspectionId: 'insp1',
       dateCreation: '2023-02-16T00:00:00.000Z',
+      auteur: 'Sophie Atangana',
+      titre: 'Rapport d\'inspection SOTRACOM',
       contenu: 'Le produit est conforme aux normes requises.',
       conclusion: 'Favorable',
-      recommandations: ['Maintenir le niveau de qualité actuel'],
-      photos: ['/photos/inspection1_1.jpg', '/photos/inspection1_2.jpg']
+      recommandations: 'Maintenir le niveau de qualité actuel',
+      photos: ['/photos/inspection1_1.jpg', '/photos/inspection1_2.jpg'],
+      statut: 'valide'
     }
   },
   {
@@ -252,7 +281,8 @@ export const MOCK_CERTIFICATS = [
     produit: 'Ciment',
     operateur: 'SOTRACOM',
     normeReference: 'NC 234-2019',
-    logo: '/logos/anor_certified.png'
+    logo: '/logos/anor_certified.png',
+    responsableQualiteId: 'user2'
   }
 ];
 
@@ -265,7 +295,7 @@ export const MOCK_NOTIFICATIONS = [
     message: 'Un nouveau dossier SOTRACOM vous a été assigné',
     dateCreation: '2023-01-02T00:00:00.000Z',
     lu: true,
-    type: 'assignation',
+    type: 'info',
     lien: '/dossiers/1'
   },
   {
@@ -275,7 +305,7 @@ export const MOCK_NOTIFICATIONS = [
     message: 'Vous êtes assigné(e) à l\'inspection SOTRACOM le 15/02/2023',
     dateCreation: '2023-02-10T00:00:00.000Z',
     lu: false,
-    type: 'inspection',
+    type: 'info',
     lien: '/inspections/insp1'
   },
   {
@@ -285,7 +315,7 @@ export const MOCK_NOTIFICATIONS = [
     message: 'Un nouveau rapport d\'inspection est disponible pour validation',
     dateCreation: '2023-02-16T00:00:00.000Z',
     lu: false,
-    type: 'validation',
+    type: 'info',
     lien: '/rapports/rap1'
   },
   {
@@ -295,7 +325,7 @@ export const MOCK_NOTIFICATIONS = [
     message: 'Vous êtes assigné(e) à l\'inspection NESTLE le 10/03/2023',
     dateCreation: '2023-03-05T00:00:00.000Z',
     lu: false,
-    type: 'inspection',
+    type: 'info',
     lien: '/inspections/insp2'
   }
 ];

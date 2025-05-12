@@ -1,3 +1,4 @@
+
 export interface Inspection {
   id: string;
   dossierId: string;
@@ -11,7 +12,7 @@ export interface Inspection {
   planInspection?: string;
   planEchantillonage?: string;
   checklistComplete?: boolean;
-  // Add property used in mock data
+  // Ajout de la propriété rapport utilisée dans les données mock
   rapport?: RapportInspection | null;
 }
 
@@ -51,4 +52,3 @@ export interface AvisDecision {
   commentaires?: string;
   status?: string;
 }
-

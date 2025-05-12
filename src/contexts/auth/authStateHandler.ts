@@ -1,3 +1,4 @@
+
 import { User } from '@/types';
 import { MOCK_USERS } from '../data/mockData';
 
@@ -97,7 +98,7 @@ export const loginUser = async (email: string, password: string): Promise<User> 
     // Map the demoUser properties to User interface properties
     const mappedUser: User = {
       id: demoUser.id,
-      name: demoUser.prenom + ' ' + demoUser.nom,
+      name: demoUser.name || `${demoUser.prenom} ${demoUser.nom}`,
       email: demoUser.email,
       role: demoUser.role as any, // Using any to bypass strict typing temporarily
       phone: demoUser.telephone,
