@@ -1,6 +1,6 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-// Import from the root types module instead of directly from dossier.ts
 import { Dossier } from '@/types';
 
 export const useNotesFraisFormState = (dossier, onNoteFraisCreated) => {

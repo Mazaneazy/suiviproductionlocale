@@ -1,7 +1,8 @@
+
 import { useState, useCallback, useRef } from 'react';
 import { z } from 'zod';
 import { NoteFrais } from '@/types/finances';
-import { Dossier } from '@/types'; // Changed this import to use the index file
+import { Dossier } from '@/types'; // Import from root types index
 
 // This function directly replaces the iteration over Json values with our safe version
 function safelyProcessJsonValues(value: Json) {
