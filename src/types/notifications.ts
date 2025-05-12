@@ -1,4 +1,6 @@
 
+import { type User } from './users';
+
 export interface Notification {
   id: string;
   message: string;
@@ -6,8 +8,6 @@ export interface Notification {
   lue: boolean;
   type: 'info' | 'warning' | 'error' | 'success';
   lienDossier?: string;
-  destinataireId?: string;
-  // Add properties used in mock notifications
   userId?: string;
   titre?: string;
   lien?: string;
@@ -15,21 +15,9 @@ export interface Notification {
   lu?: boolean;
 }
 
-export interface Statistique {
-  totalDossiers: number;
-  enAttente: number;
-  enCours: number;
-  complet: number;
-  rejete: number;
-  certifie: number;
-  aCorrection: number;
-  tauxRejection: number;
-  delaiMoyenTraitement: number;
-  certificationsParMois: Record<string, number>;
-  dossiersParStatut: Record<string, number>;
-  dossiersParProduit: Record<string, number>;
-  // Add the properties being used elsewhere in the codebase
-  dossiersEnCours?: number;
-  dossiersCertifies?: number;
-  dossiersRejetes?: number;
+export interface NotificationContextType {
+  notifications: Notification[];
+  markNotificationAsRead: (id: string) => void;
+  getUnreadNotificationsCount: () => number;
+  addNotification?: (notification: Omit<Notification, 'id' | 'date'>) => void;
 }
