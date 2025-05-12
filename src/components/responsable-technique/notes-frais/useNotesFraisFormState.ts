@@ -17,7 +17,8 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
   const {
     selectedParametres = [],
     toggleParametre,
-    totalPrix = 75000
+    totalPrix = 75000,
+    setSelectedParametres
   } = useParametresEvaluation(dossier?.id || '');
   
   // Individual state items for direct form control
@@ -39,7 +40,6 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
     acquitte: false,
     dossierId: dossier?.id || '',
     inspecteurId: currentUser?.id || '',
-    inspecteurNom: currentUser?.name || '',
     commentaire: '',
     dateCreation: new Date().toISOString(),
   });
@@ -92,7 +92,6 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
       acquitte: false,
       dossierId: dossier?.id || '',
       inspecteurId: currentUser?.id || '',
-      inspecteurNom: currentUser?.name || '',
       commentaire: '',
       dateCreation: new Date().toISOString(),
     });
@@ -155,7 +154,6 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
     handleFileChange,
     handleReset,
     handleSubmit,
-    // Add missing properties that were causing errors
     selectedParametres,
     fraisGestion,
     fraisInspection,
@@ -168,6 +166,7 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
     setFraisInspection,
     setFraisSurveillance,
     fileInputRef,
-    toggleParametre
+    toggleParametre,
+    setSelectedParametres
   };
 };

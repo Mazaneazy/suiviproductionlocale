@@ -40,12 +40,18 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({
     setFraisInspection,
     setFraisSurveillance,
     fileInputRef,
-    toggleParametre
+    toggleParametre,
+    setSelectedParametres
   } = useNotesFraisFormState(dossier, onNoteFraisCreated);
 
   // Handler for description input change
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(e.target.value);
+  };
+  
+  // This adapter function will convert the signature from string[] to what the form expects
+  const handleParametresChange = (parametres: string[]) => {
+    setSelectedParametres(parametres);
   };
   
   return (
@@ -63,7 +69,7 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({
       
       <ParametresAnalyseForm
         selectedParametres={selectedParametres}
-        onChange={toggleParametre}
+        onChange={handleParametresChange}
       />
       
       <RecapitulatifFrais 
