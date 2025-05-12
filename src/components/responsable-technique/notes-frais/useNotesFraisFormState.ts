@@ -1,8 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { z } from 'zod';
 import { NoteFrais } from '@/types/finances';
-import { Dossier } from '@/types/dossier';  // Updated import path
-import { Json } from '@/integrations/supabase/types';
+import { Dossier } from '@/types/dossier';  // Direct import from dossier.ts
 
 // This function directly replaces the iteration over Json values with our safe version
 function safelyProcessJsonValues(value: Json) {
@@ -17,6 +16,9 @@ function makeJsonIterable<T = any>(value: Json): T[] {
   if (typeof value === 'string') return [value] as unknown as T[];
   return [value] as unknown as T[]; // For number, boolean, etc.
 }
+
+// Import Json type from Supabase
+import { Json } from '@/integrations/supabase/types';
 
 // Define enum locally since it's not exported from types
 export enum NoteFraisType {
