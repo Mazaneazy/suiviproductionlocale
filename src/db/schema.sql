@@ -1,4 +1,12 @@
+// Import the createClient function from the Supabase library
+import { createClient } from '@supabase/supabase-js';
 
+// Create a Supabase client instance
+const supabaseUrl = 'https://pzrhugkzszjngtqxsyzt.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6cmh1Z2t6c3pqbmd0cXhzeXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcwMzg2MzUsImV4cCI6MjA2MjYxNDYzNX0.qr-Wic6sf-sTtnYKkxvTWvxzJTRV5a_T-bElvs50uUc';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Now you can use the supabase client to interact with your database
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY,
