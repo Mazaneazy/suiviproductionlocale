@@ -12,6 +12,7 @@ interface RecapitulatifFraisProps {
   total: number;
   description: string;
   setDescription: (value: string) => void;
+  fraisAnalyses?: number;
 }
 
 const RecapitulatifFrais: React.FC<RecapitulatifFraisProps> = ({
@@ -21,7 +22,8 @@ const RecapitulatifFrais: React.FC<RecapitulatifFraisProps> = ({
   fraisSurveillance,
   total,
   description,
-  setDescription
+  setDescription,
+  fraisAnalyses = 0
 }) => {
   return (
     <div>
@@ -30,7 +32,7 @@ const RecapitulatifFrais: React.FC<RecapitulatifFraisProps> = ({
         <div className="space-y-4">
           <div className="flex justify-between border-b pb-2">
             <span>Analyses et essais:</span>
-            <span className="font-medium">{totalPrix.toLocaleString()} FCFA</span>
+            <span className="font-medium">{(fraisAnalyses || totalPrix).toLocaleString()} FCFA</span>
           </div>
           <div className="flex justify-between border-b pb-2">
             <span>Frais de gestion:</span>

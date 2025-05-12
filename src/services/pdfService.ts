@@ -2,7 +2,6 @@
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { NoteFrais, Certificat, Dossier } from '@/types';
-import { useData } from '@/contexts/DataContext';
 import { formatDate } from '@/utils/dateUtils';
 
 declare module 'jspdf' {
@@ -26,7 +25,7 @@ export const generateNoteFraisPDF = (noteFrais: NoteFrais, dossier?: Dossier | n
   
   if (dossier) {
     doc.text(`Opérateur: ${dossier.operateurNom}`, 20, 50);
-    doc.text(`Dossier: ${dossier.reference}`, 20, 60);
+    doc.text(`Dossier: ${dossier.reference || dossier.id}`, 20, 60);
     doc.text(`Produit: ${dossier.typeProduit}`, 20, 70);
   }
   
@@ -91,7 +90,7 @@ export const generateCertificatPDF = (certificat: Certificat, dossier: Dossier |
   doc.text("CERTIFICAT DE CONFORMITÉ", 105, 30, { align: "center" });
   
   doc.setFontSize(16);
-  doc.text(`N° ${certificat.numeroCertificat}`, 105, 40, { align: "center" });
+  doc.text(`N° ${certificat.numeroCertificat || certificat.numero}`, 105, 40, { align: "center" });
   
   // Add content
   doc.setFontSize(12);
@@ -111,7 +110,7 @@ export const generateCertificatPDF = (certificat: Certificat, dossier: Dossier |
     
     doc.setFontSize(12);
     doc.text("est conforme aux exigences applicables", 105, contentY + 55, { align: "center" });
-    doc.text(`Date d'émission: ${formatDate(certificat.dateEmission)}`, 50, contentY + 70);
+    doc.text(`Date d'émission: ${formatDate(certificat.dateEmission || certificat.dateDelivrance)}`, 50, contentY + 70);
     doc.text(`Date d'expiration: ${formatDate(certificat.dateExpiration)}`, 50, contentY + 80);
   }
   
