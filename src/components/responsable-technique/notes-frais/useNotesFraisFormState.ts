@@ -3,13 +3,12 @@ import { useState, useCallback, FormEvent, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { NoteFrais, Dossier } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
-import { useData } from '@/contexts/DataContext';
 import { useParametresEvaluation } from '@/hooks/useParametresEvaluation';
+import { supabase } from '@/lib/supabase';
 
 export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreated: () => void) => {
   const { toast } = useToast();
   const { currentUser } = useAuth();
-  const { addNoteFrais } = useData();
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -98,7 +97,7 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
   }, [dossier, currentUser]);
 
   // Soumettre le formulaire
-  const handleSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback(async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     
@@ -114,16 +113,60 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
 
     try {
       // Calculer le montant total
-      const noteFraisComplete: NoteFrais = {
-        ...newNoteFrais as NoteFrais,
-        id: `frais-${Date.now()}`,
-        montant: total,
+      const noteFraisComplete = {
+        dossier_id: newNoteFrais.dossierId,
+        inspecteur_id: newNoteFrais.inspecteurId,
         date: new Date().toISOString(),
-        parametresAnalyse: selectedParametres,
+        date_creation: new Date().toISOString(),
+        montant: total,
+        description: description || `Note de frais - ${new Date().toLocaleDateString()}`,
+        status: 'en_attente',
+        acquitte: false,
+        frais_gestion: fraisGestion,
+        frais_inspection: fraisInspection,
+        frais_analyses: totalPrix,
+        frais_surveillance: fraisSurveillance,
+        commentaire: newNoteFrais.commentaire || '',
+        parametres_analyse: selectedParametres
       };
 
-      // Ajouter la note de frais
-      addNoteFrais(noteFraisComplete);
+      // Ajouter la note de frais dans Supabase
+      const { error } = await supabase
+        .from('notes_frais')
+        .insert(noteFraisComplete);
+        
+      if (error) {
+        throw error;
+      }
+      
+      // Ajouter à l'historique du dossier
+      if (dossier?.id) {
+        // Get current historique
+        const { data: dossierData } = await supabase
+          .from('dossiers')
+          .select('historique')
+          .eq('id', dossier.id)
+          .single();
+          
+        const historique = dossierData?.historique || [];
+        
+        const newHistorique = [
+          ...historique,
+          {
+            id: crypto.randomUUID(),
+            dossierId: dossier.id,
+            date: new Date().toISOString(),
+            action: 'Note de frais créée',
+            responsable: currentUser?.id || 'Système',
+            commentaire: `Note de frais pour un montant total de ${total} FCFA`
+          }
+        ];
+        
+        await supabase
+          .from('dossiers')
+          .update({ historique: newHistorique })
+          .eq('id', dossier.id);
+      }
       
       toast({
         title: "Note de frais créée",
@@ -133,17 +176,17 @@ export const useNotesFraisFormState = (dossier: Dossier | null, onNoteFraisCreat
       // Réinitialiser et notifier
       handleReset();
       onNoteFraisCreated();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erreur lors de la création de la note de frais:", error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de la création de la note de frais",
+        description: error.message || "Une erreur est survenue lors de la création de la note de frais",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
-  }, [newNoteFrais, total, addNoteFrais, toast, handleReset, onNoteFraisCreated, selectedParametres]);
+  }, [newNoteFrais, total, toast, handleReset, onNoteFraisCreated, selectedParametres, description, fraisGestion, fraisInspection, totalPrix, fraisSurveillance, dossier, currentUser]);
 
   return {
     newNoteFrais,

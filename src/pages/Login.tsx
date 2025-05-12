@@ -19,6 +19,7 @@ import {
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/use-toast';
 import ResetPasswordDialog from '@/components/auth/ResetPasswordDialog';
+import { supabase } from '@/lib/supabase';
 
 // Définition du schéma de validation
 const loginSchema = z.object({
@@ -76,14 +77,24 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
-  // Get all available users for demo
-  const users = getAllUsers();
-  
-  // Create login examples from users
-  const loginExamples = users.map(user => ({
-    role: user.name,
-    email: user.email,
-  }));
+  // Get demo accounts from Supabase for demonstration
+  const [demoAccounts, setDemoAccounts] = React.useState<{role: string, email: string}[]>([]);
+
+  React.useEffect(() => {
+    const fetchDemoAccounts = async () => {
+      const { data, error } = await supabase
+        .from('demo_accounts')
+        .select('role, email');
+      
+      if (error) {
+        console.error('Error fetching demo accounts:', error);
+      } else if (data) {
+        setDemoAccounts(data);
+      }
+    };
+    
+    fetchDemoAccounts();
+  }, []);
 
   const handleExampleLogin = (exampleEmail: string) => {
     form.setValue('email', exampleEmail);
@@ -193,18 +204,24 @@ const Login = () => {
             <div className="w-full border-t pt-4">
               <p className="text-sm text-gray-500 mb-2">Pour la démonstration, utilisez:</p>
               <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto">
-                {loginExamples.map((example) => (
-                  <Button 
-                    key={example.role}
-                    variant="outline" 
-                    onClick={() => handleExampleLogin(example.email)}
-                    className="text-xs justify-between"
-                    size="sm"
-                  >
-                    <span className="font-semibold">{example.role}</span>
-                    <span className="text-gray-500 truncate max-w-[150px]">{example.email}</span>
-                  </Button>
-                ))}
+                {demoAccounts.length > 0 ? (
+                  demoAccounts.map((account) => (
+                    <Button 
+                      key={account.role}
+                      variant="outline" 
+                      onClick={() => handleExampleLogin(account.email)}
+                      className="text-xs justify-between"
+                      size="sm"
+                    >
+                      <span className="font-semibold">{account.role}</span>
+                      <span className="text-gray-500 truncate max-w-[150px]">{account.email}</span>
+                    </Button>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500 text-center py-2">
+                    Chargement des comptes de démonstration...
+                  </p>
+                )}
               </div>
               <p className="text-xs text-gray-400 mt-2 text-center">Mot de passe: "password"</p>
             </div>
