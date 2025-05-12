@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-// Direct import from dossier.ts with correct path
-import { Dossier } from '@/types/dossier';
+// Import from index.ts instead of directly from dossier.ts
+import { Dossier } from '@/types';
 
 export const useNotesFraisFormState = (dossier, onNoteFraisCreated) => {
   const { toast } = useToast();
