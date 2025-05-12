@@ -14,6 +14,25 @@ export interface NoteFrais {
   fraisAnalyses: number;
   fraisSurveillance: number;
   parametresAnalyse?: string[];
+  // Additional properties used in the application
+  commentaire?: string;
+  fichierUrl?: string;
+  notificationEnvoyee?: boolean;
+  operateurNotifie?: boolean;
+  total?: number;
+  pdfUrl?: string;
+}
+
+export interface PreuvePaiement {
+  id: string;
+  noteFraisId: string;
+  dossierId: string;
+  date: string;
+  montant: number;
+  referencePaiement: string;
+  fichierUrl: string;
+  status: 'recu' | 'valide' | 'rejete';
+  commentaires?: string;
 }
 
 export interface Transaction {
