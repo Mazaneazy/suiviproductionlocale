@@ -1,9 +1,17 @@
-import { AuthUser } from './AuthContext';
+
 import { User } from '@/types';
 import { MOCK_USERS } from '../data/mockData';
 
 // Import des comptes de démonstration
 import { DEMO_USERS } from '../data/mockData';
+
+// Type pour l'état d'authentification
+export interface AuthUser {
+  isAuthenticated: boolean;
+  currentUser: User | null;
+  loading: boolean;
+  error: string | null;
+}
 
 export const initAuthState = (): AuthUser => {
   try {
@@ -32,6 +40,45 @@ export const initAuthState = (): AuthUser => {
       error: "Failed to initialize authentication state"
     };
   }
+};
+
+export const initializeAuthState = (
+  setCurrentUser: (user: User | null) => void,
+  setLoading: (loading: boolean) => void
+) => {
+  try {
+    const storedUser = localStorage.getItem('authUser');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setCurrentUser(parsedUser);
+    }
+    setLoading(false);
+  } catch (error) {
+    console.error("Error initializing auth state:", error);
+    setLoading(false);
+  }
+};
+
+export const setupAuthStateListener = (
+  setCurrentUser: (user: User | null) => void
+) => {
+  const handleStorageChange = (event: StorageEvent) => {
+    if (event.key === 'authUser') {
+      if (event.newValue) {
+        setCurrentUser(JSON.parse(event.newValue));
+      } else {
+        setCurrentUser(null);
+      }
+    }
+  };
+
+  window.addEventListener('storage', handleStorageChange);
+  
+  return {
+    unsubscribe: () => {
+      window.removeEventListener('storage', handleStorageChange);
+    }
+  };
 };
 
 export const logoutUser = (): void => {

@@ -1,4 +1,4 @@
-import { Dossier, DocumentDossier, Inspection, NoteFrais, PreuvePaiement, User } from '../../types';
+import { Dossier, DocumentDossier, Inspection, NoteFrais, PreuvePaiement, User, UserRole } from '../../types';
 import { generateId } from './utils';
 
 // Comptes de démonstration
@@ -8,7 +8,7 @@ export const DEMO_USERS = [
     name: 'Admin Système',
     email: 'admin@anor.cm',
     password: 'admin123',
-    role: 'admin',
+    role: 'admin' as UserRole,
     modules: ['dossiers', 'inspections', 'certificats', 'notes-frais', 'statistiques', 'user-management']
   },
   {
@@ -16,7 +16,7 @@ export const DEMO_USERS = [
     name: 'Jean Responsable',
     email: 'responsable@anor.cm',
     password: 'resp123',
-    role: 'responsable_technique',
+    role: 'responsable_technique' as UserRole,
     modules: ['responsable-technique', 'inspections', 'notes-frais']
   },
   {
@@ -24,7 +24,7 @@ export const DEMO_USERS = [
     name: 'Marie Accueil',
     email: 'accueil@anor.cm',
     password: 'accueil123',
-    role: 'acceuil',
+    role: 'acceuil' as UserRole,
     modules: ['acceuil', 'dossiers']
   },
   {
@@ -32,7 +32,7 @@ export const DEMO_USERS = [
     name: 'Pierre Comptable',
     email: 'comptable@anor.cm',
     password: 'compta123',
-    role: 'comptable',
+    role: 'comptable' as UserRole,
     modules: ['notes-frais', 'statistiques']
   },
   {
@@ -40,7 +40,7 @@ export const DEMO_USERS = [
     name: 'Sophie Inspecteur',
     email: 'inspecteur@anor.cm',
     password: 'inspect123',
-    role: 'inspecteur',
+    role: 'inspecteur' as UserRole,
     modules: ['inspections', 'notes-frais']
   },
   {
@@ -48,7 +48,7 @@ export const DEMO_USERS = [
     name: 'Paul Directeur',
     email: 'directeur@anor.cm',
     password: 'dir123',
-    role: 'directeur',
+    role: 'directeur' as UserRole,
     modules: ['notes-frais', 'certificats', 'statistiques']
   }
 ];
@@ -58,7 +58,7 @@ export const MOCK_USERS: User[] = [
     id: '1',
     name: 'John Doe',
     email: 'john.doe@example.com',
-    role: 'admin',
+    role: 'admin' as UserRole,
     dateCreation: '2023-01-01',
     phone: '123-456-7890',
     modules: ['dossiers', 'inspections', 'certificats', 'notes-frais', 'statistiques', 'user-management'],
@@ -78,7 +78,7 @@ export const MOCK_USERS: User[] = [
     id: '2',
     name: 'Jane Smith',
     email: 'jane.smith@example.com',
-    role: 'acceuil',
+    role: 'acceuil' as UserRole,
     dateCreation: '2023-02-15',
     phone: '987-654-3210',
     modules: ['acceuil', 'dossiers'],
@@ -98,7 +98,7 @@ export const MOCK_USERS: User[] = [
     id: '3',
     name: 'Alice Johnson',
     email: 'alice.johnson@example.com',
-    role: 'inspecteur',
+    role: 'inspecteur' as UserRole,
     dateCreation: '2023-03-20',
     phone: '555-123-4567',
     modules: ['inspections', 'notes-frais'],
@@ -118,7 +118,7 @@ export const MOCK_USERS: User[] = [
     id: '4',
     name: 'Bob Williams',
     email: 'bob.williams@example.com',
-    role: 'certificats',
+    role: 'certificats' as UserRole,
     dateCreation: '2023-04-01',
     phone: '111-222-3333',
     modules: ['resultats'],
@@ -138,7 +138,7 @@ export const MOCK_USERS: User[] = [
     id: '5',
     name: 'Charlie Brown',
     email: 'charlie.brown@example.com',
-    role: 'analyste',
+    role: 'analyste' as UserRole,
     dateCreation: '2023-05-05',
     phone: '444-555-6666',
     modules: ['resultats'],
@@ -158,7 +158,7 @@ export const MOCK_USERS: User[] = [
     id: '6',
     name: 'Diana Miller',
     email: 'diana.miller@example.com',
-    role: 'comptable',
+    role: 'comptable' as UserRole,
     dateCreation: '2023-06-10',
     phone: '777-888-9999',
     modules: ['notes-frais', 'statistiques'],
@@ -178,7 +178,7 @@ export const MOCK_USERS: User[] = [
     id: '7',
     name: 'Eve Davis',
     email: 'eve.davis@example.com',
-    role: 'responsable_technique',
+    role: 'responsable_technique' as UserRole,
     dateCreation: '2023-07-15',
     phone: '333-444-5555',
     modules: ['responsable-technique', 'inspections'],
@@ -198,7 +198,7 @@ export const MOCK_USERS: User[] = [
     id: '8',
     name: 'Frank White',
     email: 'frank.white@example.com',
-    role: 'chef_mission',
+    role: 'chef_mission' as UserRole,
     dateCreation: '2023-08-20',
     phone: '666-777-8888',
     modules: ['inspections'],
@@ -218,7 +218,7 @@ export const MOCK_USERS: User[] = [
     id: '9',
     name: 'Grace Taylor',
     email: 'grace.taylor@example.com',
-    role: 'surveillant',
+    role: 'surveillant' as UserRole,
     dateCreation: '2023-09-01',
     phone: '222-333-4444',
     modules: ['inspections'],
@@ -238,7 +238,7 @@ export const MOCK_USERS: User[] = [
     id: '10',
     name: 'Henry Moore',
     email: 'henry.moore@example.com',
-    role: 'directeur',
+    role: 'directeur' as UserRole,
     dateCreation: '2023-10-10',
     phone: '888-999-0000',
     modules: ['notes-frais', 'certificats', 'statistiques'],
@@ -257,6 +257,7 @@ export const MOCK_USERS: User[] = [
   ...DEMO_USERS
 ];
 
+// Données mock pour les autres entités
 export const MOCK_DOSSIERS: Dossier[] = [
   {
     id: '1',
@@ -587,3 +588,10 @@ export const MOCK_DOSSIERS: Dossier[] = [
     ressourcesMateriellesTracabilite: 'RAS'
   }
 ];
+
+// Exporter des données mock pour les autres fonctionnalités
+export const MOCK_NOTES_FRAIS = [];
+export const MOCK_INSPECTIONS = [];
+export const MOCK_CERTIFICATS = [];
+export const MOCK_DOCUMENTS = [];
+export const MOCK_NOTIFICATIONS = [];
