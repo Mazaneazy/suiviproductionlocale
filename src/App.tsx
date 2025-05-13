@@ -12,7 +12,9 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Dossiers from "./pages/Dossiers";
+import AddDossier from "./pages/AddDossier";
 import Inspections from "./pages/Inspections";
+import AddInspection from "./pages/AddInspection";
 import Calendar from "./pages/Calendar";
 import Certificats from "./pages/Certificats";
 import NotesFrais from "./pages/NotesFrais";
@@ -50,6 +52,12 @@ const App = () => (
                   <Dossiers />
                 </ProtectedRoute>
               } />
+              
+              <Route path="/ajouter-dossier" element={
+                <ProtectedRoute>
+                  <AddDossier />
+                </ProtectedRoute>
+              } />
 
               <Route path="/accueil" element={
                 <ProtectedRoute moduleName="acceuil">
@@ -66,6 +74,18 @@ const App = () => (
               <Route path="/inspections" element={
                 <ProtectedRoute moduleName="inspections">
                   <Inspections />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/ajouter-inspection" element={
+                <ProtectedRoute moduleName="inspections">
+                  <AddInspection />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/ajouter-inspection/:dossierId" element={
+                <ProtectedRoute moduleName="inspections">
+                  <AddInspection />
                 </ProtectedRoute>
               } />
 

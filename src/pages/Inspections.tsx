@@ -2,25 +2,22 @@
 import React, { useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import Layout from '../components/Layout';
-import { Button } from '../components/ui/button';
 import { useToast } from '../hooks/use-toast';
-import { PlusCircle } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-// Import the new components
+// Import the components
 import InspectionFilters from '../components/inspections/InspectionFilters';
 import InspectionsTable from '../components/inspections/InspectionsTable';
-import NewInspectionDialog from '../components/inspections/NewInspectionDialog';
+import NewInspectionButton from '../components/inspections/NewInspectionDialog';
 import InspectionDetails from '../components/inspections/InspectionDetails';
 import RapportsList from '../components/inspections/RapportsList';
 import NotesFraisOverview from '../components/inspections/NotesFraisOverview';
 
 const Inspections = () => {
-  const { inspections, dossiers, addInspection, updateInspection } = useData();
+  const { inspections, dossiers, updateInspection } = useData();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('tous');
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [inspectionDetailsOpen, setInspectionDetailsOpen] = useState(false);
   const [selectedInspectionId, setSelectedInspectionId] = useState('');
 
@@ -29,24 +26,14 @@ const Inspections = () => {
     const dossier = dossiers.find(d => d.id === inspection.dossierId);
     
     const matchesSearch = dossier 
-      ? dossier.operateurNom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        inspection.lieu.toLowerCase().includes(searchTerm.toLowerCase())
+      ? (dossier.operateurNom?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+        (inspection.lieu?.toLowerCase().includes(searchTerm.toLowerCase()) || false)
       : false;
     
     const matchesStatus = statusFilter === 'tous' || inspection.resultat === statusFilter;
     
     return matchesSearch && matchesStatus;
   });
-
-  // Fonction pour ajouter une nouvelle inspection
-  const handleAddInspection = (newInspection: any) => {
-    addInspection(newInspection);
-    toast({
-      title: "Inspection programmée",
-      description: "L'inspection a été programmée avec succès.",
-    });
-    setDialogOpen(false);
-  };
 
   // Fonction pour marquer une inspection comme conforme
   const handleMarkAsConforme = (id: string) => {
@@ -82,13 +69,7 @@ const Inspections = () => {
     <Layout>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-certif-blue">Responsable des missions</h1>
-        <Button 
-          onClick={() => setDialogOpen(true)} 
-          className="bg-certif-blue hover:bg-certif-blue/90"
-        >
-          <PlusCircle className="mr-2" size={16} />
-          Nouvelle mission
-        </Button>
+        <NewInspectionButton />
       </div>
 
       <Tabs defaultValue="inspections">
@@ -125,13 +106,6 @@ const Inspections = () => {
           <NotesFraisOverview />
         </TabsContent>
       </Tabs>
-      
-      <NewInspectionDialog 
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        dossiers={dossiers}
-        onAddInspection={handleAddInspection}
-      />
       
       {inspectionDetailsOpen && selectedInspectionId && (
         <InspectionDetails 
