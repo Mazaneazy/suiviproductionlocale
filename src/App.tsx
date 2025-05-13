@@ -14,9 +14,11 @@ import { useAuth } from './hooks/useAuth';
 import AddNoteFrais from './pages/AddNoteFrais';
 import NoteFraisDetails from './pages/NoteFraisDetails';
 import DossierDetails from './pages/DossierDetails';
-import AddDossier from './pages/AddDossier';
+
 import ProgrammerInspection from './pages/ProgrammerInspection';
 import Dossiers from './pages/Dossiers';
+import AddDossier from './components/dossiers/AddDossier';
+
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { currentUser } = useAuth();
