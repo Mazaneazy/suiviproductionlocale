@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { useData } from '../contexts/DataContext';
 import DossiersTable from '../components/dossiers/DossiersTable';
+import DossierDialogContent from './dossiers/DossierDialogContent.tsx'; // ou .jsx
 import DossierFilters from '../components/dossiers/DossierFilters';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
