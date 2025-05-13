@@ -14,6 +14,8 @@ const AddDossier = () => {
   
   const [newDossier, setNewDossier] = useState<Omit<Dossier, 'id'>>({
     operateurNom: '',
+    promoteurNom: '',
+    telephone: '',
     typeProduit: '',
     responsable: 'Gestionnaire',
     dateTransmission: new Date().toISOString().split('T')[0],
@@ -23,7 +25,7 @@ const AddDossier = () => {
     historique: []
   });
   
-  const [latestDossierId, setLatestDossierId] = useState<string>();
+  const [latestDossierId, setLatestDossierId] = useState<string | undefined>(undefined);
   
   const handleSubmit = () => {
     const dossierId = addDossier(newDossier);
