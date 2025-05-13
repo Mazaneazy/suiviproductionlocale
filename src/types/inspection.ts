@@ -14,20 +14,32 @@ export interface Inspection {
   date_creation: string;
   dateInspection?: string;
   date_inspection: string;
+  // Additional properties used in components
+  lieu?: string;
+  notes?: string;
+  recommandations?: string;
+  actionsCorrectives?: string;
+  planInspection?: string;
+  planEchantillonage?: string;
+  checklistComplete?: boolean;
 }
 
 export interface RapportInspection {
   id: string;
   inspection_id: string;
-  inspectionId: string;
+  inspectionId?: string;
   date_creation: string;
+  dateCreation?: string;
   statut: 'brouillon' | 'soumis' | 'valide' | 'rejete';
+  status?: 'brouillon' | 'soumis' | 'valide' | 'rejete';
   fichier_url?: string;
+  fichierUrl?: string;
   commentaires?: string;
   non_conformites?: string[];
   observations?: string[];
   conclusion: string;
   date_soumission?: string;
+  date?: string;
   redacteur: string;
   validateur?: string;
   date_validation?: string;
@@ -38,7 +50,7 @@ export interface AvisDecision {
   id: string;
   dossier_id: string;
   date_creation: string;
-  decision: 'favorable' | 'defavorable' | 'reserve';
+  decision: 'favorable' | 'defavorable' | 'reserve' | 'avec_reserve';
   motifs: string;
   recommandations?: string[];
   responsable: string;

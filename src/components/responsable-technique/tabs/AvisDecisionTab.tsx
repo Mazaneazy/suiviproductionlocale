@@ -1,162 +1,133 @@
-
-import React, { useState } from 'react';
-import { Send, FileText } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dossier, RapportInspection, AvisDecision } from '@/types';
-import { generateId } from '@/contexts/data/utils';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 interface AvisDecisionTabProps {
-  dossier: Dossier | null;
+  dossier: Dossier;
   rapports: RapportInspection[];
-  onAvisSubmitted: () => void;
+  onAvisSaved: (avis: AvisDecision) => void;
 }
 
-const AvisDecisionTab: React.FC<AvisDecisionTabProps> = ({ dossier, rapports, onAvisSubmitted }) => {
+const AvisDecisionTab: React.FC<AvisDecisionTabProps> = ({ dossier, rapports, onAvisSaved }) => {
+  const { currentUser } = useAuth();
   const { toast } = useToast();
-  const [selectedRapport, setSelectedRapport] = useState<string>('');
-  const [contenu, setContenu] = useState<string>('');
-  const [resultat, setResultat] = useState<'favorable' | 'defavorable' | 'avec_reserves'>('favorable');
-  const [commentaires, setCommentaires] = useState<string>('');
-  
-  if (!dossier) return null;
+  const [decision, setDecision] = useState<'favorable' | 'defavorable' | 'reserve'>('favorable');
+  const [motifs, setMotifs] = useState('');
+  const [recommandations, setRecommandations] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const rapport = rapports.length > 0 ? rapports[0] : null;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!selectedRapport || !contenu) {
-      toast({
-        title: "Champs manquants",
-        description: "Veuillez remplir tous les champs obligatoires",
-        variant: "destructive",
-      });
-      return;
+  const decisions = [
+    { id: 'favorable', label: 'Favorable', description: 'Accord pour la certification' },
+    { id: 'defavorable', label: 'Défavorable', description: 'Refus de certification' },
+    { id: 'reserve', label: 'Avec réserve', description: 'Accord sous conditions' },
+  ];
+
+  const handleRecommandationChange = (recommandation: string, checked: boolean) => {
+    if (checked) {
+      setRecommandations([...recommandations, recommandation]);
+    } else {
+      setRecommandations(recommandations.filter(r => r !== recommandation));
     }
-    
-    // Create avis de décision
-    const avis: AvisDecision = {
-      id: generateId(),
-      dossierId: dossier.id,
-      rapportId: selectedRapport,
-      dateCreation: new Date().toISOString(),
-      date: new Date().toISOString(),
-      auteur: "current-user",
-      contenu: contenu,
-      decision: resultat === 'favorable' ? 'favorable' : 
-               resultat === 'defavorable' ? 'defavorable' : 'avec_reserve',
-      resultat: resultat,
-      justification: commentaires,
-      commentaires: commentaires,
-      status: 'transmis',
-      actions: []
-    };
-    
-    // In a real app, we would save the avis to the database
-    
-    toast({
-      title: "Avis de décision transmis",
-      description: "L'avis de décision a été transmis au comité de validation",
-    });
-    
-    onAvisSubmitted();
-    
-    // Reset form
-    setSelectedRapport('');
-    setContenu('');
-    setResultat('favorable');
-    setCommentaires('');
   };
-  
+
+  const handleSaveAvis = async () => {
+    setLoading(true);
+    try {
+      const newAvis = {
+        dossier_id: dossier.id,
+        date_creation: new Date().toISOString(),
+        decision: decision,  // This will be "favorable", "defavorable", or "reserve"
+        motifs: motifs,
+        recommandations: decision === 'reserve' ? recommandations : [],
+        responsable: currentUser?.id || 'system',
+      };
+
+      onAvisSaved(newAvis);
+
+      toast({
+        title: "Avis enregistré",
+        description: "L'avis a été enregistré avec succès."
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'enregistrement de l'avis:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Une erreur s'est produite lors de l'enregistrement de l'avis."
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Avis de décision pour {dossier.operateurNom}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <Label htmlFor="rapport">Rapport d'inspection</Label>
-            <Select 
-              value={selectedRapport} 
-              onValueChange={setSelectedRapport}
-            >
-              <SelectTrigger id="rapport">
-                <SelectValue placeholder="Sélectionner un rapport d'inspection" />
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Avis et décision</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="decision">Décision</Label>
+            <Select value={decision} onValueChange={setDecision}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Sélectionner une décision" />
               </SelectTrigger>
               <SelectContent>
-                {rapports.length > 0 ? (
-                  rapports.map((rapport) => (
-                    <SelectItem key={rapport.id} value={rapport.id}>
-                      Rapport du {rapport.dateCreation ? new Date(rapport.dateCreation).toLocaleDateString() : 'date inconnue'}
-                    </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem value="demo-rapport">Rapport d'inspection (démo)</SelectItem>
-                )}
+                {decisions.map(d => (
+                  <SelectItem key={d.id} value={d.id}>{d.label}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
-          
-          <div>
-            <Label htmlFor="contenu">Contenu de l'avis</Label>
-            <Textarea
-              id="contenu"
-              value={contenu}
-              onChange={e => setContenu(e.target.value)}
-              rows={8}
-              placeholder="Détaillez votre avis technique sur la conformité du produit..."
-              className="resize-y"
-            />
+
+          <div className="space-y-2">
+            <Label htmlFor="motifs">Motifs</Label>
+            <Textarea id="motifs" value={motifs} onChange={(e) => setMotifs(e.target.value)} placeholder="Motifs de la décision" />
           </div>
-          
-          <div>
-            <Label>Résultat de l'évaluation</Label>
-            <RadioGroup 
-              value={resultat} 
-              onValueChange={value => setResultat(value as 'favorable' | 'defavorable' | 'avec_reserves')}
-              className="mt-2 space-y-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="favorable" id="favorable" />
-                <Label htmlFor="favorable" className="cursor-pointer font-normal">Avis favorable</Label>
+
+          {decision === 'reserve' && (
+            <div className="space-y-2">
+              <Label>Recommandations</Label>
+              <div className="space-y-1">
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="recommandation1" checked={recommandations.includes('actions_correctives')} onCheckedChange={(checked) => handleRecommandationChange('actions_correctives', checked!)} />
+                  <Label htmlFor="recommandation1">Mise en place d'actions correctives</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="recommandation2" checked={recommandations.includes('suivi_renforce')} onCheckedChange={(checked) => handleRecommandationChange('suivi_renforce', checked!)} />
+                  <Label htmlFor="recommandation2">Suivi renforcé</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="recommandation3" checked={recommandations.includes('nouvelle_inspection')} onCheckedChange={(checked) => handleRecommandationChange('nouvelle_inspection', checked!)} />
+                  <Label htmlFor="recommandation3">Nouvelle inspection</Label>
+                </div>
               </div>
-              
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="avec_reserves" id="avec_reserves" />
-                <Label htmlFor="avec_reserves" className="cursor-pointer font-normal">Avis favorable avec réserves</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="defavorable" id="defavorable" />
-                <Label htmlFor="defavorable" className="cursor-pointer font-normal">Avis défavorable</Label>
-              </div>
-            </RadioGroup>
-          </div>
-          
-          <div>
-            <Label htmlFor="commentaires">Commentaires additionnels</Label>
-            <Textarea
-              id="commentaires"
-              value={commentaires}
-              onChange={e => setCommentaires(e.target.value)}
-              rows={3}
-              placeholder="Commentaires complémentaires ou précisions sur l'avis..."
-              className="resize-y"
-            />
-          </div>
-          
-          <Button type="submit" className="bg-certif-blue hover:bg-certif-blue/90">
-            <Send className="mr-2 h-4 w-4" />
-            Transmettre l'avis au comité de validation
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div>
+        <p className="text-sm text-gray-500">
+          Basé sur le rapport du {rapport ? new Date(rapport.date_creation).toLocaleDateString() : new Date().toLocaleDateString()}
+        </p>
+      </div>
+
+      <div className="flex justify-end">
+        <Button onClick={handleSaveAvis} disabled={loading} className="bg-certif-blue hover:bg-certif-blue/90">
+          {loading ? "Enregistrement..." : "Enregistrer l'avis"}
+        </Button>
+      </div>
+    </div>
   );
 };
 

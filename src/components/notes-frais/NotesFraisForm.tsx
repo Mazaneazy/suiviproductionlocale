@@ -29,7 +29,7 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({
   const { currentUser } = useAuth();
   
   const [formData, setFormData] = useState<Partial<NoteFrais>>({
-    dossierId: dossierId || '',
+    dossier_id: dossierId || '',
     inspecteur_id: currentUser?.id || '',
     date: new Date().toISOString().split('T')[0],
     frais_gestion: 50000,
@@ -73,7 +73,7 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({
     e.preventDefault();
     
     // Vérifier que tous les champs obligatoires sont remplis
-    if (!formData.dossierId) {
+    if (!formData.dossier_id) {
       toast({
         variant: "destructive",
         title: "Erreur",
@@ -98,10 +98,10 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({
     }
 
     addNoteFrais({
-      dossierId: formData.dossierId,
+      dossier_id: formData.dossier_id,
       inspecteur_id: formData.inspecteur_id || currentUser?.id,
       date: formData.date || new Date().toISOString(),
-      dateCreation: new Date().toISOString(),
+      date_creation: new Date().toISOString(),
       description: `Note de frais - ${new Date(formData.date || new Date()).toLocaleDateString()}`,
       montant: total,
       status: 'en_attente',

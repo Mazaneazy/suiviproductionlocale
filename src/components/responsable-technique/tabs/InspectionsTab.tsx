@@ -50,12 +50,12 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
               {inspections.map((inspection) => (
                 <Card key={inspection.id} className="border">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-md">Inspection {new Date(inspection.dateInspection).toLocaleDateString()}</CardTitle>
+                    <CardTitle className="text-md">Inspection {new Date(inspection.dateInspection || inspection.date_inspection).toLocaleDateString()}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2 text-sm">
-                      <p><span className="font-medium">Lieu:</span> {inspection.lieu}</p>
-                      <p><span className="font-medium">Inspecteurs:</span> {inspection.inspecteurs.join(', ')}</p>
+                      <p><span className="font-medium">Lieu:</span> {inspection.lieu || "Non spécifié"}</p>
+                      <p><span className="font-medium">Inspecteurs:</span> {(inspection.inspecteurs && inspection.inspecteurs.length) ? inspection.inspecteurs.join(', ') : "Non assigné"}</p>
                       <p><span className="font-medium">Statut:</span> {
                         inspection.resultat === 'conforme' ? 'Conforme' :
                         inspection.resultat === 'non_conforme' ? 'Non conforme' : 'En attente'

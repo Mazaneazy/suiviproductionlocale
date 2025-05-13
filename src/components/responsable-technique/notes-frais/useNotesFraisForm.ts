@@ -48,19 +48,21 @@ export const useNotesFraisForm = (dossier: Dossier, onNoteFraisCreated: () => vo
     try {
       // Créer la note de frais
       const newNoteFrais = {
-        dossierId: dossier.id,
-        inspecteurId: 'resp_technique',
+        dossier_id: dossier.id,
+        inspecteur_id: 'resp_technique',
         date: new Date().toISOString().split('T')[0],
-        dateCreation: new Date().toISOString(),
-        description: description || `Note de frais pour le dossier ${dossier.operateurNom}`,
+        date_creation: new Date().toISOString(),
+        description: description || `Note de frais pour le dossier ${dossier.operateurNom || dossier.operateur_nom}`,
         montant: total,
         status: 'en_attente' as const,
-        parametresEvaluation: selectedParametres,
-        fraisGestion,
-        fraisInspection,
-        fraisAnalyses: totalPrix,
-        fraisSurveillance,
-        acquitte: false
+        parametres_analyse: selectedParametres,
+        frais_gestion: fraisGestion,
+        frais_inspection: fraisInspection,
+        frais_analyses: totalPrix,
+        frais_surveillance: fraisSurveillance,
+        acquitte: false,
+        notification_envoyee: false,
+        operateur_notifie: false
       };
       
       addNoteFrais(newNoteFrais);

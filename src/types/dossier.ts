@@ -1,21 +1,27 @@
 
 export interface Dossier {
   id: string;
-  operateurNom: string;
-  promoteurNom: string;
-  telephone: string;
-  typeProduit: string;
-  responsable: string;
-  dateTransmission: string;
-  status: 'en_attente' | 'en_cours' | 'complet' | 'rejete' | 'certifie' | 'a_corriger';
-  delai: number;
-  dateButoir: string;
-  historique?: HistoriqueEvenement[];
-  parametresEvaluation?: string[];
+  operateur_nom: string;
+  operateurNom?: string;
+  reference?: string;
+  operateur_email?: string;
+  operateur_telephone?: string;
+  type_produit?: string;
+  typeProduit?: string;
+  status: 'en_attente' | 'en_cours' | 'complet' | 'rejete' | 'a_corriger' | 'certifie';
+  date_creation?: string;
+  dateCreation?: string;
+  date_transmission?: string;
+  dateTransmission?: string;
+  date_butoir?: string;
+  dateButoir?: string;
+  responsable?: string;
   commentaires?: string;
-  comiteTechnique?: ComiteTechnique;
+  historique?: HistoriqueEvenement[];
+  pilote_technique_id?: string;
   piloteTechniqueId?: string;
-  piloteTechniqueNom?: string;
+  documents_ids?: string[];
+  documentsIds?: string[];
 }
 
 export interface HistoriqueEvenement {
@@ -27,17 +33,11 @@ export interface HistoriqueEvenement {
   commentaire?: string;
 }
 
-export interface ComiteTechnique {
-  id: string;
-  dossierId: string;
-  dateCreation: string;
-  chefComite: MembreComite;
-  membres: MembreComite[];
-}
-
-export interface MembreComite {
+export interface ParametreEvaluation {
   id: string;
   nom: string;
-  role: 'chef' | 'inspecteur' | 'analyste' | 'expert';
-  specialite?: string;
+  description?: string;
+  prix: number;
+  unite?: string;
+  categorie?: string;
 }

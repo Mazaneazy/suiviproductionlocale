@@ -50,23 +50,23 @@ const FraisValidationTable: React.FC<FraisValidationTableProps> = ({
                 <TableCell>
                   {noteFrais.acquitte ? (
                     <Badge className="bg-green-500 text-white">Acquitté</Badge>
-                  ) : noteFrais.status === 'valide' ? (
+                  ) : noteFrais.status === 'validee' || noteFrais.status === 'valide' ? (
                     <Badge className="bg-blue-500 text-white">Validé</Badge>
-                  ) : noteFrais.status === 'rejete' ? (
+                  ) : noteFrais.status === 'rejetee' || noteFrais.status === 'rejete' ? (
                     <Badge className="bg-red-500 text-white">Rejeté</Badge>
                   ) : (
                     <Badge className="bg-gray-500 text-white">En attente</Badge>
                   )}
                 </TableCell>
                 <TableCell>
-                  {noteFrais.fichierUrl ? (
+                  {(noteFrais.fichier_url || noteFrais.fichierUrl) ? (
                     <Button 
                       variant="outline" 
                       size="sm" 
                       className="h-8 px-2 text-gray-600"
                       asChild
                     >
-                      <a href={noteFrais.fichierUrl} target="_blank" rel="noopener noreferrer">
+                      <a href={noteFrais.fichier_url || noteFrais.fichierUrl} target="_blank" rel="noopener noreferrer">
                         <Download className="h-4 w-4 mr-1" />
                         Document
                       </a>
@@ -76,7 +76,7 @@ const FraisValidationTable: React.FC<FraisValidationTableProps> = ({
                   )}
                 </TableCell>
                 <TableCell className="text-right">
-                  {noteFrais.status === 'valide' && !noteFrais.acquitte && (
+                  {(noteFrais.status === 'validee' || noteFrais.status === 'valide') && !noteFrais.acquitte && (
                     <Button
                       variant="outline"
                       size="sm"

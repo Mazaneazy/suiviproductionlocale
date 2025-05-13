@@ -14,14 +14,14 @@ export function useInspections(updateDossier: (id: string, data: any) => void) {
     // Add to dossier history
     const historique: HistoriqueEvenement = {
       id: generateId(),
-      dossierId: inspection.dossierId,
+      dossierId: inspection.dossierId || inspection.dossier_id,
       date: new Date().toISOString(),
       action: 'Inspection programmée',
-      responsable: inspection.inspecteurs[0] || 'Système',
-      commentaire: `Inspection programmée pour le ${new Date(inspection.dateInspection).toLocaleDateString()}`
+      responsable: inspection.inspecteurs && inspection.inspecteurs[0] ? inspection.inspecteurs[0] : 'Système',
+      commentaire: `Inspection programmée pour le ${new Date(inspection.dateInspection || inspection.date_inspection).toLocaleDateString()}`
     };
     
-    updateDossier(inspection.dossierId, {
+    updateDossier(inspection.dossierId || inspection.dossier_id, {
       historique: [historique] // The updateDossier function will merge with existing historique
     });
   };
@@ -38,10 +38,10 @@ export function useInspections(updateDossier: (id: string, data: any) => void) {
     if (data.resultat && data.resultat !== inspection.resultat) {
       const historique: HistoriqueEvenement = {
         id: generateId(),
-        dossierId: inspection.dossierId,
+        dossierId: inspection.dossierId || inspection.dossier_id,
         date: new Date().toISOString(),
         action: `Résultat d'inspection: ${data.resultat}`,
-        responsable: inspection.inspecteurs[0] || 'Inspecteur',
+        responsable: inspection.inspecteurs && inspection.inspecteurs[0] ? inspection.inspecteurs[0] : 'Inspecteur',
         commentaire: data.resultat === 'conforme' 
           ? 'Inspection validée comme conforme'
           : data.resultat === 'non_conforme'
@@ -49,14 +49,14 @@ export function useInspections(updateDossier: (id: string, data: any) => void) {
             : 'Statut d\'inspection mis à jour'
       };
       
-      updateDossier(inspection.dossierId, {
+      updateDossier(inspection.dossierId || inspection.dossier_id, {
         historique: [historique] // The updateDossier function will merge with existing historique
       });
     }
   };
 
   const getInspectionsByDossierId = (dossierId: string) => {
-    return inspections.filter(inspection => inspection.dossierId === dossierId);
+    return inspections.filter(inspection => inspection.dossierId === dossierId || inspection.dossier_id === dossierId);
   };
 
   return {
