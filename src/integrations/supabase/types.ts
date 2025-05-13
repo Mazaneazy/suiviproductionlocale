@@ -169,7 +169,6 @@ export type Database = {
           date_certification: string | null
           date_reception: string | null
           description: string | null
-          document_ids: string[] | null
           duree_certification: number | null
           historique: Json | null
           id: string
@@ -190,7 +189,6 @@ export type Database = {
           date_certification?: string | null
           date_reception?: string | null
           description?: string | null
-          document_ids?: string[] | null
           duree_certification?: number | null
           historique?: Json | null
           id?: string
@@ -211,7 +209,6 @@ export type Database = {
           date_certification?: string | null
           date_reception?: string | null
           description?: string | null
-          document_ids?: string[] | null
           duree_certification?: number | null
           historique?: Json | null
           id?: string
@@ -430,33 +427,6 @@ export type Database = {
           },
         ]
       }
-      profiles: {
-        Row: {
-          created_at: string | null
-          email: string | null
-          full_name: string | null
-          id: number
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          email?: string | null
-          full_name?: string | null
-          id?: never
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          email?: string | null
-          full_name?: string | null
-          id?: never
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       user_actions: {
         Row: {
           action: string
@@ -500,7 +470,6 @@ export type Database = {
           id: string
           modules: string[] | null
           name: string | null
-          password: string
           permissions: string[] | null
           phone: string | null
           producteur_dossier_id: string | null
@@ -513,7 +482,6 @@ export type Database = {
           id: string
           modules?: string[] | null
           name?: string | null
-          password: string
           permissions?: string[] | null
           phone?: string | null
           producteur_dossier_id?: string | null
@@ -526,7 +494,6 @@ export type Database = {
           id?: string
           modules?: string[] | null
           name?: string | null
-          password?: string
           permissions?: string[] | null
           phone?: string | null
           producteur_dossier_id?: string | null
@@ -539,42 +506,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      change_user_password: {
-        Args: { p_id: string; p_new_password: string }
-        Returns: undefined
-      }
-      create_user: {
-        Args: {
-          p_id: string
-          p_email: string
-          p_name: string
-          p_role: string
-          p_password: string
-          p_phone: string
-        }
-        Returns: undefined
-      }
-      insert_pdf_document: {
-        Args: {
-          p_dossier_id: string
-          p_nom: string
-          p_type: string
-          p_url: string
-          p_uploaded_by: string
-          p_taille: number
-        }
-        Returns: undefined
-      }
-      update_user: {
-        Args: {
-          p_id: string
-          p_email: string
-          p_name: string
-          p_role: string
-          p_phone: string
-        }
-        Returns: undefined
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

@@ -13,6 +13,10 @@ export const useNotesFraisManagement = () => {
     setSearchTerm,
     statusFilter,
     setStatusFilter,
+    dialogOpen,
+    setDialogOpen,
+    detailDialogOpen,
+    setDetailDialogOpen,
     selectedNote,
     setSelectedNote,
     uploadedFile,
@@ -38,11 +42,12 @@ export const useNotesFraisManagement = () => {
     handleSendNotification,
     handleMarkAsNotified,
     handleValidateNoteFrais,
-    handleRejectNoteFrais
+    handleRejectNoteFrais,
+    handleShowDetails
   } = useNotesFraisActions(
     updateNoteFrais,
     setSelectedNote,
-    () => {} // Removed setDetailDialogOpen
+    setDetailDialogOpen
   );
 
   const { calculerTotal, getStatusColor, formatStatus } = useNotesFraisUtils();
@@ -61,10 +66,10 @@ export const useNotesFraisManagement = () => {
 
     // Calculer le montant total
     const total = 
-      newNoteFrais.frais_gestion + 
-      newNoteFrais.frais_inspection + 
-      newNoteFrais.frais_analyses + 
-      newNoteFrais.frais_surveillance;
+      (newNoteFrais.fraisGestion || 0) + 
+      (newNoteFrais.fraisInspection || 0) + 
+      (newNoteFrais.fraisAnalyses || 0) + 
+      (newNoteFrais.fraisSurveillance || 0);
     
     // Simuler l'upload du fichier (dans une vraie application, cela serait fait vers un service de stockage)
     let fichierUrl = '';
@@ -76,21 +81,21 @@ export const useNotesFraisManagement = () => {
 
     addNoteFrais({
       dossierId: newNoteFrais.dossierId,
-      inspecteurId: newNoteFrais.inspecteurId,
-      date: newNoteFrais.date,
+      inspecteurId: newNoteFrais.inspecteurId || '',
+      date: newNoteFrais.date || '',
       dateCreation: new Date().toISOString(),
-      description: `Note de frais - ${new Date(newNoteFrais.date).toLocaleDateString()}`,
+      description: `Note de frais - ${new Date(newNoteFrais.date || '').toLocaleDateString()}`,
       montant: total,
-      status: newNoteFrais.status,
+      status: 'en_attente',
       acquitte: false,
-      frais_gestion: newNoteFrais.frais_gestion,
-      frais_inspection: newNoteFrais.frais_inspection,
-      frais_analyses: newNoteFrais.frais_analyses,
-      frais_surveillance: newNoteFrais.frais_surveillance,
-      commentaire: newNoteFrais.commentaire || undefined,
-      fichier_url: fichierUrl || undefined,
-      notification_envoyee: false,
-      operateur_notifie: false
+      fraisGestion: newNoteFrais.fraisGestion || 0,
+      fraisInspection: newNoteFrais.fraisInspection || 0,
+      fraisAnalyses: newNoteFrais.fraisAnalyses || 0,
+      fraisSurveillance: newNoteFrais.fraisSurveillance || 0,
+      commentaire: newNoteFrais.commentaire,
+      fichierUrl: fichierUrl || undefined,
+      notificationEnvoyee: false,
+      operateurNotifie: false
     });
     
     toast({
@@ -103,23 +108,24 @@ export const useNotesFraisManagement = () => {
       dossierId: '',
       inspecteurId: currentUser?.id || '',
       date: new Date().toISOString().split('T')[0],
-      frais_gestion: 50000,
-      frais_inspection: 75000,
-      frais_analyses: 60000,
-      frais_surveillance: 40000,
+      fraisGestion: 50000,
+      fraisInspection: 75000,
+      fraisAnalyses: 60000,
+      fraisSurveillance: 40000,
       status: 'en_attente',
       commentaire: '',
       description: '',
       montant: 0,
-      fichier_url: '',
-      notification_envoyee: false,
-      operateur_notifie: false
+      fichierUrl: '',
+      notificationEnvoyee: false,
+      operateurNotifie: false
     });
-    
     setUploadedFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    
+    setDialogOpen(false);
   };
 
   return {
@@ -127,6 +133,10 @@ export const useNotesFraisManagement = () => {
     setSearchTerm,
     statusFilter,
     setStatusFilter,
+    dialogOpen,
+    setDialogOpen,
+    detailDialogOpen,
+    setDetailDialogOpen,
     selectedNote,
     setSelectedNote,
     uploadedFile,
@@ -144,6 +154,7 @@ export const useNotesFraisManagement = () => {
     handleValidateNoteFrais,
     handleRejectNoteFrais,
     calculerTotal,
+    handleShowDetails,
     getStatusColor,
     formatStatus
   };

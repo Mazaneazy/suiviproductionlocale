@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import RapportInspectionForm from '../rapports/RapportInspectionForm';
 import { Dossier, Inspection, RapportInspection } from '@/types';
-import { useNavigate } from 'react-router-dom';
 
 interface InspectionsTabProps {
   dossier: Dossier | null;
   inspections: Inspection[];
   selectedInspection: Inspection | null;
   setSelectedInspection: (inspection: Inspection | null) => void;
+  onOpenInspectionDialog: () => void;
   onSubmitRapport: (rapport: RapportInspection) => void;
 }
 
@@ -20,10 +20,9 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
   inspections,
   selectedInspection,
   setSelectedInspection,
+  onOpenInspectionDialog,
   onSubmitRapport,
 }) => {
-  const navigate = useNavigate();
-
   if (!dossier) return null;
 
   return (
@@ -34,7 +33,7 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
           Gestion des inspections
         </h2>
         <Button 
-          onClick={() => navigate(`/inspections/programmer/${dossier.id}`)}
+          onClick={onOpenInspectionDialog}
           className="bg-certif-blue hover:bg-certif-blue/90"
         >
           <CalendarClock className="h-4 w-4 mr-2" />
@@ -50,12 +49,12 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
               {inspections.map((inspection) => (
                 <Card key={inspection.id} className="border">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-md">Inspection {new Date(inspection.dateInspection || inspection.date_inspection).toLocaleDateString()}</CardTitle>
+                    <CardTitle className="text-md">Inspection {new Date(inspection.dateInspection).toLocaleDateString()}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2 text-sm">
-                      <p><span className="font-medium">Lieu:</span> {inspection.lieu || "Non spécifié"}</p>
-                      <p><span className="font-medium">Inspecteurs:</span> {(inspection.inspecteurs && inspection.inspecteurs.length) ? inspection.inspecteurs.join(', ') : "Non assigné"}</p>
+                      <p><span className="font-medium">Lieu:</span> {inspection.lieu}</p>
+                      <p><span className="font-medium">Inspecteurs:</span> {inspection.inspecteurs.join(', ')}</p>
                       <p><span className="font-medium">Statut:</span> {
                         inspection.resultat === 'conforme' ? 'Conforme' :
                         inspection.resultat === 'non_conforme' ? 'Non conforme' : 'En attente'

@@ -30,7 +30,7 @@ const InspectionDetails: React.FC<InspectionDetailsProps> = ({
   const { inspections, dossiers, getDocumentsByDossierId } = useData();
   
   const inspection = inspections.find(i => i.id === inspectionId);
-  const dossier = inspection ? dossiers.find(d => d.id === inspection.dossierId || d.id === inspection.dossier_id) : null;
+  const dossier = inspection ? dossiers.find(d => d.id === inspection.dossierId) : null;
   const documents = dossier ? getDocumentsByDossierId(dossier.id) : [];
   
   if (!inspection || !dossier) {
@@ -125,7 +125,7 @@ const InspectionDetails: React.FC<InspectionDetailsProps> = ({
                 <h3 className="text-sm font-medium text-gray-500">Date d'inspection</h3>
                 <div className="flex items-center mt-1">
                   <CalendarIcon size={16} className="mr-2 text-gray-400" />
-                  <p>{new Date(inspection.dateInspection || inspection.date_inspection).toLocaleDateString()}</p>
+                  <p>{new Date(inspection.dateInspection).toLocaleDateString()}</p>
                 </div>
               </div>
               <div>
@@ -140,14 +140,14 @@ const InspectionDetails: React.FC<InspectionDetailsProps> = ({
                 <h3 className="text-sm font-medium text-gray-500">Lieu</h3>
                 <div className="flex items-center mt-1">
                   <MapPin size={16} className="mr-2 text-gray-400" />
-                  <p>{inspection.lieu || "Non spécifié"}</p>
+                  <p>{inspection.lieu}</p>
                 </div>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Inspecteurs</h3>
                 <div className="flex items-center mt-1">
                   <User size={16} className="mr-2 text-gray-400" />
-                  <p>{(inspection.inspecteurs && inspection.inspecteurs.length > 0) ? inspection.inspecteurs.join(', ') : "Non assigné"}</p>
+                  <p>{inspection.inspecteurs.join(', ')}</p>
                 </div>
               </div>
             </div>

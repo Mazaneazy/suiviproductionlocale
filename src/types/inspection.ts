@@ -1,21 +1,11 @@
 
 export interface Inspection {
   id: string;
-  dossier_id?: string;
-  dossierId?: string;
-  status: 'planifiee' | 'realisee' | 'annulee' | 'reportee';
-  resultat?: string;
-  rapport_url?: string;
-  commentaires?: string;
-  points_controle?: string[];
-  objectifs?: string;
-  inspecteurs?: string[];
-  responsable?: string;
-  date_creation: string;
-  dateInspection?: string;
-  date_inspection: string;
-  // Additional properties used in components
-  lieu?: string;
+  dossierId: string;
+  dateInspection: string;
+  lieu: string;
+  inspecteurs: string[];
+  resultat: 'conforme' | 'non_conforme' | 'en_attente';
   notes?: string;
   recommandations?: string;
   actionsCorrectives?: string;
@@ -26,44 +16,35 @@ export interface Inspection {
 
 export interface RapportInspection {
   id: string;
-  inspection_id: string;
-  inspectionId?: string;
-  date_creation: string;
-  dateCreation?: string;
-  statut: 'brouillon' | 'soumis' | 'valide' | 'rejete';
-  status?: 'brouillon' | 'soumis' | 'valide' | 'rejete';
-  fichier_url?: string;
-  fichierUrl?: string;
-  commentaires?: string;
-  non_conformites?: string[];
-  observations?: string[];
+  inspectionId: string;
+  dateCreation: string;
+  auteur: string;
+  titre: string;
+  contenu: string;
   conclusion: string;
-  date_soumission?: string;
+  recommandations: string;
+  statut: 'brouillon' | 'soumis' | 'valide' | 'rejete';
+  fichierUrl?: string;
+  // Add missing properties used in components
+  dossierId?: string;
   date?: string;
-  redacteur: string;
-  validateur?: string;
-  date_validation?: string;
-  resultat_conformite?: 'conforme' | 'non_conforme' | 'conforme_avec_reserve';
+  status?: string;
+  avisTechnique?: string;
 }
 
 export interface AvisDecision {
   id: string;
-  dossier_id: string;
-  date_creation: string;
-  decision: 'favorable' | 'defavorable' | 'reserve' | 'avec_reserve';
-  motifs: string;
-  recommandations?: string[];
-  responsable: string;
-  validateur?: string;
-  date_validation?: string;
-}
-
-export interface ResultatConformite {
-  id: string;
-  dossier_id: string;
-  rapport_id: string;
-  date_evaluation: string;
-  niveau_conformite: 'A' | 'B' | 'C' | 'D' | 'E';
-  responsable: string;
+  rapportId: string;
+  dateCreation: string;
+  auteur: string;
+  decision: 'favorable' | 'defavorable' | 'avec_reserve';
+  justification: string;
+  actions: string[];
+  // Add missing properties used in components
+  dossierId?: string;
+  date?: string;
+  contenu?: string;
+  resultat?: 'favorable' | 'defavorable' | 'avec_reserves';
   commentaires?: string;
+  status?: string;
 }

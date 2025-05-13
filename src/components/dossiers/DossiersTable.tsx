@@ -1,125 +1,149 @@
+
 import React from 'react';
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { File, FileCheck, FileX, AlertTriangle } from 'lucide-react';
-import { Dossier } from '@/types';
 import { useNavigate } from 'react-router-dom';
+import { Calendar, Clock, User, AlertTriangle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Dossier } from '@/types';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import DossierDetailsDialog from './DossierDetailsDialog';
+import AssignPiloteTechniqueDialog from './AssignPiloteTechniqueDialog';
 
 interface DossiersTableProps {
   dossiers: Dossier[];
-  filteredDossiers: Dossier[];
-  onValidate: (id: string) => void;
-  onReject: (id: string) => void;
-  onMarkAsComplete: (id: string) => void;
-  getStatusColor: (status: string) => string;
-  formatStatus: (status: string) => string;
 }
 
-const DossiersTable: React.FC<DossiersTableProps> = ({
-  dossiers,
-  filteredDossiers,
-  onValidate,
-  onReject,
-  onMarkAsComplete,
-  getStatusColor,
-  formatStatus
-}) => {
+const DossiersTable: React.FC<DossiersTableProps> = ({ dossiers }) => {
   const navigate = useNavigate();
-  
-  const handleViewDetails = (dossierId: string) => {
-    navigate(`/dossiers/${dossierId}`);
+  const { toast } = useToast();
+
+  // Fonction pour obtenir la couleur du badge en fonction du statut
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'complet': return 'bg-green-500 text-white';
+      case 'en_attente': return 'bg-yellow-500 text-white';
+      case 'rejete': return 'bg-red-500 text-white';
+      case 'en_cours': return 'bg-blue-500 text-white';
+      case 'certifie': return 'bg-green-700 text-white';
+      case 'a_corriger': return 'bg-orange-500 text-white';
+      default: return 'bg-gray-500 text-white';
+    }
   };
-  
-  if (filteredDossiers.length === 0) {
-    return (
-      <div className="text-center py-10">
-        <p className="text-gray-500">Aucun dossier à afficher</p>
-      </div>
-    );
-  }
+
+  // Fonction pour formater le statut pour l'affichage
+  const formatStatus = (status: string) => {
+    switch (status) {
+      case 'complet': return 'Complet';
+      case 'en_attente': return 'En attente';
+      case 'rejete': return 'Rejeté';
+      case 'en_cours': return 'En cours';
+      case 'certifie': return 'Certifié';
+      case 'a_corriger': return 'À corriger';
+      default: return status;
+    }
+  };
+
+  // Vérifier si une date butoir est dépassée
+  const isOverdue = (deadline: string) => {
+    const today = new Date();
+    const deadlineDate = new Date(deadline);
+    return today > deadlineDate;
+  };
+
+  // Calculer le nombre de jours avant échéance ou de retard
+  const getDaysUntilDeadline = (deadline: string) => {
+    const today = new Date();
+    const deadlineDate = new Date(deadline);
+    const diffTime = deadlineDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
 
   return (
-    <div className="rounded-md border">
+    <div className="overflow-x-auto">
       <Table>
-        <TableCaption>Liste des dossiers</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Référence</TableHead>
-            <TableHead>Opérateur</TableHead>
-            <TableHead>Produit</TableHead>
-            <TableHead>Date</TableHead>
+            <TableHead className="whitespace-nowrap">Date de transmission</TableHead>
+            <TableHead>Opérateur/Promoteur</TableHead>
+            <TableHead>Type de produit</TableHead>
+            <TableHead>Responsable</TableHead>
+            <TableHead>Pilote technique</TableHead>
             <TableHead>Statut</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>Échéance</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredDossiers.map((dossier) => (
-            <TableRow key={dossier.id}>
-              <TableCell className="font-medium">{dossier.reference}</TableCell>
-              <TableCell>{dossier.operateurNom}</TableCell>
-              <TableCell>{dossier.typeProduit}</TableCell>
-              <TableCell>{new Date(dossier.dateTransmission).toLocaleDateString()}</TableCell>
-              <TableCell>
-                <Badge className={`${getStatusColor(dossier.status)}`}>
-                  {formatStatus(dossier.status)}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleViewDetails(dossier.id)}
-                  >
-                    <File className="mr-2 h-4 w-4" />
-                    Détails
-                  </Button>
-                  {dossier.status === 'en_attente' && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="text-orange-600" 
-                      onClick={() => onMarkAsComplete(dossier.id)}
-                    >
-                      <AlertTriangle className="mr-2 h-4 w-4" />
-                      Complet
-                    </Button>
-                  )}
-                  {dossier.status === 'complet' && (
-                    <>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-green-600" 
-                        onClick={() => onValidate(dossier.id)}
-                      >
-                        <FileCheck className="mr-2 h-4 w-4" />
-                        Valider
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-red-600" 
-                        onClick={() => onReject(dossier.id)}
-                      >
-                        <FileX className="mr-2 h-4 w-4" />
-                        Rejeter
-                      </Button>
-                    </>
-                  )}
-                </div>
+          {dossiers.length > 0 ? (
+            dossiers.map((dossier) => {
+              const daysUntilDeadline = getDaysUntilDeadline(dossier.dateButoir);
+              const overdue = isOverdue(dossier.dateButoir);
+              
+              return (
+                <TableRow key={dossier.id}>
+                  <TableCell className="whitespace-nowrap">
+                    <div className="flex items-center">
+                      <Calendar className="mr-2 text-gray-500" size={16} />
+                      {new Date(dossier.dateTransmission).toLocaleDateString()}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium">{dossier.operateurNom}</div>
+                    <div className="text-sm text-gray-500">
+                      <User className="inline mr-1" size={14} />
+                      {dossier.promoteurNom}
+                    </div>
+                  </TableCell>
+                  <TableCell>{dossier.typeProduit}</TableCell>
+                  <TableCell>{dossier.responsable}</TableCell>
+                  <TableCell>{dossier.piloteTechniqueNom || "-"}</TableCell>
+                  <TableCell>
+                    <Badge className={getStatusColor(dossier.status)}>
+                      {formatStatus(dossier.status)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <div className="flex items-center">
+                      <Clock className={`mr-2 ${overdue ? 'text-red-500' : 'text-gray-500'}`} size={16} />
+                      <span>{new Date(dossier.dateButoir).toLocaleDateString()}</span>
+                    </div>
+                    {overdue && dossier.status !== 'certifie' && dossier.status !== 'rejete' && (
+                      <div className="flex items-center text-xs text-red-500 mt-1">
+                        <AlertTriangle size={12} className="mr-1" />
+                        <span>En retard de {Math.abs(daysUntilDeadline)} jour{Math.abs(daysUntilDeadline) > 1 ? 's' : ''}</span>
+                      </div>
+                    )}
+                    {!overdue && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        Dans {daysUntilDeadline} jour{daysUntilDeadline > 1 ? 's' : ''}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <DossierDetailsDialog dossierId={dossier.id} />
+                      <AssignPiloteTechniqueDialog dossierId={dossier.id} />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })
+          ) : (
+            <TableRow>
+              <TableCell colSpan={8} className="h-24 text-center">
+                Aucun dossier trouvé
               </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
     </div>

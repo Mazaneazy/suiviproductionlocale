@@ -1,9 +1,9 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useData } from '@/contexts/DataContext';
 import { useParametresEvaluation } from '@/hooks/useParametresEvaluation';
-import { Dossier } from '@/types';
+import { Dossier, NoteFrais } from '@/types';
 
 export const useNotesFraisForm = (dossier: Dossier, onNoteFraisCreated: () => void) => {
   const { toast } = useToast();
@@ -15,7 +15,8 @@ export const useNotesFraisForm = (dossier: Dossier, onNoteFraisCreated: () => vo
     totalPrix,
     addParametre,
     removeParametre,
-    toggleParametre
+    toggleParametre,
+    parametresOptions
   } = useParametresEvaluation(dossier.id);
   
   const [fraisGestion, setFraisGestion] = useState(50000);
@@ -24,6 +25,7 @@ export const useNotesFraisForm = (dossier: Dossier, onNoteFraisCreated: () => vo
   const [total, setTotal] = useState(0);
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   
   // Calculer le total
   useEffect(() => {
@@ -31,7 +33,28 @@ export const useNotesFraisForm = (dossier: Dossier, onNoteFraisCreated: () => vo
     setTotal(newTotal);
   }, [totalPrix, fraisGestion, fraisInspection, fraisSurveillance]);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  // Gérer les modifications de fichier
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setUploadedFile(file);
+      toast({
+        title: "Fichier sélectionné",
+        description: `${file.name} a été sélectionné.`,
+      });
+    }
+  };
+
+  // Gérer les modifications d'input
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    
+    if (name === 'description') {
+      setDescription(value);
+    }
+  };
+  
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
@@ -47,22 +70,20 @@ export const useNotesFraisForm = (dossier: Dossier, onNoteFraisCreated: () => vo
     
     try {
       // Créer la note de frais
-      const newNoteFrais = {
-        dossier_id: dossier.id,
-        inspecteur_id: 'resp_technique',
+      const newNoteFrais: Omit<NoteFrais, 'id'> = {
+        dossierId: dossier.id,
+        inspecteurId: 'resp_technique',
         date: new Date().toISOString().split('T')[0],
-        date_creation: new Date().toISOString(),
-        description: description || `Note de frais pour le dossier ${dossier.operateurNom || dossier.operateur_nom}`,
+        dateCreation: new Date().toISOString(),
+        description: description || `Note de frais pour le dossier ${dossier.operateurNom}`,
         montant: total,
-        status: 'en_attente' as const,
-        parametres_analyse: selectedParametres,
-        frais_gestion: fraisGestion,
-        frais_inspection: fraisInspection,
-        frais_analyses: totalPrix,
-        frais_surveillance: fraisSurveillance,
-        acquitte: false,
-        notification_envoyee: false,
-        operateur_notifie: false
+        status: 'en_attente',
+        parametresAnalyse: selectedParametres,
+        fraisGestion,
+        fraisInspection,
+        fraisAnalyses: totalPrix,
+        fraisSurveillance,
+        acquitte: false
       };
       
       addNoteFrais(newNoteFrais);
@@ -92,6 +113,7 @@ export const useNotesFraisForm = (dossier: Dossier, onNoteFraisCreated: () => vo
     addParametre,
     removeParametre,
     toggleParametre,
+    parametresOptions,
     fraisGestion,
     setFraisGestion,
     fraisInspection,
@@ -102,6 +124,9 @@ export const useNotesFraisForm = (dossier: Dossier, onNoteFraisCreated: () => vo
     description,
     setDescription,
     isSubmitting,
-    handleSubmit
+    handleSubmit,
+    handleInputChange,
+    handleFileChange,
+    uploadedFile
   };
 };

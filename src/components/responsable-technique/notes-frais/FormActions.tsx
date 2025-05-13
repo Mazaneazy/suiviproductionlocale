@@ -1,22 +1,50 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { FileCog } from 'lucide-react';
+import { SaveIcon, RotateCcw } from 'lucide-react';
 
-interface FormActionsProps {
-  isSubmitting: boolean;
+export interface FormActionsProps {
+  onReset: () => void;
+  isLoading?: boolean;
+  isSubmitting?: boolean; // Adding the missing property
 }
 
-const FormActions: React.FC<FormActionsProps> = ({ isSubmitting }) => {
+const FormActions: React.FC<FormActionsProps> = ({ 
+  onReset,
+  isLoading = false,
+  isSubmitting = false
+}) => {
+  // Use either isLoading or isSubmitting
+  const isDisabled = isLoading || isSubmitting;
+  
   return (
-    <div className="flex justify-end pt-4 border-t">
-      <Button type="submit" disabled={isSubmitting} className="bg-certif-green hover:bg-certif-green/90">
-        {isSubmitting ? (
-          <>Création en cours...</>
+    <div className="flex justify-between space-x-4 mt-6">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={onReset}
+        disabled={isDisabled}
+      >
+        <RotateCcw className="h-4 w-4 mr-2" />
+        Réinitialiser
+      </Button>
+      
+      <Button
+        type="submit"
+        disabled={isDisabled}
+      >
+        {isDisabled ? (
+          <>
+            <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Traitement en cours...
+          </>
         ) : (
           <>
-            <FileCog className="mr-2" size={16} />
-            Créer la note de frais
+            <SaveIcon className="h-4 w-4 mr-2" />
+            Enregistrer la note de frais
           </>
         )}
       </Button>

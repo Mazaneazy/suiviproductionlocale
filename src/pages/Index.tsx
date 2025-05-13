@@ -1,20 +1,22 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
-  const { currentUser } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (currentUser) {
+    // Vérifier l'authentification et rediriger
+    if (isAuthenticated) {
       navigate('/dashboard');
     } else {
       navigate('/login');
     }
-  }, [currentUser, navigate]);
+  }, [isAuthenticated, navigate]);
 
+  // Afficher une page de chargement pendant la redirection
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">

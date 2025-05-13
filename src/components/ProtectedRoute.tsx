@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { UserRole } from '../types';
 
 interface ProtectedRouteProps {
@@ -22,12 +22,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" />;
   }
   
-  // Vérifier les rôles si spécifiés
+  // Check roles if specified
   if (allowedRoles && !hasRole(allowedRoles)) {
     return <Navigate to="/unauthorized" />;
   }
 
-  // Vérifier l'accès au module si spécifié
+  // Check module access if specified
   if (moduleName && !hasAccess(moduleName)) {
     return <Navigate to="/unauthorized" />;
   }

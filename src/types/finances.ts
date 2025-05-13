@@ -1,62 +1,46 @@
 
 export interface NoteFrais {
   id: string;
-  dossier_id?: string;
-  dossierId?: string;
-  inspecteur_id?: string;
-  inspecteurId?: string;
+  dossierId: string;
+  inspecteurId: string;
   date: string;
-  date_creation?: string;
-  dateCreation?: string;
+  dateCreation: string;
+  description: string;
   montant: number;
+  status: 'en_attente' | 'valide' | 'rejete';
   acquitte: boolean;
-  frais_gestion?: number;
-  fraisGestion?: number;
-  frais_inspection?: number;
-  fraisInspection?: number;
-  frais_analyses?: number;
-  fraisAnalyses?: number;
-  frais_surveillance?: number;
-  fraisSurveillance?: number;
-  notification_envoyee?: boolean;
-  notificationEnvoyee?: boolean;
-  operateur_notifie?: boolean;
-  operateurNotifie?: boolean;
-  parametres_analyse?: string[];
+  fraisGestion: number;
+  fraisInspection: number;
+  fraisAnalyses: number;
+  fraisSurveillance: number;
   parametresAnalyse?: string[];
-  parametresEvaluation?: string[];
-  description?: string;
-  status: 'en_attente' | 'validee' | 'rejetee' | 'valide' | 'rejete';
+  // Additional properties used in the application
   commentaire?: string;
-  fichier_url?: string;
   fichierUrl?: string;
+  notificationEnvoyee?: boolean;
+  operateurNotifie?: boolean;
+  total?: number;
+  pdfUrl?: string;
 }
 
 export interface PreuvePaiement {
   id: string;
-  notefrais_id?: string;
-  noteFraisId?: string;
-  dossier_id?: string;
-  dossierId?: string;
-  fichier_url?: string;
-  fichierUrl?: string;
-  date_upload?: string;
-  date?: string;
-  uploaded_by?: string;
-  validation_status?: 'en_attente' | 'acceptee' | 'rejetee';
-  commentaire?: string;
-  montant?: number;
-  referencePaiement?: string;
-  status?: string;
+  noteFraisId: string;
+  dossierId: string;
+  date: string;
+  montant: number;
+  referencePaiement: string;
+  fichierUrl: string;
+  status: 'recu' | 'valide' | 'rejete';
   commentaires?: string;
 }
 
-export interface FactureDetails {
+export interface Transaction {
   id: string;
-  numero: string;
   date: string;
   montant: number;
-  dossier_id: string;
-  status: 'en_attente' | 'payee' | 'annulee';
-  details?: string;
+  type: 'debit' | 'credit';
+  description: string;
+  reference: string;
+  noteFraisId?: string;
 }

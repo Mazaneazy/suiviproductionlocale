@@ -60,21 +60,18 @@ const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
     try {
       const success = await resetPassword(values.email);
       
-      if (success) {
-        toast({
-          title: "Email envoyé",
-          description: "Si un compte existe avec cet email, les instructions de réinitialisation ont été envoyées.",
-        });
-        form.reset();
-        onOpenChange(false);
-      } else {
-        // On ne révèle pas si l'email existe ou non pour des raisons de sécurité
-        toast({
-          title: "Email envoyé",
-          description: "Si un compte existe avec cet email, les instructions de réinitialisation ont été envoyées.",
-        });
-      }
+      // Always show the same message regardless of whether the email exists
+      // for security reasons
+      toast({
+        title: "Email envoyé",
+        description: "Si un compte existe avec cet email, les instructions de réinitialisation ont été envoyées.",
+      });
+      
+      form.reset();
+      onOpenChange(false);
+      
     } catch (error) {
+      console.error('Reset password error:', error);
       toast({
         title: "Erreur",
         description: "Une erreur est survenue. Veuillez réessayer.",

@@ -1,12 +1,10 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import Layout from '../components/Layout';
-import { useData } from '../contexts/DataContext';
-import { useToast } from '../hooks/use-toast';
-import { useRapportSubmission } from '../hooks/useRapportSubmission';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RapportInspection, ComiteTechnique, Inspection } from '@/types';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
+import { useResponsableTechniqueState } from '@/components/responsable-technique/state/useResponsableTechniqueState';
 import ProgrammerInspectionDialog from '../components/responsable-technique/inspections/ProgrammerInspectionDialog';
+import TabsNavigation from '@/components/responsable-technique/TabsNavigation';
 
 // Import tab components
 import DossiersTab from '../components/responsable-technique/tabs/DossiersTab';
@@ -19,109 +17,31 @@ import ChecklistTab from '../components/responsable-technique/tabs/ChecklistTab'
 import AvisDecisionTab from '../components/responsable-technique/tabs/AvisDecisionTab';
 
 const ResponsableTechnique = () => {
-  const { 
-    dossiers, 
-    getDocumentsByDossierId, 
-    getNoteFraisByDossierId, 
-    updateNoteFrais, 
-    updateDossier, 
-    inspections, 
-    addInspection 
-  } = useData();
-  const { toast } = useToast();
-  const { submitRapport } = useRapportSubmission();
-  
-  const [selectedDossierId, setSelectedDossierId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('dossiers');
-  const [inspectionDialogOpen, setInspectionDialogOpen] = useState(false);
-  const [selectedInspection, setSelectedInspection] = useState<Inspection | null>(null);
-  const [selectedRapport, setSelectedRapport] = useState<RapportInspection | null>(null);
-  
-  const selectedDossier = selectedDossierId 
-    ? dossiers.find(d => d.id === selectedDossierId) 
-    : null;
-    
-  const documents = selectedDossierId 
-    ? getDocumentsByDossierId(selectedDossierId)
-    : [];
-
-  const notesFrais = selectedDossierId
-    ? getNoteFraisByDossierId(selectedDossierId)
-    : [];
-
-  const dossierInspections = selectedDossierId
-    ? inspections.filter(i => i.dossierId === selectedDossierId)
-    : [];
-    
-  const handleSelectDossier = (id: string) => {
-    setSelectedDossierId(id);
-  };
-
-  const handleSaveComite = (comite: ComiteTechnique) => {
-    if (selectedDossierId) {
-      updateDossier(selectedDossierId, { comiteTechnique: comite });
-    }
-  };
-
-  const handleValidateFrais = (id: string) => {
-    updateNoteFrais(id, { acquitte: true });
-    toast({
-      title: "Frais acquittés",
-      description: "Les frais ont été marqués comme acquittés",
-    });
-  };
-
-  const handleProgrammerInspection = (inspection: Omit<Inspection, 'id'>) => {
-    addInspection(inspection);
-    toast({
-      title: "Inspection programmée",
-      description: `L'inspection a été programmée pour le ${new Date(inspection.dateInspection).toLocaleDateString()}`,
-    });
-  };
-
-  const handleSubmitRapport = (rapport: RapportInspection) => {
-    submitRapport(rapport);
-    
-    // Simuler l'envoi de notifications
-    setTimeout(() => {
-      toast({
-        title: "Rapport transmis",
-        description: "Le rapport a été transmis au directeur d'évaluation",
-      });
-      setSelectedInspection(null);
-    }, 1000);
-  };
-
-  const handleViewRapport = (rapport: RapportInspection) => {
-    setSelectedRapport(rapport);
-  };
-
-  const handleValidationComplete = () => {
-    setActiveTab('comite');
-  };
-
-  const handleNoteFraisCreated = () => {
-    toast({
-      title: "Note de frais créée",
-      description: "La note de frais a été créée et transmise au directeur pour validation.",
-    });
-    setActiveTab('dossiers');
-    setSelectedDossierId(null);
-  };
-
-  const handleChecklistSubmitted = () => {
-    toast({
-      title: "Checklist d'inspection soumise",
-      description: "Le plan d'inspection et le plan d'échantillonnage ont été enregistrés.",
-    });
-  };
-
-  const handleAvisSubmitted = () => {
-    toast({
-      title: "Avis de décision soumis",
-      description: "L'avis de décision a été transmis au comité de validation.",
-    });
-  };
+  const {
+    selectedDossierId,
+    activeTab,
+    setActiveTab,
+    inspectionDialogOpen,
+    setInspectionDialogOpen,
+    selectedInspection,
+    setSelectedInspection,
+    selectedRapport,
+    selectedDossier,
+    documents,
+    notesFrais,
+    dossierInspections,
+    handleSelectDossier,
+    handleSaveComite,
+    handleValidateFrais,
+    handleProgrammerInspection,
+    handleSubmitRapport,
+    handleViewRapport,
+    handleValidationComplete,
+    handleNoteFraisCreated,
+    handleChecklistSubmitted,
+    handleAvisSubmitted,
+    dossiers
+  } = useResponsableTechniqueState();
 
   return (
     <Layout>
@@ -133,16 +53,10 @@ const ResponsableTechnique = () => {
       </div>
       
       <Tabs defaultValue="dossiers" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="dossiers">Dossiers à traiter</TabsTrigger>
-          <TabsTrigger value="comite" disabled={!selectedDossier}>Pilote technique</TabsTrigger>
-          <TabsTrigger value="checklist" disabled={!selectedDossier}>Checklist d'inspection</TabsTrigger>
-          <TabsTrigger value="frais" disabled={!selectedDossier}>Validation des frais</TabsTrigger>
-          <TabsTrigger value="inspections" disabled={!selectedDossier}>Inspections</TabsTrigger>
-          <TabsTrigger value="rapports">Rapports</TabsTrigger>
-          <TabsTrigger value="avis" disabled={!selectedDossier}>Avis de décision</TabsTrigger>
-          <TabsTrigger value="notesfrais" disabled={!selectedDossier}>Note de frais</TabsTrigger>
-        </TabsList>
+        <TabsNavigation 
+          activeTab={activeTab} 
+          selectedDossier={selectedDossier} 
+        />
         
         {/* Tab: Dossiers */}
         <TabsContent value="dossiers" className="space-y-6">
@@ -190,15 +104,6 @@ const ResponsableTechnique = () => {
             onOpenInspectionDialog={() => setInspectionDialogOpen(true)}
             onSubmitRapport={handleSubmitRapport}
           />
-          
-          {selectedDossier && (
-            <ProgrammerInspectionDialog
-              dossier={selectedDossier}
-              open={inspectionDialogOpen}
-              onOpenChange={setInspectionDialogOpen}
-              onProgrammer={handleProgrammerInspection}
-            />
-          )}
         </TabsContent>
         
         {/* Tab: Rapports */}
@@ -226,6 +131,15 @@ const ResponsableTechnique = () => {
           />
         </TabsContent>
       </Tabs>
+      
+      {selectedDossier && (
+        <ProgrammerInspectionDialog
+          dossier={selectedDossier}
+          open={inspectionDialogOpen}
+          onOpenChange={setInspectionDialogOpen}
+          onProgrammer={handleProgrammerInspection}
+        />
+      )}
     </Layout>
   );
 };

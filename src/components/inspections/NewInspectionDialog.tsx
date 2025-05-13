@@ -1,18 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from '@/components/ui/dialog';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { CalendarIcon, X } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -20,13 +11,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Dossier } from '@/types';
-import { toast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { User, X } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NewInspectionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  dossiers: Dossier[];
+  dossiers: any[];
   onAddInspection: (inspection: any) => void;
 }
 
@@ -36,181 +36,199 @@ const NewInspectionDialog: React.FC<NewInspectionDialogProps> = ({
   dossiers,
   onAddInspection,
 }) => {
-  const [dossierId, setDossierId] = useState('');
-  const [dateInspection, setDateInspection] = useState('');
-  const [lieu, setLieu] = useState('');
-  const [inspecteurs, setInspecteurs] = useState<string[]>(['']);
-  const [notes, setNotes] = useState('');
+  const { currentUser } = useAuth();
+  const { toast } = useToast();
+  
+  // État pour le nouvel inspecteur à ajouter
+  const [newInspectorName, setNewInspectorName] = useState('');
+  
+  // État pour la nouvelle inspection
+  const [newInspection, setNewInspection] = useState({
+    dossierId: '',
+    dateInspection: new Date().toISOString().split('T')[0],
+    lieu: '',
+    inspecteurs: currentUser?.name ? [currentUser.name] : [],
+    resultat: 'en_attente' as 'conforme' | 'non_conforme' | 'en_attente',
+    recommandations: '',
+    actionsCorrectives: ''
+  });
 
-  // Reset form when dialog opens
-  useEffect(() => {
-    if (open) {
-      setDossierId('');
-      setDateInspection('');
-      setLieu('');
-      setInspecteurs(['']);
-      setNotes('');
-      
-      // Set default date to tomorrow
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      setDateInspection(tomorrow.toISOString().split('T')[0]);
-    }
-  }, [open]);
-
-  // Handle inspecteur changes
-  const handleInspecteurChange = (index: number, value: string) => {
-    const newInspecteurs = [...inspecteurs];
-    newInspecteurs[index] = value;
-    setInspecteurs(newInspecteurs);
+  // Fonction pour mettre à jour les champs de la nouvelle inspection
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setNewInspection({
+      ...newInspection,
+      [name]: value,
+    });
   };
 
-  // Add inspecteur field
-  const addInspecteur = () => {
-    setInspecteurs([...inspecteurs, '']);
-  };
-
-  // Remove inspecteur field
-  const removeInspecteur = (index: number) => {
-    if (inspecteurs.length > 1) {
-      const newInspecteurs = inspecteurs.filter((_, i) => i !== index);
-      setInspecteurs(newInspecteurs);
-    }
-  };
-
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Fonction pour ajouter un inspecteur
+  const handleAddInspector = () => {
+    if (newInspectorName.trim() === '') return;
     
-    // Form validation
-    if (!dossierId || !dateInspection || !lieu || inspecteurs.some(i => !i)) {
+    if (!newInspection.inspecteurs.includes(newInspectorName.trim())) {
+      setNewInspection({
+        ...newInspection,
+        inspecteurs: [...newInspection.inspecteurs, newInspectorName.trim()]
+      });
+    }
+    
+    setNewInspectorName('');
+  };
+
+  // Fonction pour supprimer un inspecteur
+  const handleRemoveInspector = (inspector: string) => {
+    setNewInspection({
+      ...newInspection,
+      inspecteurs: newInspection.inspecteurs.filter(i => i !== inspector)
+    });
+  };
+
+  // Fonction pour ajouter une nouvelle inspection
+  const handleAddInspection = () => {
+    // Vérifier que tous les champs obligatoires sont remplis
+    if (!newInspection.dossierId || !newInspection.lieu || newInspection.inspecteurs.length === 0) {
       toast({
-        title: "Champs requis",
-        description: "Veuillez remplir tous les champs obligatoires.",
-        variant: "destructive"
+        variant: "destructive",
+        title: "Erreur",
+        description: "Veuillez remplir tous les champs obligatoires, y compris l'ajout d'au moins un inspecteur.",
       });
       return;
     }
-    
-    // Create new inspection
-    const newInspection = {
-      dossierId,
-      dateInspection,
-      date_inspection: dateInspection, // For compatibility with both naming conventions
-      lieu,
-      inspecteurs: inspecteurs.filter(i => i), // Remove any empty inspecteurs
-      notes,
-      resultat: 'en_attente',
-      status: 'planifiee',
-      date_creation: new Date().toISOString()
-    };
-    
+
     onAddInspection(newInspection);
-    onOpenChange(false);
+    
+    // Réinitialiser le formulaire
+    setNewInspection({
+      dossierId: '',
+      dateInspection: new Date().toISOString().split('T')[0],
+      lieu: '',
+      inspecteurs: currentUser?.name ? [currentUser.name] : [],
+      resultat: 'en_attente',
+      recommandations: '',
+      actionsCorrectives: ''
+    });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Programmer une nouvelle inspection</DialogTitle>
-          <DialogDescription>
-            Remplissez les détails pour planifier une inspection pour un dossier.
-          </DialogDescription>
+          <DialogTitle>Programmer une inspection</DialogTitle>
         </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-          <div className="space-y-2">
-            <Label htmlFor="dossier">Dossier</Label>
-            <Select value={dossierId} onValueChange={setDossierId}>
-              <SelectTrigger>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="dossierId" className="text-right font-medium text-sm">
+              Dossier*
+            </label>
+            <Select
+              value={newInspection.dossierId}
+              onValueChange={(value) => setNewInspection({ ...newInspection, dossierId: value })}
+            >
+              <SelectTrigger className="col-span-3">
                 <SelectValue placeholder="Sélectionner un dossier" />
               </SelectTrigger>
               <SelectContent>
-                {dossiers.map(dossier => (
-                  <SelectItem key={dossier.id} value={dossier.id}>
-                    {dossier.operateurNom || dossier.operateur_nom} - {dossier.reference || '(Sans référence)'}
-                  </SelectItem>
-                ))}
+                {dossiers
+                  .filter(d => d.status !== 'certifie' && d.status !== 'rejete')
+                  .map((dossier) => (
+                    <SelectItem key={dossier.id} value={dossier.id}>
+                      {dossier.operateurNom} - {dossier.typeProduit}
+                    </SelectItem>
+                  ))
+                }
               </SelectContent>
             </Select>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="dateInspection">Date d'inspection</Label>
-            <div className="relative">
-              <Input
-                id="dateInspection"
-                type="date"
-                value={dateInspection}
-                onChange={e => setDateInspection(e.target.value)}
-                className="pl-10"
-              />
-              <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={16} />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="lieu">Lieu</Label>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="dateInspection" className="text-right font-medium text-sm">
+              Date d'inspection*
+            </label>
             <Input
-              id="lieu"
-              value={lieu}
-              onChange={e => setLieu(e.target.value)}
-              placeholder="Adresse du lieu d'inspection"
+              id="dateInspection"
+              name="dateInspection"
+              type="date"
+              value={newInspection.dateInspection}
+              onChange={handleInputChange}
+              className="col-span-3"
             />
           </div>
-
-          <div className="space-y-2">
-            <Label>Inspecteurs</Label>
-            {inspecteurs.map((inspecteur, index) => (
-              <div key={index} className="flex items-center gap-2">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="lieu" className="text-right font-medium text-sm">
+              Lieu*
+            </label>
+            <Input
+              id="lieu"
+              name="lieu"
+              value={newInspection.lieu}
+              onChange={handleInputChange}
+              className="col-span-3"
+              placeholder="Adresse de l'inspection"
+            />
+          </div>
+          
+          <div className="grid grid-cols-4 items-start gap-4">
+            <label className="text-right font-medium text-sm pt-2">
+              Inspecteurs*
+            </label>
+            <div className="col-span-3">
+              <div className="flex flex-wrap gap-2 mb-2">
+                {newInspection.inspecteurs.map((inspector) => (
+                  <Badge key={inspector} variant="secondary" className="flex items-center gap-1 px-2 py-1">
+                    <User size={14} />
+                    {inspector}
+                    <button 
+                      type="button" 
+                      onClick={() => handleRemoveInspector(inspector)}
+                      className="ml-1 rounded-full hover:bg-gray-200 p-0.5"
+                    >
+                      <X size={14} />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex gap-2">
                 <Input
-                  value={inspecteur}
-                  onChange={e => handleInspecteurChange(index, e.target.value)}
-                  placeholder={`Nom de l'inspecteur ${index + 1}`}
+                  value={newInspectorName}
+                  onChange={(e) => setNewInspectorName(e.target.value)}
+                  placeholder="Nom de l'inspecteur"
                   className="flex-1"
                 />
-                {inspecteurs.length > 1 && (
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="icon"
-                    onClick={() => removeInspecteur(index)}
-                  >
-                    <X size={16} />
-                  </Button>
-                )}
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleAddInspector}
+                >
+                  Ajouter
+                </Button>
               </div>
-            ))}
-            
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={addInspecteur}
-              className="w-full mt-2"
-            >
-              Ajouter un inspecteur
-            </Button>
+            </div>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
+          
+          <div className="grid grid-cols-4 items-start gap-4">
+            <label htmlFor="recommandations" className="text-right font-medium text-sm pt-2">
+              Notes
+            </label>
             <Textarea
-              id="notes"
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-              placeholder="Informations supplémentaires pour l'inspection"
+              id="recommandations"
+              name="recommandations"
+              value={newInspection.recommandations}
+              onChange={handleInputChange}
+              className="col-span-3"
+              placeholder="Notes ou recommandations pour cette inspection"
               rows={3}
             />
           </div>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Annuler
-            </Button>
-            <Button type="submit">Programmer</Button>
-          </DialogFooter>
-        </form>
+        </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Annuler</Button>
+          </DialogClose>
+          <Button onClick={handleAddInspection} className="bg-certif-blue hover:bg-certif-blue/90">
+            Programmer
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

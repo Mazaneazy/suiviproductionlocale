@@ -64,8 +64,8 @@ export const useDossierForm = () => {
     
     // Créer l'objet dossier
     return {
-      operateur_nom: entreprise,
-      promoteur_nom: promoteur,
+      operateurNom: entreprise,
+      promoteurNom: promoteur,
       telephone,
       email: email || undefined,
       adresse: adresse || undefined,

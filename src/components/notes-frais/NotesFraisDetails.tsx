@@ -26,7 +26,7 @@ const NotesFraisDetails: React.FC<NotesFraisDetailsProps> = ({
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
           <p className="text-sm font-medium text-gray-500">Opérateur</p>
-          <p>{dossiers.find(d => d.id === note.dossierId || d.id === note.dossier_id)?.operateurNom || dossiers.find(d => d.id === note.dossierId || d.id === note.dossier_id)?.operateur_nom}</p>
+          <p>{dossiers.find(d => d.id === note.dossierId)?.operateurNom}</p>
         </div>
         <div>
           <p className="text-sm font-medium text-gray-500">Date</p>
@@ -48,13 +48,13 @@ const NotesFraisDetails: React.FC<NotesFraisDetailsProps> = ({
         <h3 className="font-medium mb-2">Détails des frais</h3>
         <div className="grid grid-cols-2 gap-2">
           <p className="text-sm">Gestion du dossier:</p>
-          <p className="text-sm text-right">{(note.frais_gestion || note.fraisGestion || 0).toLocaleString() || '0'} FCFA</p>
+          <p className="text-sm text-right">{note.fraisGestion?.toLocaleString() || '0'} FCFA</p>
           <p className="text-sm">Inspection/échantillonage:</p>
-          <p className="text-sm text-right">{(note.frais_inspection || note.fraisInspection || 0).toLocaleString() || '0'} FCFA</p>
+          <p className="text-sm text-right">{note.fraisInspection?.toLocaleString() || '0'} FCFA</p>
           <p className="text-sm">Analyses/essais:</p>
-          <p className="text-sm text-right">{(note.frais_analyses || note.fraisAnalyses || 0).toLocaleString() || '0'} FCFA</p>
+          <p className="text-sm text-right">{note.fraisAnalyses?.toLocaleString() || '0'} FCFA</p>
           <p className="text-sm">Surveillance:</p>
-          <p className="text-sm text-right">{(note.frais_surveillance || note.fraisSurveillance || 0).toLocaleString() || '0'} FCFA</p>
+          <p className="text-sm text-right">{note.fraisSurveillance?.toLocaleString() || '0'} FCFA</p>
         </div>
       </div>
 
@@ -65,13 +65,13 @@ const NotesFraisDetails: React.FC<NotesFraisDetailsProps> = ({
         </div>
       )}
 
-      {(note.fichier_url || note.fichierUrl) && (
+      {note.fichierUrl && (
         <div className="border-t border-gray-200 pt-4">
           <h3 className="font-medium mb-2">Document joint</h3>
           <div className="flex items-center">
             <FileText size={20} className="mr-2 text-blue-500" />
             <a 
-              href={note.fichier_url || note.fichierUrl} 
+              href={note.fichierUrl} 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-blue-500 underline"

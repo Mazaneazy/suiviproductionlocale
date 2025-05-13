@@ -71,8 +71,8 @@ const InspectionsTable: React.FC<InspectionsTableProps> = ({
         <TableBody>
           {inspections.length > 0 ? (
             inspections.map((inspection) => {
-              const dossier = dossiers.find(d => d.id === inspection.dossierId || d.id === inspection.dossier_id);
-              const isPast = new Date(inspection.dateInspection || inspection.date_inspection) < new Date();
+              const dossier = dossiers.find(d => d.id === inspection.dossierId);
+              const isPast = new Date(inspection.dateInspection) < new Date();
               const canUpdate = isPast && inspection.resultat === 'en_attente' && 
                              (currentUser?.role === 'inspecteur' || currentUser?.role === 'chef_mission');
               
@@ -81,20 +81,20 @@ const InspectionsTable: React.FC<InspectionsTableProps> = ({
                   <TableCell className="whitespace-nowrap">
                     <div className="flex items-center">
                       <Calendar className="mr-2 text-gray-500" size={16} />
-                      {new Date(inspection.dateInspection || inspection.date_inspection).toLocaleDateString()}
+                      {new Date(inspection.dateInspection).toLocaleDateString()}
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium">{dossier?.operateurNom || dossier?.operateur_nom}</TableCell>
+                  <TableCell className="font-medium">{dossier?.operateurNom}</TableCell>
                   <TableCell>
                     <div className="flex items-center">
                       <MapPin className="mr-1 text-gray-500" size={16} />
-                      {inspection.lieu || "Non spécifié"}
+                      {inspection.lieu}
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center">
                       <User className="mr-1 text-gray-500" size={16} />
-                      {(inspection.inspecteurs && inspection.inspecteurs.length) ? inspection.inspecteurs.join(', ') : "Non assigné"}
+                      {inspection.inspecteurs.join(', ')}
                     </div>
                   </TableCell>
                   <TableCell>

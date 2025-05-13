@@ -1,8 +1,5 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { LogOut, User } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,53 +7,94 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
-import { Button } from '../ui/button';
-import { useAuth } from '../../contexts/AuthContext';
-import { useToast } from '../../hooks/use-toast';
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import ChangePasswordDialog from '@/components/auth/ChangePasswordDialog';
+import { Button } from '@/components/ui/button';
 
-const UserDropdown: React.FC = () => {
-  const { currentUser, logout } = useAuth();
+const UserDropdown = () => {
+  const { currentUser, logout, hasRole } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const handleLogout = () => {
-    logout();
-    toast({
-      title: "Déconnexion réussie",
-      description: "Vous avez été déconnecté avec succès.",
-    });
-    navigate('/login');
-  };
+  
+  if (!currentUser) {
+    return (
+      <Button variant="ghost" onClick={() => navigate('/login')}>
+        Se connecter
+      </Button>
+    );
+  }
+  
+  const initials = currentUser.name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase();
+  
+  const roleName = getRoleName(currentUser.role);
+  
+  // Vérifier si l'utilisateur est admin ou a un rôle qui lui donne accès à la gestion des utilisateurs
+  const canAccessUserManagement = hasRole(['admin', 'directeur_general']);
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar>
-            <AvatarImage src="" alt={currentUser?.name} />
-            <AvatarFallback>{currentUser?.name?.charAt(0) || 'U'}</AvatarFallback>
-          </Avatar>
-        </Button>
+      <DropdownMenuTrigger>
+        <Avatar>
+          <AvatarImage src="" alt={currentUser.name} />
+          <AvatarFallback>{initials}</AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>
+          <div>
+            <p className="font-medium text-sm">{currentUser.name}</p>
+            <p className="text-xs text-gray-500">{roleName}</p>
+          </div>
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="flex items-center">
-          <User className="mr-2" size={16} />
-          <span>{currentUser?.name}</span>
+        <DropdownMenuItem onSelect={() => navigate('/dashboard')}>
+          Tableau de bord
         </DropdownMenuItem>
-        <DropdownMenuItem className="text-sm text-muted-foreground">
-          Rôle: {currentUser?.role}
-        </DropdownMenuItem>
+        {canAccessUserManagement && (
+          <DropdownMenuItem onSelect={() => navigate('/users')}>
+            Gestion des utilisateurs
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout} className="flex items-center text-certif-red">
-          <LogOut className="mr-2" size={16} />
-          <span>Se déconnecter</span>
+        <ChangePasswordDialog 
+          trigger={
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              Changer mon mot de passe
+            </DropdownMenuItem>
+          } 
+        />
+        <DropdownMenuItem onSelect={() => logout()}>
+          Se déconnecter
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 };
+
+function getRoleName(role: string): string {
+  const roleMap: Record<string, string> = {
+    'admin': 'Administrateur',
+    'acceuil': 'Chargé de clientèle',
+    'inspecteur': 'Inspecteur',
+    'certificats': 'Gestionnaire de certificats',
+    'analyste': 'Analyste',
+    'comptable': 'Comptable',
+    'responsable_technique': 'Responsable Technique',
+    'chef_mission': 'Chef de Mission',
+    'surveillant': 'Surveillant',
+    'directeur': 'Directeur',
+    'directeur_general': 'Directeur Général',
+    'gestionnaire': 'Gestionnaire Dossiers',
+    'producteur': 'Producteur',
+  };
+  
+  return roleMap[role] || role;
+}
 
 export default UserDropdown;
