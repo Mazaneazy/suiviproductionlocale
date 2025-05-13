@@ -4,16 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const Index = () => {
-  const { isAuthenticated } = useAuth();
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (currentUser) {
       navigate('/dashboard');
     } else {
       navigate('/login');
     }
-  }, [isAuthenticated, navigate]);
+  }, [currentUser, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">

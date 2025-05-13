@@ -30,7 +30,7 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({
   
   const [formData, setFormData] = useState<Partial<NoteFrais>>({
     dossierId: dossierId || '',
-    inspecteurId: currentUser?.id || '',
+    inspecteur_id: currentUser?.id || '',
     date: new Date().toISOString().split('T')[0],
     frais_gestion: 50000,
     frais_inspection: 75000,
@@ -90,16 +90,16 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({
       (formData.frais_surveillance || 0);
     
     // Simuler l'upload du fichier (dans une vraie application, cela serait fait vers un service de stockage)
-    let fichierUrl = '';
+    let fichier_url = '';
     if (uploadedFile) {
       // Dans une vraie application, nous téléchargerions le fichier vers un serveur
       // et obtiendrions une URL. Ici, nous simulons simplement cette URL
-      fichierUrl = `document-${Date.now()}-${uploadedFile.name}`;
+      fichier_url = `document-${Date.now()}-${uploadedFile.name}`;
     }
 
     addNoteFrais({
       dossierId: formData.dossierId,
-      inspecteurId: formData.inspecteurId || currentUser?.id,
+      inspecteur_id: formData.inspecteur_id || currentUser?.id,
       date: formData.date || new Date().toISOString(),
       dateCreation: new Date().toISOString(),
       description: `Note de frais - ${new Date(formData.date || new Date()).toLocaleDateString()}`,
@@ -111,7 +111,7 @@ const NotesFraisForm: React.FC<NotesFraisFormProps> = ({
       frais_analyses: formData.frais_analyses || 0,
       frais_surveillance: formData.frais_surveillance || 0,
       commentaire: formData.commentaire,
-      fichier_url: fichierUrl || undefined,
+      fichier_url: fichier_url || undefined,
       notification_envoyee: false,
       operateur_notifie: false
     });

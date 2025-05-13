@@ -23,7 +23,7 @@ const PaymentReceiptForm = () => {
   
   // Filter to show only notes de frais that have been notified but not paid
   const unpaidNotesFrais = notesFrais.filter(note => 
-    note.notificationEnvoyee && !note.acquitte
+    note.notification_envoyee && !note.acquitte
   );
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,12 +54,12 @@ const PaymentReceiptForm = () => {
     // Create payment receipt
     const preuvePaiement: PreuvePaiement = {
       id: generateId(),
-      noteFraisId: selectedNoteFrais,
+      notefrais_id: selectedNoteFrais,
       dossierId: selectedNote.dossierId,
       date: new Date().toISOString(),
       montant: montant,
       referencePaiement: reference,
-      fichierUrl: fichierUrl,
+      fichier_url: fichierUrl,
       status: 'recu',
       commentaires: commentaire
     };
