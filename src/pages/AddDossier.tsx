@@ -6,7 +6,13 @@ import { useData } from '../contexts/DataContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Dossier } from '@/types';
-import DossierDialogContent from './dossiers/DossierDialogContent';
+import DossierDialogContent from '@/components/dossiers/DossierDialogContent'; // Chemin corrigé
+
+const AddDossier = () => {
+    // Votre logique ici
+};
+
+export default AddDossier;
 
 const AddDossier = () => {
   const navigate = useNavigate();
