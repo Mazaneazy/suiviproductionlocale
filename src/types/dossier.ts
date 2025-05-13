@@ -1,6 +1,7 @@
 
 export interface Dossier {
   id: string;
+  delai?: number;
   operateur_nom: string;
   operateurNom?: string;
   reference?: string;
