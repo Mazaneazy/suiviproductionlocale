@@ -1,29 +1,25 @@
 
 import React from 'react';
+import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface NotesFraisHeaderProps {
-  onOpenDialog: () => void;
+  title?: string;
 }
 
-const NotesFraisHeader: React.FC<NotesFraisHeaderProps> = ({ onOpenDialog }) => {
+const NotesFraisHeader = ({ title = "Notes de frais" }: NotesFraisHeaderProps) => {
+  const navigate = useNavigate();
+  
   return (
-    <div className="flex justify-between items-center mb-6">
-      <div className="flex items-center">
-        <img 
-          src="/lovable-uploads/e1bf7151-3abe-4c2a-8037-71e791d77bf9.png" 
-          alt="ANOR Logo" 
-          className="h-14 mr-4" 
-        />
-        <h1 className="text-3xl font-bold text-certif-blue">Notes de frais</h1>
-      </div>
+    <div className="flex items-center justify-between mb-6">
+      <h1 className="text-3xl font-bold text-certif-blue">{title}</h1>
       <Button 
+        onClick={() => navigate('/notes-frais/add')}
         className="bg-certif-blue hover:bg-certif-blue/90"
-        onClick={onOpenDialog}
       >
-        <PlusCircle className="mr-2" size={16} />
-        Nouvelle note de frais
+        <Plus className="mr-2" size={16} />
+        Ajouter une note de frais
       </Button>
     </div>
   );

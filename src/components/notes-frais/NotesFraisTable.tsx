@@ -1,12 +1,19 @@
 
 import React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { 
+  Table, 
+  TableBody, 
+  TableCaption, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Check, X, Mail } from 'lucide-react';
-import { NoteFrais } from '@/types';
-import { Dossier } from '@/types';
-import { useAuth } from '@/contexts/AuthContext';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle, XCircle, Send, Eye, AlertTriangle } from 'lucide-react';
+import { Dossier, NoteFrais } from '@/types';
+import { useNavigate } from 'react-router-dom';
 
 interface NotesFraisTableProps {
   notesFrais: NoteFrais[];
@@ -15,7 +22,6 @@ interface NotesFraisTableProps {
   onReject: (id: string) => void;
   onSendNotification: (id: string) => void;
   onMarkAsNotified: (id: string) => void;
-  onShowDetails: (note: NoteFrais) => void;
   getStatusColor: (status: string) => string;
   formatStatus: (status: string) => string;
   calculerTotal: (note: NoteFrais) => number;
@@ -28,124 +34,113 @@ const NotesFraisTable: React.FC<NotesFraisTableProps> = ({
   onReject,
   onSendNotification,
   onMarkAsNotified,
-  onShowDetails,
   getStatusColor,
   formatStatus,
   calculerTotal
 }) => {
-  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  if (notesFrais.length === 0) {
+    return (
+      <div className="text-center py-10">
+        <p className="text-gray-500">Aucune note de frais à afficher</p>
+      </div>
+    );
+  }
+
+  const getDossierName = (dossierId: string) => {
+    const dossier = dossiers.find(d => d.id === dossierId);
+    return dossier ? dossier.operateurNom : 'Inconnu';
+  };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="rounded-md border">
       <Table>
+        <TableCaption>Liste des notes de frais</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Opérateur</TableHead>
-            <TableHead className="text-right">Gestion</TableHead>
-            <TableHead className="text-right">Inspection</TableHead>
-            <TableHead className="text-right">Analyses</TableHead>
-            <TableHead className="text-right">Surveillance</TableHead>
-            <TableHead className="text-right">Total</TableHead>
+            <TableHead className="w-[100px]">Date</TableHead>
+            <TableHead>Dossier</TableHead>
+            <TableHead>Montant (FCFA)</TableHead>
             <TableHead>Statut</TableHead>
-            <TableHead>Notification</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>Paiement</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {notesFrais.length > 0 ? (
-            notesFrais.map((note) => {
-              const dossier = dossiers.find(d => d.id === note.dossierId);
-              const total = note.montant || calculerTotal(note);
-              
-              return (
-                <TableRow key={note.id}>
-                  <TableCell>{new Date(note.date).toLocaleDateString()}</TableCell>
-                  <TableCell className="font-medium">{dossier?.operateurNom}</TableCell>
-                  <TableCell className="text-right">{note.fraisGestion?.toLocaleString() || '0'} FCFA</TableCell>
-                  <TableCell className="text-right">{note.fraisInspection?.toLocaleString() || '0'} FCFA</TableCell>
-                  <TableCell className="text-right">{note.fraisAnalyses?.toLocaleString() || '0'} FCFA</TableCell>
-                  <TableCell className="text-right">{note.fraisSurveillance?.toLocaleString() || '0'} FCFA</TableCell>
-                  <TableCell className="text-right font-medium">{total.toLocaleString()} FCFA</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(note.status)}>
-                      {formatStatus(note.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {note.notificationEnvoyee ? (
-                      note.operateurNotifie ? (
-                        <Badge className="bg-green-500 text-white">Reçue</Badge>
-                      ) : (
-                        <Badge className="bg-yellow-500 text-white">Envoyée</Badge>
-                      )
-                    ) : (
-                      <Badge className="bg-gray-400 text-white">Non envoyée</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      {note.status === 'en_attente' && currentUser?.role === 'comptable' && (
-                        <>
-                          <Button 
-                            variant="outline" 
-                            size="icon" 
-                            className="h-8 w-8 text-green-500 hover:text-green-700"
-                            onClick={() => onValidate(note.id)}
-                          >
-                            <Check size={16} />
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="icon" 
-                            className="h-8 w-8 text-red-500 hover:text-red-700"
-                            onClick={() => onReject(note.id)}
-                          >
-                            <X size={16} />
-                          </Button>
-                        </>
-                      )}
-                      {note.status === 'valide' && note.notificationEnvoyee === false && (
-                        <Button 
-                          variant="outline" 
-                          size="icon"
-                          className="h-8 w-8 text-blue-500 hover:text-blue-700"
-                          onClick={() => onSendNotification(note.id)}
-                          title="Envoyer une notification"
-                        >
-                          <Mail size={16} />
-                        </Button>
-                      )}
-                      {note.notificationEnvoyee && !note.operateurNotifie && (
-                        <Button 
-                          variant="outline" 
-                          size="icon"
-                          className="h-8 w-8 text-green-500 hover:text-green-700"
-                          onClick={() => onMarkAsNotified(note.id)}
-                          title="Marquer comme notifié"
-                        >
-                          <Check size={16} />
-                        </Button>
-                      )}
+          {notesFrais.map((note) => (
+            <TableRow key={note.id}>
+              <TableCell className="font-medium">{new Date(note.date).toLocaleDateString()}</TableCell>
+              <TableCell>{getDossierName(note.dossierId || '')}</TableCell>
+              <TableCell>{calculerTotal(note).toLocaleString()}</TableCell>
+              <TableCell>
+                <Badge className={`${getStatusColor(note.status)}`}>
+                  {formatStatus(note.status)}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                {note.acquitte ? (
+                  <Badge className="bg-green-100 text-green-800">Acquitté</Badge>
+                ) : (
+                  <Badge className="bg-orange-100 text-orange-800">En attente</Badge>
+                )}
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => navigate(`/notes-frais/${note.id}`)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  
+                  {note.status === 'en_attente' && (
+                    <>
                       <Button 
                         variant="outline" 
-                        size="sm"
-                        onClick={() => onShowDetails(note)}
+                        size="sm" 
+                        className="text-green-600" 
+                        onClick={() => onValidate(note.id)}
                       >
-                        Détails
+                        <CheckCircle className="h-4 w-4" />
                       </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })
-          ) : (
-            <TableRow>
-              <TableCell colSpan={10} className="h-24 text-center">
-                Aucune note de frais trouvée
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-red-600" 
+                        onClick={() => onReject(note.id)}
+                      >
+                        <XCircle className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
+                  
+                  {note.status === 'validee' && !note.notification_envoyee && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-blue-600" 
+                      onClick={() => onSendNotification(note.id)}
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  )}
+                  
+                  {note.notification_envoyee && !note.operateur_notifie && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-orange-600" 
+                      onClick={() => onMarkAsNotified(note.id)}
+                    >
+                      <AlertTriangle className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
-          )}
+          ))}
         </TableBody>
       </Table>
     </div>

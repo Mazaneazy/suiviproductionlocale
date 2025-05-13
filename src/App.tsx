@@ -1,123 +1,87 @@
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { DataProvider } from './contexts/DataContext';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import Acceuil from './pages/Acceuil';
+import Dossiers from './pages/Dossiers';
+import ResponsableTechnique from './pages/ResponsableTechnique';
+import DirecteurEvaluation from './pages/DirecteurEvaluation';
+import DirecteurGeneral from './pages/DirecteurGeneral';
+import NotesFrais from './pages/NotesFrais';
+import Statistiques from './pages/Statistiques';
+import Profile from './pages/Profile';
+import { useAuth } from './hooks/useAuth';
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
-import { DataProvider } from "./contexts/DataContext";
-import ProtectedRoute from "./components/ProtectedRoute";
+// Importation des nouvelles pages
+import AddNoteFrais from './pages/AddNoteFrais';
+import NoteFraisDetails from './pages/NoteFraisDetails';
+import DossierDetails from './pages/DossierDetails';
+import AddDossier from './pages/AddDossier';
+import ProgrammerInspection from './pages/ProgrammerInspection';
 
-import Index from "./pages/Index";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Dossiers from "./pages/Dossiers";
-import Inspections from "./pages/Inspections";
-import Calendar from "./pages/Calendar";
-import Certificats from "./pages/Certificats";
-import NotesFrais from "./pages/NotesFrais";
-import Accueil from "./pages/Accueil";
-import ResponsableTechnique from "./pages/ResponsableTechnique";
-import Unauthorized from "./pages/Unauthorized";
-import NotFound from "./pages/NotFound";
-import Statistiques from "./pages/Statistiques";
-import UserManagement from "./pages/UserManagement";
-import UserDetails from "./pages/UserDetails";
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { currentUser, loading } = useAuth();
 
-const queryClient = new QueryClient();
+  if (loading) {
+    return <div>Chargement...</div>;
+  }
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+  if (!currentUser) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
+};
+
+function App() {
+  const [loading, setLoading] = useState(true);
+  const { currentUser } = useAuth();
+
+  useEffect(() => {
+    // Simulate loading
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
     <AuthProvider>
       <DataProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/unauthorized" element={<Unauthorized />} />
-              
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-
-              <Route path="/dossiers" element={
-                <ProtectedRoute>
-                  <Dossiers />
-                </ProtectedRoute>
-              } />
-
-              <Route path="/accueil" element={
-                <ProtectedRoute moduleName="acceuil">
-                  <Accueil />
-                </ProtectedRoute>
-              } />
-
-              <Route path="/responsable-technique" element={
-                <ProtectedRoute moduleName="responsable-technique">
-                  <ResponsableTechnique />
-                </ProtectedRoute>
-              } />
-
-              <Route path="/inspections" element={
-                <ProtectedRoute moduleName="inspections">
-                  <Inspections />
-                </ProtectedRoute>
-              } />
-
-              <Route path="/calendar" element={
-                <ProtectedRoute moduleName="inspections">
-                  <Calendar />
-                </ProtectedRoute>
-              } />
-
-              <Route path="/certificats" element={
-                <ProtectedRoute moduleName="resultats">
-                  <Certificats />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/notes-frais" element={
-                <ProtectedRoute moduleName="notes-frais">
-                  <NotesFrais />
-                </ProtectedRoute>
-              } />
-
-              <Route path="/resultats" element={
-                <ProtectedRoute moduleName="resultats">
-                  <Certificats />
-                </ProtectedRoute>
-              } />
-
-              <Route path="/statistiques" element={
-                <ProtectedRoute moduleName="statistiques">
-                  <Statistiques />
-                </ProtectedRoute>
-              } />
-
-              <Route path="/user-management" element={
-                <ProtectedRoute moduleName="user-management">
-                  <UserManagement />
-                </ProtectedRoute>
-              } />
-
-              <Route path="/user-details/:userId" element={
-                <ProtectedRoute moduleName="user-management">
-                  <UserDetails />
-                </ProtectedRoute>
-              } />
-
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:oobCode" element={<ResetPassword />} />
+            <Route path="/" element={<ProtectedRoute><Acceuil /></ProtectedRoute>} />
+            <Route path="/dossiers" element={<ProtectedRoute><Dossiers /></ProtectedRoute>} />
+            <Route path="/responsable-technique" element={<ProtectedRoute><ResponsableTechnique /></ProtectedRoute>} />
+            <Route path="/directeur-evaluation" element={<ProtectedRoute><DirecteurEvaluation /></ProtectedRoute>} />
+            <Route path="/directeur-general" element={<ProtectedRoute><DirecteurGeneral /></ProtectedRoute>} />
+            <Route path="/notes-frais" element={<ProtectedRoute><NotesFrais /></ProtectedRoute>} />
+            <Route path="/statistiques" element={<ProtectedRoute><Statistiques /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            
+            {/* Nouvelles routes pour remplacer les popups */}
+            <Route path="/notes-frais/add" element={<ProtectedRoute><AddNoteFrais /></ProtectedRoute>} />
+            <Route path="/notes-frais/add/:dossierId" element={<ProtectedRoute><AddNoteFrais /></ProtectedRoute>} />
+            <Route path="/notes-frais/:noteId" element={<ProtectedRoute><NoteFraisDetails /></ProtectedRoute>} />
+            <Route path="/dossiers/add" element={<ProtectedRoute><AddDossier /></ProtectedRoute>} />
+            <Route path="/dossiers/:dossierId" element={<ProtectedRoute><DossierDetails /></ProtectedRoute>} />
+            <Route path="/inspections/programmer/:dossierId" element={<ProtectedRoute><ProgrammerInspection /></ProtectedRoute>} />
+          </Routes>
+        </Router>
       </DataProvider>
     </AuthProvider>
-  </QueryClientProvider>
-);
+  );
+}
 
 export default App;

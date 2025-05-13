@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import RapportInspectionForm from '../rapports/RapportInspectionForm';
 import { Dossier, Inspection, RapportInspection } from '@/types';
+import { useNavigate } from 'react-router-dom';
 
 interface InspectionsTabProps {
   dossier: Dossier | null;
   inspections: Inspection[];
   selectedInspection: Inspection | null;
   setSelectedInspection: (inspection: Inspection | null) => void;
-  onOpenInspectionDialog: () => void;
   onSubmitRapport: (rapport: RapportInspection) => void;
 }
 
@@ -20,9 +20,10 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
   inspections,
   selectedInspection,
   setSelectedInspection,
-  onOpenInspectionDialog,
   onSubmitRapport,
 }) => {
+  const navigate = useNavigate();
+
   if (!dossier) return null;
 
   return (
@@ -33,7 +34,7 @@ const InspectionsTab: React.FC<InspectionsTabProps> = ({
           Gestion des inspections
         </h2>
         <Button 
-          onClick={onOpenInspectionDialog}
+          onClick={() => navigate(`/inspections/programmer/${dossier.id}`)}
           className="bg-certif-blue hover:bg-certif-blue/90"
         >
           <CalendarClock className="h-4 w-4 mr-2" />

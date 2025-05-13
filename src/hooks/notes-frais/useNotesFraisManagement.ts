@@ -13,10 +13,6 @@ export const useNotesFraisManagement = () => {
     setSearchTerm,
     statusFilter,
     setStatusFilter,
-    dialogOpen,
-    setDialogOpen,
-    detailDialogOpen,
-    setDetailDialogOpen,
     selectedNote,
     setSelectedNote,
     uploadedFile,
@@ -42,12 +38,11 @@ export const useNotesFraisManagement = () => {
     handleSendNotification,
     handleMarkAsNotified,
     handleValidateNoteFrais,
-    handleRejectNoteFrais,
-    handleShowDetails
+    handleRejectNoteFrais
   } = useNotesFraisActions(
     updateNoteFrais,
     setSelectedNote,
-    setDetailDialogOpen
+    () => {} // Removed setDetailDialogOpen
   );
 
   const { calculerTotal, getStatusColor, formatStatus } = useNotesFraisUtils();
@@ -66,10 +61,10 @@ export const useNotesFraisManagement = () => {
 
     // Calculer le montant total
     const total = 
-      newNoteFrais.fraisGestion + 
-      newNoteFrais.fraisInspection + 
-      newNoteFrais.fraisAnalyses + 
-      newNoteFrais.fraisSurveillance;
+      newNoteFrais.frais_gestion + 
+      newNoteFrais.frais_inspection + 
+      newNoteFrais.frais_analyses + 
+      newNoteFrais.frais_surveillance;
     
     // Simuler l'upload du fichier (dans une vraie application, cela serait fait vers un service de stockage)
     let fichierUrl = '';
@@ -88,14 +83,14 @@ export const useNotesFraisManagement = () => {
       montant: total,
       status: newNoteFrais.status,
       acquitte: false,
-      fraisGestion: newNoteFrais.fraisGestion,
-      fraisInspection: newNoteFrais.fraisInspection,
-      fraisAnalyses: newNoteFrais.fraisAnalyses,
-      fraisSurveillance: newNoteFrais.fraisSurveillance,
+      frais_gestion: newNoteFrais.frais_gestion,
+      frais_inspection: newNoteFrais.frais_inspection,
+      frais_analyses: newNoteFrais.frais_analyses,
+      frais_surveillance: newNoteFrais.frais_surveillance,
       commentaire: newNoteFrais.commentaire || undefined,
-      fichierUrl: fichierUrl || undefined,
-      notificationEnvoyee: false,
-      operateurNotifie: false
+      fichier_url: fichierUrl || undefined,
+      notification_envoyee: false,
+      operateur_notifie: false
     });
     
     toast({
@@ -108,24 +103,23 @@ export const useNotesFraisManagement = () => {
       dossierId: '',
       inspecteurId: currentUser?.id || '',
       date: new Date().toISOString().split('T')[0],
-      fraisGestion: 50000,
-      fraisInspection: 75000,
-      fraisAnalyses: 60000,
-      fraisSurveillance: 40000,
+      frais_gestion: 50000,
+      frais_inspection: 75000,
+      frais_analyses: 60000,
+      frais_surveillance: 40000,
       status: 'en_attente',
       commentaire: '',
       description: '',
       montant: 0,
-      fichierUrl: '',
-      notificationEnvoyee: false,
-      operateurNotifie: false
+      fichier_url: '',
+      notification_envoyee: false,
+      operateur_notifie: false
     });
+    
     setUploadedFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    
-    setDialogOpen(false);
   };
 
   return {
@@ -133,10 +127,6 @@ export const useNotesFraisManagement = () => {
     setSearchTerm,
     statusFilter,
     setStatusFilter,
-    dialogOpen,
-    setDialogOpen,
-    detailDialogOpen,
-    setDetailDialogOpen,
     selectedNote,
     setSelectedNote,
     uploadedFile,
@@ -154,7 +144,6 @@ export const useNotesFraisManagement = () => {
     handleValidateNoteFrais,
     handleRejectNoteFrais,
     calculerTotal,
-    handleShowDetails,
     getStatusColor,
     formatStatus
   };
