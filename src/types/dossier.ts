@@ -20,6 +20,7 @@ export interface Dossier {
   historique?: HistoriqueEvenement[];
   pilote_technique_id?: string;
   piloteTechniqueId?: string;
+  piloteTechniqueNom?: string;
   documents_ids?: string[];
   documentsIds?: string[];
 }
