@@ -17,8 +17,7 @@ export const rolePermissionsMap: Record<UserRole, string[]> = {
   'gestionnaire': ['dossiers'],
   'producteur': ['dashboard', 'dossiers'], 
   'responsable_qualite': ['certificates-creation', 'dossiers'], 
-  'comite_validation': ['validation', 'dossiers'],
-  'directeur_evaluation': ['resultats', 'dossiers']
+  'comite_validation': ['validation', 'dossiers']
 };
 
 // Module names for navigation and access control

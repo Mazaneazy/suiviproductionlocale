@@ -12,8 +12,6 @@ export interface Inspection {
   planInspection?: string;
   planEchantillonage?: string;
   checklistComplete?: boolean;
-  // Ajout de la propriété rapport utilisée dans les données mock
-  rapport?: RapportInspection | null;
 }
 
 export interface RapportInspection {
@@ -32,8 +30,6 @@ export interface RapportInspection {
   date?: string;
   status?: string;
   avisTechnique?: string;
-  // Add properties used in mock data
-  photos?: string[];
 }
 
 export interface AvisDecision {

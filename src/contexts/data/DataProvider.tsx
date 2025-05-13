@@ -7,6 +7,7 @@ import { useInspections } from './hooks/useInspections';
 import { useCertificats } from './hooks/useCertificats';
 import { useDocuments } from './hooks/useDocuments';
 import { useNotifications } from './hooks/useNotifications';
+import { MOCK_NOTIFICATIONS } from './mockData';
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Initialize hooks that manage different data domains

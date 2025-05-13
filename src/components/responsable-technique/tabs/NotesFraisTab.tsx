@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Dossier } from '@/types';
 import NotesFraisForm from '../NotesFraisForm';
+import { Dossier } from '@/types';
 
 interface NotesFraisTabProps {
   dossier: Dossier | null;

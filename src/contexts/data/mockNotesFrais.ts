@@ -18,8 +18,5 @@ export const MOCK_NOTES_FRAIS: NoteFrais[] = MOCK_DOSSIERS
     fraisGestion: Math.floor(Math.random() * 10000) + 5000,
     fraisInspection: Math.floor(Math.random() * 15000) + 10000,
     fraisAnalyses: Math.floor(Math.random() * 15000) + 10000,
-    fraisSurveillance: Math.floor(Math.random() * 10000) + 5000,
-    acquitte: Math.random() > 0.5,
-    notificationEnvoyee: Math.random() > 0.5,
-    operateurNotifie: Math.random() > 0.7
+    acquitte: Math.random() > 0.5
   }));

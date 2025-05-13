@@ -5,23 +5,7 @@ import { MOCK_CERTIFICATS } from '../mockData';
 import { generateId } from '../utils';
 
 export function useCertificats(updateDossier: (id: string, data: any) => void) {
-  // Map the mock data to match the Certificat interface
-  const mappedCertificats: Certificat[] = MOCK_CERTIFICATS.map(cert => ({
-    id: cert.id,
-    dossierId: cert.dossierId,
-    numero: cert.numero,
-    dateDelivrance: cert.dateDelivrance,
-    dateExpiration: cert.dateExpiration,
-    entreprise: cert.operateur || '',
-    produit: cert.produit,
-    status: (cert.status as 'actif' | 'expire' | 'suspendu' | 'revoque'),
-    responsableQualiteId: cert.responsableQualiteId || `resp-${generateId().substring(0, 8)}`,
-    normeReference: cert.normeReference,
-    operateur: cert.operateur,
-    logo: cert.logo
-  }));
-  
-  const [certificats, setCertificats] = useState<Certificat[]>(mappedCertificats);
+  const [certificats, setCertificats] = useState<Certificat[]>(MOCK_CERTIFICATS);
 
   const addCertificat = (certificat: Omit<Certificat, 'id'>) => {
     const newCertificat = { ...certificat, id: generateId() };

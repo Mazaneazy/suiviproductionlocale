@@ -1,6 +1,4 @@
 
-import { type User } from './users';
-
 export interface Notification {
   id: string;
   message: string;
@@ -8,16 +6,24 @@ export interface Notification {
   lue: boolean;
   type: 'info' | 'warning' | 'error' | 'success';
   lienDossier?: string;
-  userId?: string;
-  titre?: string;
-  lien?: string;
-  dateCreation?: string;
-  lu?: boolean;
+  destinataireId?: string;
 }
 
-export interface NotificationContextType {
-  notifications: Notification[];
-  markNotificationAsRead: (id: string) => void;
-  getUnreadNotificationsCount: () => number;
-  addNotification?: (notification: Omit<Notification, 'id' | 'date'>) => void;
+export interface Statistique {
+  totalDossiers: number;
+  enAttente: number;
+  enCours: number;
+  complet: number;
+  rejete: number;
+  certifie: number;
+  aCorrection: number;
+  tauxRejection: number;
+  delaiMoyenTraitement: number;
+  certificationsParMois: Record<string, number>;
+  dossiersParStatut: Record<string, number>;
+  dossiersParProduit: Record<string, number>;
+  // Add the properties being used elsewhere in the codebase
+  dossiersEnCours?: number;
+  dossiersCertifies?: number;
+  dossiersRejetes?: number;
 }
