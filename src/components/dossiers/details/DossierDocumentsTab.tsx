@@ -34,21 +34,11 @@ const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({
   const [viewerOpen, setViewerOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<DocumentDossier | null>(null);
   
-  // Chargé de clientèle peut maintenant voir les documents
-  const canViewDocuments = hasRole(['acceuil', 'responsable_technique', 'chef_mission', 'directeur', 'directeur_general', 'gestionnaire']);
+  // Check if user has the necessary role to view documents
+  const canViewDocuments = hasRole(['responsable_technique', 'chef_mission', 'directeur', 'directeur_general', 'gestionnaire']);
 
   // Helper function to view a document
   const viewDocument = (doc: DocumentDossier) => {
-    // Si le document n'est pas public et que l'utilisateur est un chargé de clientèle, ne pas l'afficher
-    if (!doc.accessiblePublic && hasRole(['acceuil'])) {
-      toast({
-        title: "Accès refusé",
-        description: "Vous n'avez pas accès à ce document",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     setSelectedDocument(doc);
     setViewerOpen(true);
   };
@@ -99,21 +89,13 @@ const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({
     }
   };
 
+  console.log("Rendering DossierDocumentsTab with documents:", documents?.length || 0);
+
   // Ensure documents is an array even if it's undefined
   const docsToDisplay = Array.isArray(documents) ? documents : [];
-  
-  // Pour le chargé de clientèle, ne montrer que les documents accessibles
-  const accessibleDocuments = docsToDisplay.filter(doc => {
-    // Si l'utilisateur est un chargé de clientèle, ne montrer que les documents marqués comme accessibles
-    if (hasRole(['acceuil'])) {
-      return doc.accessiblePublic === true;
-    }
-    // Sinon montrer tous les documents
-    return true;
-  });
 
   // Filter documents based on search and type filter
-  const filteredDocuments = accessibleDocuments.filter(doc => {
+  const filteredDocuments = docsToDisplay.filter(doc => {
     const matchesSearch = doc.nom.toLowerCase().includes(searchTerm.toLowerCase()) || 
                        formatDocumentType(doc.type).toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = typeFilter === 'tous' || doc.type === typeFilter;
@@ -148,7 +130,7 @@ const DossierDocumentsTab: React.FC<DossierDocumentsTabProps> = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium">
-            Pièces jointes ({filteredDocuments.length})
+            Pièces jointes ({docsToDisplay.length})
           </h3>
           
           {dossierId && (

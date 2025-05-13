@@ -1,69 +1,67 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Card } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
-export interface RecapitulatifFraisProps {
+interface RecapitulatifFraisProps {
+  totalPrix: number;
   fraisGestion: number;
   fraisInspection: number;
-  fraisAnalyses: number;
   fraisSurveillance: number;
   total: number;
-  totalPrix?: number; // Added missing property
-  description?: string; // Added missing property
-  setDescription?: (value: string) => void; // Added missing property
+  description: string;
+  setDescription: (value: string) => void;
 }
 
 const RecapitulatifFrais: React.FC<RecapitulatifFraisProps> = ({
+  totalPrix,
   fraisGestion,
   fraisInspection,
-  fraisAnalyses,
   fraisSurveillance,
-  total
+  total,
+  description,
+  setDescription
 }) => {
-  // Formater les nombres en format monétaire
-  const formatMontant = (montant: number) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'XAF',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(montant);
-  };
-
   return (
-    <Card className="w-full mb-6">
-      <CardHeader>
-        <CardTitle className="text-lg">Récapitulatif des frais</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
+    <div>
+      <h3 className="text-lg font-medium text-certif-blue mb-4">Récapitulatif</h3>
+      <Card className="p-4 space-y-4">
+        <div className="space-y-4">
+          <div className="flex justify-between border-b pb-2">
+            <span>Analyses et essais:</span>
+            <span className="font-medium">{totalPrix.toLocaleString()} FCFA</span>
+          </div>
+          <div className="flex justify-between border-b pb-2">
             <span>Frais de gestion:</span>
-            <span className="font-medium">{formatMontant(fraisGestion)}</span>
+            <span>{fraisGestion.toLocaleString()} FCFA</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span>Frais d'inspection:</span>
-            <span className="font-medium">{formatMontant(fraisInspection)}</span>
+          <div className="flex justify-between border-b pb-2">
+            <span>Inspection et échantillonage:</span>
+            <span>{fraisInspection.toLocaleString()} FCFA</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span>Frais d'analyses:</span>
-            <span className="font-medium">{formatMontant(fraisAnalyses)}</span>
-          </div>
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between border-b pb-2">
             <span>Frais de surveillance:</span>
-            <span className="font-medium">{formatMontant(fraisSurveillance)}</span>
+            <span>{fraisSurveillance.toLocaleString()} FCFA</span>
           </div>
-          
-          <Separator className="my-3" />
-          
-          <div className="flex justify-between font-semibold text-base">
+          <div className="flex justify-between font-bold text-lg text-certif-blue">
             <span>Total:</span>
-            <span className="text-certif-blue">{formatMontant(total)}</span>
+            <span>{total.toLocaleString()} FCFA</span>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </Card>
+      
+      <div className="mt-4 space-y-2">
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Description de la note de frais"
+          className="h-24"
+        />
+      </div>
+    </div>
   );
 };
 

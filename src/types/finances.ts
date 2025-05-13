@@ -9,18 +9,15 @@ export interface NoteFrais {
   montant: number;
   status: 'en_attente' | 'valide' | 'rejete';
   acquitte: boolean;
-  fraisGestion: number;
-  fraisInspection: number;
-  fraisAnalyses: number;
-  fraisSurveillance: number;
-  parametresAnalyse?: string[];
-  // Additional properties used in the application
+  fraisGestion?: number;
+  fraisInspection?: number;
+  fraisAnalyses?: number;
+  fraisSurveillance?: number;
   commentaire?: string;
   fichierUrl?: string;
-  notificationEnvoyee?: boolean;
   operateurNotifie?: boolean;
+  notificationEnvoyee?: boolean;
   total?: number;
-  pdfUrl?: string;
 }
 
 export interface PreuvePaiement {
@@ -33,14 +30,4 @@ export interface PreuvePaiement {
   fichierUrl: string;
   status: 'recu' | 'valide' | 'rejete';
   commentaires?: string;
-}
-
-export interface Transaction {
-  id: string;
-  date: string;
-  montant: number;
-  type: 'debit' | 'credit';
-  description: string;
-  reference: string;
-  noteFraisId?: string;
 }

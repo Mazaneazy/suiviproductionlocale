@@ -18,7 +18,7 @@ export function useNotesFrais(updateDossier: (id: string, data: any) => void) {
       date: new Date().toISOString(),
       action: 'Note de frais créée',
       responsable: noteFrais.inspecteurId,
-      commentaire: `Note de frais pour un montant total de ${noteFrais.montant || 0} FCFA`
+      commentaire: `Note de frais pour un montant total de ${noteFrais.total || 0} FCFA`
     };
     
     updateDossier(noteFrais.dossierId, {

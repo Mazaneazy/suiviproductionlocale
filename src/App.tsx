@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./contexts/auth/AuthProvider";
+import { AuthProvider } from "./contexts/AuthContext";
 import { DataProvider } from "./contexts/DataContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -16,7 +16,6 @@ import Inspections from "./pages/Inspections";
 import Calendar from "./pages/Calendar";
 import Certificats from "./pages/Certificats";
 import NotesFrais from "./pages/NotesFrais";
-import CreateNoteFrais from "./pages/CreateNoteFrais";
 import Accueil from "./pages/Accueil";
 import ResponsableTechnique from "./pages/ResponsableTechnique";
 import Unauthorized from "./pages/Unauthorized";
@@ -85,18 +84,6 @@ const App = () => (
               <Route path="/notes-frais" element={
                 <ProtectedRoute moduleName="notes-frais">
                   <NotesFrais />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/notes-frais/nouveau" element={
-                <ProtectedRoute moduleName="notes-frais">
-                  <CreateNoteFrais />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/notes-frais/nouveau/:dossierId" element={
-                <ProtectedRoute moduleName="notes-frais">
-                  <CreateNoteFrais />
                 </ProtectedRoute>
               } />
 

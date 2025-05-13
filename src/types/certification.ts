@@ -10,9 +10,6 @@ export interface Certificat {
   status: 'actif' | 'expire' | 'suspendu' | 'revoque';
   responsableQualiteId: string;
   resultatConformite?: ResultatConformite;
-  numeroCertificat?: string;
-  normeReference?: string;
-  dateEmission?: string;
 }
 
 export interface ResultatConformite {

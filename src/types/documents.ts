@@ -11,5 +11,4 @@ export interface DocumentDossier {
   status?: 'valide' | 'rejete' | 'en_attente';
   commentaire?: string;
   url?: string;
-  accessiblePublic?: boolean; // Permet au chargé de clientèle d'accéder au document
 }

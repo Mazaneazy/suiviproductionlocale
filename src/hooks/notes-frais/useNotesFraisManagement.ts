@@ -66,10 +66,10 @@ export const useNotesFraisManagement = () => {
 
     // Calculer le montant total
     const total = 
-      (newNoteFrais.fraisGestion || 0) + 
-      (newNoteFrais.fraisInspection || 0) + 
-      (newNoteFrais.fraisAnalyses || 0) + 
-      (newNoteFrais.fraisSurveillance || 0);
+      newNoteFrais.fraisGestion + 
+      newNoteFrais.fraisInspection + 
+      newNoteFrais.fraisAnalyses + 
+      newNoteFrais.fraisSurveillance;
     
     // Simuler l'upload du fichier (dans une vraie application, cela serait fait vers un service de stockage)
     let fichierUrl = '';
@@ -81,18 +81,18 @@ export const useNotesFraisManagement = () => {
 
     addNoteFrais({
       dossierId: newNoteFrais.dossierId,
-      inspecteurId: newNoteFrais.inspecteurId || '',
-      date: newNoteFrais.date || '',
+      inspecteurId: newNoteFrais.inspecteurId,
+      date: newNoteFrais.date,
       dateCreation: new Date().toISOString(),
-      description: `Note de frais - ${new Date(newNoteFrais.date || '').toLocaleDateString()}`,
+      description: `Note de frais - ${new Date(newNoteFrais.date).toLocaleDateString()}`,
       montant: total,
-      status: 'en_attente',
+      status: newNoteFrais.status,
       acquitte: false,
-      fraisGestion: newNoteFrais.fraisGestion || 0,
-      fraisInspection: newNoteFrais.fraisInspection || 0,
-      fraisAnalyses: newNoteFrais.fraisAnalyses || 0,
-      fraisSurveillance: newNoteFrais.fraisSurveillance || 0,
-      commentaire: newNoteFrais.commentaire,
+      fraisGestion: newNoteFrais.fraisGestion,
+      fraisInspection: newNoteFrais.fraisInspection,
+      fraisAnalyses: newNoteFrais.fraisAnalyses,
+      fraisSurveillance: newNoteFrais.fraisSurveillance,
+      commentaire: newNoteFrais.commentaire || undefined,
       fichierUrl: fichierUrl || undefined,
       notificationEnvoyee: false,
       operateurNotifie: false

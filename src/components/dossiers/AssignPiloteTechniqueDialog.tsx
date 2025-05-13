@@ -34,7 +34,7 @@ const AssignPiloteTechniqueDialog: React.FC<AssignPiloteTechniqueDialogProps> = 
 }) => {
   const [open, setOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
-  const { getDossierById, updateDossier, dossiers } = useData();
+  const { getDossierById, updateDossier } = useData();
   const { getAllUsers, currentUser } = useAuth();
   const { toast } = useToast();
   
@@ -48,25 +48,6 @@ const AssignPiloteTechniqueDialog: React.FC<AssignPiloteTechniqueDialogProps> = 
   const techniciens = allUsers.filter(user => 
     user.role === 'responsable_technique'
   );
-
-  // Vérifier quels techniciens sont déjà assignés à d'autres dossiers en cours
-  // Un pilote technique ne peut être assigné qu'à un seul dossier à la fois
-  const techniciensDispo = techniciens.filter(user => {
-    // Si le technicien est déjà assigné à ce dossier, il est disponible pour ce dossier
-    if (dossier?.piloteTechniqueId === user.id) {
-      return true;
-    }
-    
-    // Vérifier s'il est assigné à d'autres dossiers en cours
-    const autresDossiersAssignes = dossiers.filter(d => 
-      d.piloteTechniqueId === user.id && 
-      d.id !== dossierId && 
-      !['certifie', 'rejete', 'archive'].includes(d.status)
-    );
-    
-    // S'il n'est pas assigné à d'autres dossiers en cours, il est disponible
-    return autresDossiersAssignes.length === 0;
-  });
 
   const handleAssign = () => {
     // Bloquer l'action si l'utilisateur est un chargé de clientèle
@@ -90,24 +71,6 @@ const AssignPiloteTechniqueDialog: React.FC<AssignPiloteTechniqueDialogProps> = 
 
     const selectedUser = techniciens.find(user => user.id === selectedUserId);
     if (!selectedUser) return;
-    
-    // Vérifier si le pilote technique est déjà assigné à un autre dossier en cours
-    if (selectedUserId !== dossier?.piloteTechniqueId) {
-      const autresDossiersAssignes = dossiers.filter(d => 
-        d.piloteTechniqueId === selectedUserId && 
-        d.id !== dossierId && 
-        !['certifie', 'rejete', 'archive'].includes(d.status)
-      );
-      
-      if (autresDossiersAssignes.length > 0) {
-        toast({
-          title: "Pilote technique déjà assigné",
-          description: `${selectedUser.name} est déjà assigné à un autre dossier en cours. Un pilote technique ne peut être assigné qu'à un seul dossier à la fois.`,
-          variant: "destructive",
-        });
-        return;
-      }
-    }
 
     updateDossier(dossierId, {
       piloteTechniqueId: selectedUserId,
@@ -156,8 +119,7 @@ const AssignPiloteTechniqueDialog: React.FC<AssignPiloteTechniqueDialogProps> = 
         <DialogHeader>
           <DialogTitle>Assigner un pilote technique</DialogTitle>
           <DialogDescription>
-            Sélectionnez un responsable technique pour piloter ce dossier.
-            Un pilote technique ne peut être assigné qu'à un seul dossier en cours à la fois.
+            Sélectionnez un responsable technique pour piloter ce dossier
           </DialogDescription>
         </DialogHeader>
         
@@ -172,8 +134,8 @@ const AssignPiloteTechniqueDialog: React.FC<AssignPiloteTechniqueDialogProps> = 
                 <SelectValue placeholder="Sélectionner un pilote technique" />
               </SelectTrigger>
               <SelectContent>
-                {techniciensDispo.length > 0 ? (
-                  techniciensDispo.map((user) => (
+                {techniciens.length > 0 ? (
+                  techniciens.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
                       {user.name}
                     </SelectItem>
@@ -185,11 +147,6 @@ const AssignPiloteTechniqueDialog: React.FC<AssignPiloteTechniqueDialogProps> = 
                 )}
               </SelectContent>
             </Select>
-            {techniciensDispo.length === 0 && techniciens.length > 0 && (
-              <p className="text-sm text-amber-600 mt-1">
-                Tous les responsables techniques sont actuellement assignés à d'autres dossiers en cours.
-              </p>
-            )}
           </div>
         </div>
         

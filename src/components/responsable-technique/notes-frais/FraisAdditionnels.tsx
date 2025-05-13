@@ -1,87 +1,61 @@
 
 import React from 'react';
-import { FormControl, FormLabel } from '@/components/ui/form';
+import { Card } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { NoteFrais } from '@/types';
-import { Separator } from '@/components/ui/separator';
 
-export interface FraisAdditionnelsProps {
-  newNoteFrais: Partial<NoteFrais>;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  fraisGestion?: number; // Added missing property
-  fraisInspection?: number; // Added missing property
-  fraisSurveillance?: number; // Added missing property
-  setFraisGestion?: (value: number) => void; // Added missing property
-  setFraisInspection?: (value: number) => void; // Added missing property
-  setFraisSurveillance?: (value: number) => void; // Added missing property
+interface FraisAdditionnelsProps {
+  fraisGestion: number;
+  fraisInspection: number;
+  fraisSurveillance: number;
+  setFraisGestion: (value: number) => void;
+  setFraisInspection: (value: number) => void;
+  setFraisSurveillance: (value: number) => void;
 }
 
-const FraisAdditionnels: React.FC<FraisAdditionnelsProps> = ({ 
-  newNoteFrais,
-  onInputChange
+const FraisAdditionnels: React.FC<FraisAdditionnelsProps> = ({
+  fraisGestion,
+  fraisInspection,
+  fraisSurveillance,
+  setFraisGestion,
+  setFraisInspection,
+  setFraisSurveillance
 }) => {
   return (
-    <Card className="w-full mb-6">
-      <CardHeader>
-        <CardTitle className="text-lg">Frais additionnels</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <Separator className="my-3" />
+    <div>
+      <h3 className="text-lg font-medium text-certif-blue mb-4">Frais additionnels</h3>
+      <Card className="p-4 space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="fraisGestion">Frais de gestion du dossier (FCFA)</Label>
+          <Input
+            id="fraisGestion"
+            type="number"
+            value={fraisGestion}
+            onChange={(e) => setFraisGestion(Number(e.target.value))}
+          />
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormControl>
-            <FormLabel htmlFor="fraisGestion">Frais de gestion (FCFA)</FormLabel>
-            <Input
-              id="fraisGestion"
-              name="fraisGestion"
-              type="number"
-              value={newNoteFrais.fraisGestion || 0}
-              onChange={onInputChange}
-              className="w-full"
-            />
-          </FormControl>
-
-          <FormControl>
-            <FormLabel htmlFor="fraisInspection">Frais d'inspection (FCFA)</FormLabel>
-            <Input
-              id="fraisInspection"
-              name="fraisInspection"
-              type="number"
-              value={newNoteFrais.fraisInspection || 0}
-              onChange={onInputChange}
-              className="w-full"
-            />
-          </FormControl>
+        <div className="space-y-2">
+          <Label htmlFor="fraisInspection">Frais d'inspection et échantillonage (FCFA)</Label>
+          <Input
+            id="fraisInspection"
+            type="number"
+            value={fraisInspection}
+            onChange={(e) => setFraisInspection(Number(e.target.value))}
+          />
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <FormControl>
-            <FormLabel htmlFor="fraisAnalyses">Frais d'analyses (FCFA)</FormLabel>
-            <Input
-              id="fraisAnalyses"
-              name="fraisAnalyses"
-              type="number"
-              value={newNoteFrais.fraisAnalyses || 0}
-              onChange={onInputChange}
-              className="w-full"
-            />
-          </FormControl>
-
-          <FormControl>
-            <FormLabel htmlFor="fraisSurveillance">Frais de surveillance (FCFA)</FormLabel>
-            <Input
-              id="fraisSurveillance"
-              name="fraisSurveillance"
-              type="number"
-              value={newNoteFrais.fraisSurveillance || 0}
-              onChange={onInputChange}
-              className="w-full"
-            />
-          </FormControl>
+        
+        <div className="space-y-2">
+          <Label htmlFor="fraisSurveillance">Frais de surveillance (FCFA)</Label>
+          <Input
+            id="fraisSurveillance"
+            type="number"
+            value={fraisSurveillance}
+            onChange={(e) => setFraisSurveillance(Number(e.target.value))}
+          />
         </div>
-      </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
 

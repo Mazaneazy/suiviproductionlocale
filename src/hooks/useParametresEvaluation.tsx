@@ -20,9 +20,6 @@ export function useParametresEvaluation(dossierId?: string) {
   const [selectedParametres, setSelectedParametres] = useState<string[]>([]);
   const [totalPrix, setTotalPrix] = useState(0);
 
-  // Liste des options de paramètres (juste les noms)
-  const parametresOptions = parametres.map(p => p.nom);
-
   // Calculer le total des prix des paramètres sélectionnés
   useEffect(() => {
     const total = parametres
@@ -82,7 +79,6 @@ export function useParametresEvaluation(dossierId?: string) {
     addParametre,
     removeParametre,
     toggleParametre,
-    setSelectedParametres,
-    parametresOptions
+    setSelectedParametres
   };
 }

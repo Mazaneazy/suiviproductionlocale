@@ -16,8 +16,6 @@ export interface Dossier {
   comiteTechnique?: ComiteTechnique;
   piloteTechniqueId?: string;
   piloteTechniqueNom?: string;
-  reference?: string;
-  operateurAdresse?: string;
 }
 
 export interface HistoriqueEvenement {
