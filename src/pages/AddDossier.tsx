@@ -7,10 +7,12 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Dossier } from '@/types';
 import DossierDialogContent from '@/components/dossiers/DossierDialogContent';
+import { useToast } from '@/hooks/use-toast';
 
 const AddDossier = () => {
   const navigate = useNavigate();
   const { addDossier } = useData();
+  const { toast } = useToast();
   
   const [newDossier, setNewDossier] = useState<Omit<Dossier, 'id'>>({
     operateurNom: '',
@@ -29,8 +31,14 @@ const AddDossier = () => {
   
   const handleSubmit = () => {
     const dossierId = addDossier(newDossier);
-    setLatestDossierId(dossierId);
-    navigate('/dossiers');
+    if (dossierId) {
+      setLatestDossierId(dossierId);
+      toast({
+        title: "Dossier créé",
+        description: `Le dossier ${newDossier.operateurNom} a été créé avec succès.`
+      });
+      navigate('/dossiers');
+    }
   };
   
   return (

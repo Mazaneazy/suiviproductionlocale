@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { DataContextProps } from './data/types';
+import { Dossier } from '../types';
 
 // Create the context with default values
 const DataContext = React.createContext<DataContextProps>({
@@ -26,10 +27,8 @@ const DataContext = React.createContext<DataContextProps>({
     dossiersCertifies: 0,
     dossiersRejetes: 0
   },
-  //addDossier: () => {},
-  addDossier: (dossier: Omit<Dossier, 'id'>) => string;
+  addDossier: () => '',
   updateDossier: () => {},
-  
   addNoteFrais: () => {},
   updateNoteFrais: () => {},
   addInspection: () => {},
@@ -57,5 +56,3 @@ export const useData = () => React.useContext(DataContext);
 // Import and re-export the Provider from a separate file
 import { DataProvider as DataProviderImplementation } from './data/DataProvider';
 export const DataProvider = DataProviderImplementation;
-
-
