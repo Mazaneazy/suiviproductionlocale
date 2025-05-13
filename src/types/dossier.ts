@@ -24,7 +24,12 @@ export interface Dossier {
   piloteTechniqueNom?: string;
   documents_ids?: string[];
   documentsIds?: string[];
+  promoteurNom: string;      // ajouter si manquant
+  telephone: string;         // ajouter si manquant
+  parametresEvaluation?: any;
+  comiteTechnique?: ComiteTechnique;
 }
+
 
 export interface HistoriqueEvenement {
   id: string;
