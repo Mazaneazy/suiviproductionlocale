@@ -1,9 +1,9 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { useData } from '../contexts/DataContext';
 import DossiersTable from '../components/dossiers/DossiersTable';
-import DossierDialogContent from './dossiers/DossierDialogContent.tsx'; // ou .jsx
 import DossierFilters from '../components/dossiers/DossierFilters';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -14,11 +14,18 @@ const Dossiers = () => {
   
   const filteredDossiers = dossiers.filter(dossier => {
     const searchTermLower = searchTerm.toLowerCase();
-    const matchesSearchTerm =
-      dossier.operateurNom.toLowerCase().includes(searchTermLower) ||
-      dossier.promoteurNom.toLowerCase().includes(searchTermLower) ||
-      dossier.reference.toLowerCase().includes(searchTermLower);
+    
+    // Add null checks before calling toLowerCase()
+    const operateurNomMatch = dossier.operateurNom ? 
+      dossier.operateurNom.toLowerCase().includes(searchTermLower) : false;
+      
+    const promoteurNomMatch = dossier.promoteurNom ? 
+      dossier.promoteurNom.toLowerCase().includes(searchTermLower) : false;
+    
+    const referenceMatch = dossier.reference ? 
+      dossier.reference.toLowerCase().includes(searchTermLower) : false;
 
+    const matchesSearchTerm = operateurNomMatch || promoteurNomMatch || referenceMatch;
     const matchesStatus = statusFilter === 'all' || dossier.status === statusFilter;
 
     return matchesSearchTerm && matchesStatus;
