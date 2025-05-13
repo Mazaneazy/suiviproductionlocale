@@ -26,13 +26,8 @@ const DataContext = React.createContext<DataContextProps>({
     dossiersCertifies: 0,
     dossiersRejetes: 0
   },
- // addDossier: () => {},
-   addDossier = (dossier: Omit<Dossier, 'id'>): string => {
-  const id = crypto.randomUUID(); // ou une autre méthode
-  const newDossier = { ...dossier, id };
-  setDossiers((prev) => [...prev, newDossier]);
-  return id;
-};
+  //addDossier: () => {},
+  addDossier: (dossier: Omit<Dossier, 'id'>) => string;
   updateDossier: () => {},
   
   addNoteFrais: () => {},
@@ -63,10 +58,4 @@ export const useData = () => React.useContext(DataContext);
 import { DataProvider as DataProviderImplementation } from './data/DataProvider';
 export const DataProvider = DataProviderImplementation;
 
-const addDossier = (dossier: Omit<Dossier, 'id'>): string => {
-  const id = crypto.randomUUID(); // ou une autre méthode
-  const newDossier = { ...dossier, id };
-  setDossiers((prev) => [...prev, newDossier]);
-  return id;
-};
 
