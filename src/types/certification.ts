@@ -1,21 +1,16 @@
 
 export interface Certificat {
   id: string;
-  dossierId: string;
   numero: string;
-  dateDelivrance: string;
-  dateExpiration: string;
+  dossier_id?: string;
+  dossierId?: string;
+  date_emission: string;
+  date_expiration: string;
   entreprise: string;
   produit: string;
-  status: 'actif' | 'expire' | 'suspendu' | 'revoque';
-  responsableQualiteId: string;
-  resultatConformite?: ResultatConformite;
-}
-
-export interface ResultatConformite {
-  id: string;
-  certificatId: string;
-  dateEvaluation: string;
-  conclusion: string;
-  rapport: string;
+  emis_par?: string;
+  status: 'valide' | 'expire' | 'suspendu' | 'annule';
+  norme?: string;
+  fichier_url?: string;
+  signature_url?: string;
 }

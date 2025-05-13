@@ -1,33 +1,31 @@
 
 export interface NoteFrais {
   id: string;
-  dossierId: string;
-  inspecteurId: string;
+  dossier_id?: string;
+  dossierId?: string;
+  inspecteur_id?: string;
   date: string;
-  dateCreation: string;
-  description: string;
   montant: number;
-  status: 'en_attente' | 'valide' | 'rejete';
   acquitte: boolean;
-  fraisGestion?: number;
-  fraisInspection?: number;
-  fraisAnalyses?: number;
-  fraisSurveillance?: number;
+  frais_gestion: number;
+  frais_inspection: number;
+  frais_analyses: number;
+  frais_surveillance: number;
+  notification_envoyee: boolean;
+  operateur_notifie: boolean;
+  parametres_analyse?: string[];
+  description?: string;
+  status: 'en_attente' | 'validee' | 'rejetee';
   commentaire?: string;
-  fichierUrl?: string;
-  operateurNotifie?: boolean;
-  notificationEnvoyee?: boolean;
-  total?: number;
+  fichier_url?: string;
 }
 
 export interface PreuvePaiement {
   id: string;
-  noteFraisId: string;
-  dossierId: string;
-  date: string;
-  montant: number;
-  referencePaiement: string;
-  fichierUrl: string;
-  status: 'recu' | 'valide' | 'rejete';
-  commentaires?: string;
+  notefrais_id: string;
+  fichier_url: string;
+  date_upload: string;
+  uploaded_by: string;
+  validation_status: 'en_attente' | 'acceptee' | 'rejetee';
+  commentaire?: string;
 }
